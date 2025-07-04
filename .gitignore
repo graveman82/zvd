@@ -39,3 +39,16 @@
 
 # debug information files
 *.dwo
+
+# Notepad++ cache files
+*.bak
+
+# Projects very project-related sources
+sources/zvd/projects/
+
+# Research & development
+rnd/
+
+# Output dirs
+bin/
+intermediate/
