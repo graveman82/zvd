@@ -52,3 +52,9 @@ rnd/
 # Output dirs
 bin/
 intermediate/
+lib/
+
+# Visual Studio
+*.idb
+*.pdb
+*.pch

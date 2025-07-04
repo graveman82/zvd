@@ -124,6 +124,34 @@ Purpose: base definitions.
 
 #endif // compiler
 
+//-----------------------------------------------------------------------------
+// OS detection
+#if defined ZVD_COMPILER_GNUC
+#   if defined (_WIN32) && !defined (ZVD_OS_WINDOWS)
+#       define ZVD_OS_WINDOWS
+#       define ZVD_OS_WINDOWS32
+#       if defined (_WIN64)
+#           define ZVD_OS_WINDOWS64
+#           if !defined (ZVD_OS_64)
+#               define ZVD_OS_64
+#           endif
+#       endif
+#   endif   // end of Windows OS detection in gnu C
+
+#elif defined ZVD_COMPILER_MSVC
+#   if defined (_WIN32) && !defined (ZVD_OS_WINDOWS)
+#       define ZVD_OS_WINDOWS
+#       define ZVD_OS_WINDOWS32
+#       if defined (_WIN64)
+#           define ZVD_OS_WINDOWS64
+#           if !defined (ZVD_OS_64)
+#               define ZVD_OS_64
+#           endif
+#       endif
+#   endif   // end of Windows OS detection in MSVC
+
+#endif      // eof if gnu C
+
 // Test to define how much bit processor architecture has.
 //--------------------------------------------------------
 #if defined(ZVD_MSVC)
