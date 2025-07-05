@@ -171,57 +171,57 @@ Purpose: base definitions.
 // fixed size integers
 //---------------------
 #if defined(ZVD_HAS_STDINT_H)
-typedef int8_t zvd_int8;
-typedef int16_t zvd_int16;
-typedef int32_t zvd_int32;
+typedef int8_t ZvdInt8;
+typedef int16_t ZvdInt16;
+typedef int32_t ZvdInt32;
 
-typedef uint8_t zvd_uint8;
-typedef uint16_t zvd_uint16;
-typedef uint32_t zvd_uint32;
+typedef uint8_t ZvdUInt8;
+typedef uint16_t ZvdUInt16;
+typedef uint32_t ZvdUInt32;
 
 #	if defined(ZVD_ARCH_X64)
-typedef int64_t zvd_int64;
-typedef uint64_t zvd_uint64;
+typedef int64_t ZvdInt64;
+typedef uint64_t ZvdUInt64;
 #	endif
 
 #elif defined(ZVD_MSVC)
-typedef __int8 zvd_int8;
-typedef __int16 zvd_int16;
-typedef __int32 zvd_int32;
+typedef __int8 ZvdInt8;
+typedef __int16 ZvdInt16;
+typedef __int32 ZvdInt32;
 
-typedef unsigned __int8 zvd_uint8;
-typedef unsigned __int16 zvd_uint16;
-typedef unsigned __int32 zvd_uint32;
+typedef unsigned __int8 ZvdUInt8;
+typedef unsigned __int16 ZvdUInt16;
+typedef unsigned __int32 ZvdUInt32;
 
 #	if defined(ZVD_ARCH_X64) // Нужен ли этот макрос здесь?
-typedef __int64 zvd_int64;
-typedef unsigned __int64 zvd_uint64;
+typedef __int64 ZvdInt64;
+typedef unsigned __int64 ZvdUInt64;
 #	endif
 
 #endif // fixed size integers
 
 // Human readable convenient integers
 //-----------------------------------
-typedef zvd_uint8 zvd_byte;
-typedef zvd_uint32 zvd_size32;
-typedef zvd_uint32 zvd_uindex32;
-typedef zvd_int32 zvd_index32;
+typedef ZvdUInt8 ZvdByte;
+typedef ZvdUInt32 ZvdSize32;
+typedef ZvdUInt32 ZvdUIndex32;
+typedef ZvdInt32 ZvdIndex32;
 
 #if defined(ZVD_ARCH_X64)
-typedef zvd_uint64 zvd_size;
-typedef zvd_int64 zvd_ptrdiff;
+typedef ZvdUInt64 ZvdSize;
+typedef ZvdInt64 ZvdPtrDiff;
 
 #elif defined(ZVD_ARCH_X86)
-typedef zvd_uint32 zvd_size;
-typedef zvd_int32 zvd_ptrdiff;
+typedef ZvdUInt32 ZvdSize;
+typedef ZvdInt32 ZvdPtrDiff;
 
 #else
-typedef zvd_uint16 zvd_size;
-typedef zvd_int16 zvd_ptrdiff;
+typedef ZvdUInt16 ZvdSize;
+typedef ZvdInt16 ZvdPtrDiff;
 
 #endif // arch
 
-typedef zvd_size zvd_uindex;
+typedef ZvdSize ZvdUIndex;
 
 //++++++++++++++++++++++++++++++++++++
 // Language standard dependent things
@@ -241,13 +241,13 @@ typedef zvd_size zvd_uindex;
 // Byte utils
 //++++++++++++++++++
 
-#define ZVD_ENUM2U8(enumVal) ((zvd_uint8)(enumVal))
-#define ZVD_ENUM2U32(enumVal) ((zvd_uint32)(enumVal))
+#define ZVD_ENUM2U8(enumVal) ((ZvdUInt8)(enumVal))
+#define ZVD_ENUM2U32(enumVal) ((ZvdUInt32)(enumVal))
 
-const zvd_uint32 kZVD_ONE_U32 = 0x01;
+const ZvdUInt32 kZVD_ONE_U32 = 0x01;
 
 #define ZVD_IS_LITTLE_ENDIAN \
-((*static_cast<const zvd_uint8*>(static_cast<const void*>(&kZVD_ONE_U32))) == 0x01)
+((*static_cast<const ZvdUInt8*>(static_cast<const void*>(&kZVD_ONE_U32))) == 0x01)
 
 
 //++++++++++++++++++
@@ -265,18 +265,18 @@ const bool			kZVD_YES = kZVD_TRUE;
 const bool			kZVD_NO = kZVD_FALSE;
 
 // as integers
-const zvd_uint32	kZVD_TRUE_U32 = 1;
-const zvd_uint32	kZVD_FALSE_U32 = 0;
+const ZvdUInt32	kZVD_TRUE_U32 = 1;
+const ZvdUInt32	kZVD_FALSE_U32 = 0;
 
-const zvd_uint8		kZVD_TRUE_U8 = 1;
-const zvd_uint8		kZVD_FALSE_U8 = 0;
+const ZvdUInt8		kZVD_TRUE_U8 = 1;
+const ZvdUInt8		kZVD_FALSE_U8 = 0;
 
 // yes/no answer constants
-const zvd_uint32	kZVD_YES_U32 = kZVD_TRUE_U32;
-const zvd_uint32	kZVD_NO_U32 = kZVD_FALSE_U32;
+const ZvdUInt32	kZVD_YES_U32 = kZVD_TRUE_U32;
+const ZvdUInt32	kZVD_NO_U32 = kZVD_FALSE_U32;
 
-const zvd_uint8		kZVD_YES_U8 = kZVD_TRUE_U8;
-const zvd_uint8		kZVD_NO_U8 = kZVD_FALSE_U8;
+const ZvdUInt8		kZVD_YES_U8 = kZVD_TRUE_U8;
+const ZvdUInt8		kZVD_NO_U8 = kZVD_FALSE_U8;
 
 //-----------------------------------------------------------------------------
 // Error format

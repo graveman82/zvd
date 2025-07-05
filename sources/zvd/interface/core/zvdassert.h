@@ -123,49 +123,49 @@ namespace zvd
         {
 
             // to exlude <new> I use this Pseudo constructor
-            class assert_point;
-            struct assert_point_ctor
+            class AssertPoint;
+            struct AssertPointCtor
             {
-                assert_point* operator()(void* p);
+                AssertPoint* operator()(void* p);
             };
 
             //-----------------------------------------------------------------------------
             // Auxiliary class to fix file and line where assertion was failed.
             // (Don't use it directly!)
-            class assert_point : public zvd_static_singleton<
-                assert_point, sizeof(void*) * 4, assert_point_ctor>
+            class AssertPoint : public ZvdStaticSingleton<
+                AssertPoint, sizeof(void*) * 4, AssertPointCtor>
             {
             public:
-                typedef ZVD_ASSERT_CHARTYPE char_type;
-                typedef const char_type* const_string_type;
+                typedef ZVD_ASSERT_CHARTYPE CharType;
+                typedef const CharType* ConstStringType;
 
-                friend class zvd_static_singleton<assert_point,
-                    sizeof(void*) * 4, assert_point_ctor>;
-                friend struct assert_point_ctor;
+                friend class ZvdStaticSingleton<AssertPoint,
+                    sizeof(void*) * 4, AssertPointCtor>;
+                friend struct AssertPointCtor;
 
-                void set(const_string_type expr, const_string_type fileAndLine)
+                void Set(ConstStringType expr, ConstStringType fileAndLine)
                 {
                     m_expr = expr;
                     m_fileAndLine = fileAndLine;
                 }
 
-                void clear() { set(ZVD_ASSERT_TEXT(""), ZVD_ASSERT_TEXT("")); }
+                void Clear() { Set(ZVD_ASSERT_TEXT(""), ZVD_ASSERT_TEXT("")); }
 
-                const_string_type expr() const { return m_expr; }
-                const_string_type file_and_line() const { return m_fileAndLine; }
+                ConstStringType Expression() const { return m_expr; }
+                ConstStringType FileAndLine() const { return m_fileAndLine; }
 
             private:
-                assert_point()
+                AssertPoint()
                     : m_expr(ZVD_ASSERT_TEXT(""))
                     , m_fileAndLine(ZVD_ASSERT_TEXT("")) {}
 
-                const_string_type m_expr;
-                const_string_type m_fileAndLine;
+                ConstStringType m_expr;
+                ConstStringType m_fileAndLine;
             };
 
             //-----------------------------------------------------------------------------
             // Shows assert related info (Don't use it directly!).
-            void output_assert_message(assert_point::const_string_type fmt, ...);
+            void OutputAssertMessage(AssertPoint::ConstStringType fmt, ...);
 
         } // end of details
     } // end of debug
@@ -174,15 +174,15 @@ namespace zvd
 //-----------------------------------------------------------------------------
 // Fixing assert failed point (Don't use it directly!)
 
-#define ZVD_FIX_ASSERT_POINT(exp) { if (!(exp)) { zvd::debug::details::assert_point::instance().set(ZVD_DEBUG_STRINGIFY(exp), ZVD_FILE_AND_LINE); } }
+#define ZVD_FIX_ASSERT_POINT(exp) { if (!(exp)) { zvd::debug::details::AssertPoint::Instance().Set(ZVD_DEBUG_STRINGIFY(exp), ZVD_FILE_AND_LINE); } }
 
 //
-#   define ZVD_ASSERT_IMPL_NOMSG(exp)               { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::output_assert_message(ZVD_DEBUG_EMPTY_TEXT          ); ZVD_DEBUG_BP(); } }
-#   define ZVD_ASSERT_IMPL(exp,fmt)                 { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::output_assert_message(fmt                           ); ZVD_DEBUG_BP(); } }
-#   define ZVD_ASSERT_IMPL1(exp,fmt,a1)             { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::output_assert_message(fmt, (a1)                     ); ZVD_DEBUG_BP(); } }
-#   define ZVD_ASSERT_IMPL2(exp,fmt,a1,a2)          { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::output_assert_message(fmt, (a1), (a2)               ); ZVD_DEBUG_BP(); } }
-#   define ZVD_ASSERT_IMPL3(exp,fmt,a1,a2,a3)       { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::output_assert_message(fmt, (a1), (a2), (a3)         ); ZVD_DEBUG_BP(); } }
-#   define ZVD_ASSERT_IMPL4(exp,fmt,a1,a2,a3,a4)    { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::output_assert_message(fmt, (a1), (a2), (a3), (a4)   ); ZVD_DEBUG_BP(); } }
+#   define ZVD_ASSERT_IMPL_NOMSG(exp)               { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::OutputAssertMessage(ZVD_DEBUG_EMPTY_TEXT          ); ZVD_DEBUG_BP(); } }
+#   define ZVD_ASSERT_IMPL(exp,fmt)                 { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::OutputAssertMessage(fmt                           ); ZVD_DEBUG_BP(); } }
+#   define ZVD_ASSERT_IMPL1(exp,fmt,a1)             { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::OutputAssertMessage(fmt, (a1)                     ); ZVD_DEBUG_BP(); } }
+#   define ZVD_ASSERT_IMPL2(exp,fmt,a1,a2)          { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::OutputAssertMessage(fmt, (a1), (a2)               ); ZVD_DEBUG_BP(); } }
+#   define ZVD_ASSERT_IMPL3(exp,fmt,a1,a2,a3)       { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::OutputAssertMessage(fmt, (a1), (a2), (a3)         ); ZVD_DEBUG_BP(); } }
+#   define ZVD_ASSERT_IMPL4(exp,fmt,a1,a2,a3,a4)    { if (!(exp)) { ZVD_FIX_ASSERT_POINT(exp); zvd::debug::details::OutputAssertMessage(fmt, (a1), (a2), (a3), (a4)   ); ZVD_DEBUG_BP(); } }
 
 
 //*****************************************************************************

@@ -71,39 +71,39 @@ namespace zvd
 		{
 			//-----------------------------------------------------------------------------
 			// Implementation of assert point ctor.
-			assert_point* assert_point_ctor::operator()(void* p)
+			AssertPoint* AssertPointCtor::operator()(void* p)
 			{
-				return ::new(p) assert_point();
+				return ::new(p) AssertPoint();
 			}
 
-			template<typename T, zvd_uint32 KSize>
-			class debug_string
+			template<typename T, ZvdUInt32 KSize>
+			class DebugString
 			{
 			public:
-				typedef zvd_uint32 size_type;
-				debug_string() : m_len(0)
+				typedef ZvdUInt32 SizeType;
+				DebugString() : m_len(0)
 				{
 					m_buffer[0] = 0;
 				}
 
-				size_type raw_length(const T* rawStr)
+				SizeType RawLength(const T* rawStr)
 				{
-					size_type result = 0;
+					SizeType result = 0;
 					if (!rawStr)
 						return 0;
 					while (*rawStr++)
 					{
 						++result;
-						if (result >= space_left())
-							return space_left();
+						if (result >= SpaceLeft())
+							return SpaceLeft();
 					}
 					return result;
 				}
 
-				void append(const T* rawStr)
+				void Append(const T* rawStr)
 				{
-					size_type nToCopy = raw_length(rawStr);
-					for (size_type i = 0; i < nToCopy; ++i)
+					SizeType nToCopy = RawLength(rawStr);
+					for (SizeType i = 0; i < nToCopy; ++i)
 					{
 						m_buffer[m_len + i] = rawStr[i];
 					}
@@ -112,48 +112,48 @@ namespace zvd
 					m_buffer[m_len] = 0;
 				}
 
-				debug_string<T, KSize>& operator +=(const T* rawStr)
+				DebugString<T, KSize>& operator +=(const T* rawStr)
 				{
-					append(rawStr);
+					Append(rawStr);
 					return *this;
 				}
 
-				const T* c_str()
+				const T* CStr()
 				{
 					return &m_buffer[0];
 				}
 
 			private:
-				size_type space_left()
+				SizeType SpaceLeft()
 				{
 					return KSize - (m_len + 1);
 				}
 
 				T m_buffer[KSize];
-				size_type m_len;
+				SizeType m_len;
 			};
 
 			//-----------------------------------------------------------------------------
 			// Implementation of output assert message function.
 #ifndef ZVD_USE_TEMPLATE_ARGS_FOR_PRINT
-			void output_assert_message(assert_point::const_string_type fmt, ...)
+			void OutputAssertMessage(AssertPoint::ConstStringType fmt, ...)
 			{
-				const zvd_uint32 kFmtStaticBufSize = 256;
-				typedef assert_point::char_type char_type;
-				typedef debug_string<assert_point::char_type, 1024 + kFmtStaticBufSize> string_type;
+				const ZvdUInt32 kFmtStaticBufSize = 256;
+				typedef AssertPoint::CharType CharType;
+				typedef DebugString<AssertPoint::CharType, 1024 + kFmtStaticBufSize> StringType;
 
-				if (!assert_point::instance().expr())
+				if (!AssertPoint::Instance().Expression())
 				{
 					return;
 				}
 
-				string_type strMsg;
+				StringType strMsg;
 				strMsg += ZVD_ASSERT_TEXT("[ASSERT]: \"");
-				strMsg += assert_point::instance().expr();
+				strMsg += AssertPoint::Instance().Expression();
 				strMsg += ZVD_ASSERT_TEXT("\" failed in \"");
-				strMsg += assert_point::instance().file_and_line();
+				strMsg += AssertPoint::Instance().FileAndLine();
 				strMsg += ZVD_ASSERT_TEXT(".\n");
-				assert_point::instance().clear();
+				AssertPoint::Instance().Clear();
 
 				if (fmt)
 				{
@@ -171,12 +171,12 @@ namespace zvd
 					va_end(args2);
 
 					
-					char_type staticBuf[kFmtStaticBufSize] = {};
-					char_type* pFormattedText = staticBuf;
+					CharType staticBuf[kFmtStaticBufSize] = {};
+					CharType* pFormattedText = staticBuf;
 					bool fStaticBuf = true;
 					if (nBufSize > kFmtStaticBufSize)
 					{
-						pFormattedText = new char_type[nBufSize];
+						pFormattedText = new CharType[nBufSize];
 						fStaticBuf = false;
 					}
 #ifdef ZVD_DEBUG_CHARTYPE_WIDE
@@ -210,17 +210,17 @@ namespace zvd
 
 #ifdef ZVD_USE_MSGBOX_FOR_ASSERT
 #   ifdef ZVD_DEBUG_CHARTYPE_WIDE
-				::MessageBoxW(0, strMsg.c_str(), ZVD_ASSERT_TEXT("Assert failed!"),
+				::MessageBoxW(0, strMsg.CStr(), ZVD_ASSERT_TEXT("Assert failed!"),
 					MB_ICONERROR | MB_OK | MB_TOPMOST);
 #   else
-				::MessageBoxA(0, strMsg.c_str(), ZVD_ASSERT_TEXT("Assert failed!"),
+				::MessageBoxA(0, strMsg.CStr(), ZVD_ASSERT_TEXT("Assert failed!"),
 					MB_ICONERROR | MB_OK | MB_TOPMOST);
 #   endif
 #else
 #   ifdef ZVD_DEBUG_CHARTYPE_WIDE
-				wprintf(strMsg.c_str());
+				wprintf(strMsg.CStr());
 #   else
-				printf(strMsg.c_str());
+				printf(strMsg.CStr());
 #   endif
 #endif // ZVD_USE_MSGBOX_FOR_ASSERT
 

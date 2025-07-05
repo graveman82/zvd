@@ -102,20 +102,20 @@ enum zvd_error_flags
 //-------------------------------------------------
 
 /// somethin was not found in search operation
-const zvd_uint8 kZVD_R_NOTFOUND = ZVD_PACK_ERROR_S_U8(kZVD_EF_NOTFOUND);
+const ZvdUInt8 kZVD_R_NOTFOUND = ZVD_PACK_ERROR_S_U8(kZVD_EF_NOTFOUND);
 /// no error (success)
-const zvd_uint8 kZVD_R_OK = kZVD_EF_SUCCESS;
+const ZvdUInt8 kZVD_R_OK = kZVD_EF_SUCCESS;
 /// there is no need to continue operation
-const zvd_uint8 kZVD_R_CANCEL = kZVD_EF_SPECIAL;
+const ZvdUInt8 kZVD_R_CANCEL = kZVD_EF_SPECIAL;
 /// Not enough memory to continue operation
-const zvd_uint8 kZVD_E_NOMEMORY = ZVD_PACK_ERROR_U8(kZVD_EF_NOMEMORY);
+const ZvdUInt8 kZVD_E_NOMEMORY = ZVD_PACK_ERROR_U8(kZVD_EF_NOMEMORY);
 
-const zvd_uint8 kZVD_E_DONTREPEAT = ZVD_PACK_ERROR_U8(kZVD_EF_DONTREPEAT);
-const zvd_uint8 kZVD_E_NOPRECOND = ZVD_PACK_ERROR_U8(kZVD_EF_NOPRECOND);
+const ZvdUInt8 kZVD_E_DONTREPEAT = ZVD_PACK_ERROR_U8(kZVD_EF_DONTREPEAT);
+const ZvdUInt8 kZVD_E_NOPRECOND = ZVD_PACK_ERROR_U8(kZVD_EF_NOPRECOND);
 
 ///  Abort program. Error is in design.
-const zvd_uint8 kZVD_E_ABORT = ZVD_PACK_ERROR_U8(kZVD_EF_EMERGENCY);
-const zvd_uint8 kZVD_E_UNACCEPTABLE = ZVD_PACK_ERROR_U8(kZVD_EF_UNKNOWN);
+const ZvdUInt8 kZVD_E_ABORT = ZVD_PACK_ERROR_U8(kZVD_EF_EMERGENCY);
+const ZvdUInt8 kZVD_E_UNACCEPTABLE = ZVD_PACK_ERROR_U8(kZVD_EF_UNKNOWN);
 
 
 

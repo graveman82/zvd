@@ -51,7 +51,7 @@ This singleton is intended to be used in static allocated memory.
 
 
 //-----------------------------------------------------------------------------
-/** @class StaticAllocatedSingleton
+/** @class StaticSingleton
     An object instance is allocated in static buffer.
     @param kBufferSize buffer size to store T instance inside.
     Specify kBufferSize in code using this class - it must have enough size
@@ -72,30 +72,30 @@ This singleton is intended to be used in static allocated memory.
     void test()
     {
         Dummy& dummy =
-            zvd_static_singleton<Dummy,
+            ZvdStaticSingleton<Dummy,
             sizeof(Dummy),
-            DummyCreator>::instance();
+            DummyCreator>::Instance();
 
         dummy.setName("Gagarin");
 
-        zvd_static_singleton<Dummy,
+        ZvdStaticSingleton<Dummy,
             sizeof(Dummy),
-            DummyCreator>::destroy();
+            DummyCreator>::Destroy();
     }
     @endcode
 
 */
-template <typename T, zvd_uint32 kBufferSize, typename TPseudoCtor>
-class zvd_static_singleton
+template <typename T, ZvdUInt32 kBufferSize, typename TPseudoCtor>
+class ZvdStaticSingleton
 {
 public:
 #ifdef ZVD_CPP11
-    zvd_static_singleton() = default;
+    ZvdStaticSingleton() = default;
 #else
-    zvd_static_singleton() {}
+    ZvdStaticSingleton() {}
 #endif
     /// Returns reference to a single instance of given template type.
-    static T& instance()
+    static T& Instance()
     {
         if (!m_pInstance)
         {
@@ -105,7 +105,7 @@ public:
     }
 
     /// Destroys the instance explicitly.
-    static void destroy()
+    static void Destroy()
     {
         if (m_pInstance)
         {
@@ -117,29 +117,29 @@ public:
 private:
 #ifdef ZVD_CPP11
     // not allowed
-    zvd_static_singleton(
-        const zvd_static_singleton<T, kBufferSize, TPseudoCtor>&) = delete;
-    zvd_static_singleton& operator=(
-        const zvd_static_singleton<T, kBufferSize, TPseudoCtor>&) = delete;
+    ZvdStaticSingleton(
+        const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&) = delete;
+    ZvdStaticSingleton& operator=(
+        const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&) = delete;
 #else
-    zvd_static_singleton(
-        const zvd_static_singleton<T, kBufferSize, TPseudoCtor>&);
-    zvd_static_singleton& operator=(
-        const zvd_static_singleton<T, kBufferSize, TPseudoCtor>&);
+    ZvdStaticSingleton(
+        const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&);
+    ZvdStaticSingleton& operator=(
+        const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&);
 #endif
 
     static T* m_pInstance;
-    static zvd_byte m_buffer[kBufferSize];
+    static ZvdByte m_buffer[kBufferSize];
 };
 
 //-----------------------------------------------------------------------------
-template <typename T, zvd_uint32 kBufferSize, typename TPseudoCtor>
-T* zvd_static_singleton<T,
+template <typename T, ZvdUInt32 kBufferSize, typename TPseudoCtor>
+T* ZvdStaticSingleton<T,
     kBufferSize, TPseudoCtor>::m_pInstance = kZVD_NULLPTR(T);
 
 //-----------------------------------------------------------------------------
-template <typename T, zvd_uint32 kBufferSize, typename TPseudoCtor>
-zvd_byte zvd_static_singleton<T,
+template <typename T, ZvdUInt32 kBufferSize, typename TPseudoCtor>
+ZvdByte ZvdStaticSingleton<T,
     kBufferSize, TPseudoCtor>::m_buffer[kBufferSize];
 
 
