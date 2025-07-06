@@ -158,11 +158,13 @@ Purpose: base definitions.
 // test x86
 #	ifdef _M_IX86
 #		define ZVD_ARCH_X86
+#		define ZVD_LITTLE_ENDIAN
 #	endif
 
 // test x64
 #	ifdef _M_X64
 #		define ZVD_ARCH_X64
+#		define ZVD_LITTLE_ENDIAN
 #	endif
 
 #endif // how much bit processor architecture tests
@@ -200,6 +202,25 @@ typedef unsigned __int64 ZvdUInt64;
 
 #endif // fixed size integers
 
+//++++++++++++++++++++++++++
+// Fixed size integers utils
+//++++++++++++++++++++++++++
+
+union ZvdU16U8Converter {
+	ZvdUInt16 m_u16;
+	ZvdUInt8 m_u8[2];
+};
+
+union ZvdU32U8Converter {
+	ZvdUInt32 m_u32;
+	ZvdUInt8 m_u8[4];
+};
+
+union ZvdU32U16Converter {
+	ZvdUInt32 m_u32;
+	ZvdUInt16 m_u16[2];
+};
+
 // Human readable convenient integers
 //-----------------------------------
 typedef ZvdUInt8 ZvdByte;
@@ -223,6 +244,20 @@ typedef ZvdInt16 ZvdPtrDiff;
 
 typedef ZvdSize ZvdUIndex;
 
+const ZvdUInt32 kZVD_BAD_MARKER_U3 = 0x7;
+const ZvdUInt32 kZVD_BAD_MARKER_U8 = 0xFF;
+const ZvdUInt32 kZVD_BAD_MARKER_U16 = 0xFFFF;
+const ZvdUInt32 kZVD_BAD_MARKER_U32 = 0xFFFFFFFF;
+
+const ZvdUInt32 kZVD_ONE_U8 = 0x01;
+const ZvdUInt32 kZVD_ONE_U32LE = 0x00000001;
+
+
+inline bool ZvdIsLittleEndian()
+{
+	return ((*static_cast<const ZvdUInt8*>(static_cast<const void*>(&kZVD_ONE_U32LE))) == kZVD_ONE_U8);
+}
+
 //++++++++++++++++++++++++++++++++++++
 // Language standard dependent things
 //++++++++++++++++++++++++++++++++++++
@@ -237,17 +272,10 @@ typedef ZvdSize ZvdUIndex;
 #	define kZVD_NULLFPTR(argType) ((argType)0)
 #endif
 
-//++++++++++++++++++
-// Byte utils
-//++++++++++++++++++
 
-#define ZVD_ENUM2U8(enumVal) ((ZvdUInt8)(enumVal))
-#define ZVD_ENUM2U32(enumVal) ((ZvdUInt32)(enumVal))
 
-const ZvdUInt32 kZVD_ONE_U32 = 0x01;
 
-#define ZVD_IS_LITTLE_ENDIAN \
-((*static_cast<const ZvdUInt8*>(static_cast<const void*>(&kZVD_ONE_U32))) == 0x01)
+
 
 
 //++++++++++++++++++
@@ -278,33 +306,35 @@ const ZvdUInt32	kZVD_NO_U32 = kZVD_FALSE_U32;
 const ZvdUInt8		kZVD_YES_U8 = kZVD_TRUE_U8;
 const ZvdUInt8		kZVD_NO_U8 = kZVD_FALSE_U8;
 
-//-----------------------------------------------------------------------------
-// Error format
 
-// Main (control) bits of error value
-// Use other 6 bit for 64 codes. Error codes must be interpreted
-// in context of local operation.
-enum zvd_error_control_bits
-{
-	/// no error (success)
-	kZVD_EF_SUCCESS = 0,
-	/// special marker - dependent flag
-	kZVD_EF_SPECIAL = 1,
-	/// error marker
-	kZVD_EF_FAIL = 2,
 
-	kZVD_EF_CODEBITS_OFFSET = 2,
-};
 
-// Packs error flags to integers
-//------------------------------
+// Offset, align
+//--------------
+#define ZVD_TYPE_SIZE(nameOfType,padBytesCount) (sizeof(nameOfType) + (padBytesCount))
+#define ZVD_DIV_TYPE_SIZE_INTO_ALIGN_MOD(nameOfType,padBytesCount,alignValue) \
+(ZVD_TYPE_SIZE(nameOfType,(padBytesCount)) % (alignValue))
 
-#define ZVD_PACK_ERROR_U8(errorFlag) (\
-(ZVD_ENUM2U8(errorFlag) << kZVD_EF_CODEBITS_OFFSET) | \
-ZVD_ENUM2U8(kZVD_EF_FAIL))
+#define ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue) \
+(alignValue - (\
+ZVD_DIV_TYPE_SIZE_INTO_ALIGN_MOD(nameOfType,padBytesCount,alignValue) ? \
+ZVD_DIV_TYPE_SIZE_INTO_ALIGN_MOD(nameOfType,padBytesCount,alignValue) : alignValue \
+))
 
-#define ZVD_PACK_ERROR_S_U8(errorFlag) (\
-(ZVD_ENUM2U8(errorFlag) << kZVD_EF_CODEBITS_OFFSET) | \
-ZVD_ENUM2U8(kZVD_EF_FAIL) | ZVD_ENUM2U8(kZVD_EF_SPECIAL))
+#define ZVD_ALIGNED_TYPE_SIZE(nameOfType,padBytesCount,alignValue) \
+(ZVD_TYPE_SIZE(nameOfType,padBytesCount) + \
+ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
+
+
+// cpp standard >= 11 feauters
+//----------------------------
+
+#ifdef ZVD_CPP11
+#	define ZVD_METHOD_OVERRIDE override
+#else
+#	define ZVD_METHOD_OVERRIDE
+#endif
+
+
 
 #endif // ZVD_BASEDEFS_H

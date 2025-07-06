@@ -52,9 +52,9 @@ Purpose: error codes.
 //-----------------------------------------------------------------------------
 // Error constants
 
-// main (control) bits of error value
-enum zvd_error_flags
+enum ZvdeErrorFlags
 {
+#if 0
 	kZVD_EF_UNKNOWN = 0,
 	kZVD_EFX_SPEC0 = 1,
 	kZVD_EFX_INVALID = 1,
@@ -93,9 +93,10 @@ enum zvd_error_flags
 	kZVD_EF_CTX_FIRST = 21,
 	kZVD_EF_CTX_LAST = 62,
 	kZVD_EF_NOTFOUND = 0x3F,
-
+#endif
 };
 
+#if 0
 // Base error codes (its cover more frequent cases)
 // "E" means error
 // "R" means return value (result)
@@ -117,6 +118,6 @@ const ZvdUInt8 kZVD_E_NOPRECOND = ZVD_PACK_ERROR_U8(kZVD_EF_NOPRECOND);
 const ZvdUInt8 kZVD_E_ABORT = ZVD_PACK_ERROR_U8(kZVD_EF_EMERGENCY);
 const ZvdUInt8 kZVD_E_UNACCEPTABLE = ZVD_PACK_ERROR_U8(kZVD_EF_UNKNOWN);
 
-
+#endif
 
 #endif // ZVD_ERRORCODES_H
