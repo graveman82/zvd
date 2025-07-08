@@ -58,9 +58,9 @@ void test()
 #ifndef ZVD_ASSERT_H
 #define ZVD_ASSERT_H
 
-#include "core/zvdbasedefs.h"
-#include "core/zvdstaticsingleton.h"
-#include "core/zvdstringify.h"
+#include "core/base/zvdbasedefs.h"
+#include "core/base/zvdstaticsingleton.h"
+#include "core/base/zvdstringify.h"
 
 #if defined(ZVD_COMPILER_MSVC) && defined(ZVD_ARCH_X64)
 #include <intrin.h>

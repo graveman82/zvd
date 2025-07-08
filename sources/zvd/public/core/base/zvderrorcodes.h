@@ -47,15 +47,29 @@ Purpose: error codes.
 #ifndef ZVD_ERRORCODES_H
 #define ZVD_ERRORCODES_H
 
-#include "core/zvdbasedefs.h"
+#include "core/base/zvdbasedefs.h"
 
 //-----------------------------------------------------------------------------
 // Error constants
 
-enum ZvdeErrorFlags
+const ZvdUInt16 kZVD_EC_MAX = 32767u;
+
+enum ZvdeErrorCodes
 {
+	kZVD_EC_UNKNOWN = kZVD_EC_MAX - 1,
+	kZVD_EC_UNDEFINED = 0,
+	kZVD_EC_UNACCEPTABLE,
+	kZVD_EC_NOIMPL,
+	kZVD_EC_NOPRECOND,
+	/// has no instance or instance can not be created
+	kZVD_EC_NOINSTANCE,
+	/// instance can not be created on stack
+	kZVD_EC_NOSTACKOBJECT, 
+	/// allocator instance can not be created on stack
+	kZVD_EC_NOSTACKALLOCATOR, 
+
 #if 0
-	kZVD_EF_UNKNOWN = 0,
+	
 	kZVD_EFX_SPEC0 = 1,
 	kZVD_EFX_INVALID = 1,
 	kZVD_EFX_SPEC1 = 2,
@@ -114,9 +128,8 @@ const ZvdUInt8 kZVD_E_NOMEMORY = ZVD_PACK_ERROR_U8(kZVD_EF_NOMEMORY);
 const ZvdUInt8 kZVD_E_DONTREPEAT = ZVD_PACK_ERROR_U8(kZVD_EF_DONTREPEAT);
 const ZvdUInt8 kZVD_E_NOPRECOND = ZVD_PACK_ERROR_U8(kZVD_EF_NOPRECOND);
 
-///  Abort program. Error is in design.
-const ZvdUInt8 kZVD_E_ABORT = ZVD_PACK_ERROR_U8(kZVD_EF_EMERGENCY);
-const ZvdUInt8 kZVD_E_UNACCEPTABLE = ZVD_PACK_ERROR_U8(kZVD_EF_UNKNOWN);
+
+
 
 #endif
 

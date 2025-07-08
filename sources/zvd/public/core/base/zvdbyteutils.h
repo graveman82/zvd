@@ -48,7 +48,7 @@ Purpose: byte utilities.
 
 
 
-#include "core/zvdbasedefs.h"
+#include "core/base/zvdbasedefs.h"
 
 
 //++++++++++++++++++
@@ -61,7 +61,7 @@ Purpose: byte utilities.
 
 inline ZvdUInt8 ZvdGetByte(ZvdUInt32 v, ZvdSize idx)
 {
-	ZvdU32U8Converter conv;
+	ZvdU32U8Converter conv = {};
 	conv.m_u32 = v;
 
 	return ZvdIsLittleEndian() ? conv.m_u8[idx] : conv.m_u8[3 - idx];
@@ -69,7 +69,7 @@ inline ZvdUInt8 ZvdGetByte(ZvdUInt32 v, ZvdSize idx)
 
 inline void ZvdSetByte(ZvdUInt32& v, ZvdSize idx, ZvdUInt8 val)
 {
-	ZvdU32U8Converter conv;
+	ZvdU32U8Converter conv = {};
 	conv.m_u32 = v;
 
 	if (ZvdIsLittleEndian())
@@ -81,7 +81,7 @@ inline void ZvdSetByte(ZvdUInt32& v, ZvdSize idx, ZvdUInt8 val)
 
 inline ZvdUInt16 ZvdGetWord(ZvdUInt32 v, ZvdSize idx)
 {
-	ZvdU32U16Converter conv;
+	ZvdU32U16Converter conv = {};
 	conv.m_u32 = v;
 
 	return ZvdIsLittleEndian() ? conv.m_u16[idx] : conv.m_u16[1 - idx];
@@ -99,4 +99,51 @@ inline void ZvdSetWord(ZvdUInt32& v, ZvdSize idx, ZvdUInt16 val)
 	v = conv.m_u32;
 }
 
+
+
+template <typename T>
+class ZvdByteModifier
+{
+public:
+	ZvdByteModifier(T& value)
+	{
+		m_pData = reinterpret_cast<ZvdByte*>(&value);
+	}
+
+	ZvdByte get(ZvdSize byteIndex) const
+	{
+		return m_pData[byteIndex];
+	}
+
+	ZvdByte& get(ZvdSize byteIndex)
+	{
+		return m_pData[byteIndex];
+	}
+
+private:
+	ZvdByte* m_pData{};
+};
+
+template <typename T>
+class ZvdWordModifier
+{
+public:
+	ZvdWordModifier(T& value)
+	{
+		m_pData = reinterpret_cast<ZvdUInt16*>(&value);
+	}
+
+	ZvdUInt16 get(ZvdSize wordIndex) const
+	{
+		return m_pData[wordIndex];
+	}
+
+	ZvdUInt16& get(ZvdSize wordIndex)
+	{
+		return m_pData[wordIndex];
+	}
+
+private:
+	ZvdUInt16* m_pData{};
+};
 #endif // ZVD_BYTEUTILS_H

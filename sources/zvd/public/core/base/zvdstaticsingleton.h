@@ -47,7 +47,7 @@ This singleton is intended to be used in static allocated memory.
 #ifndef ZVD_STATICSINGLETON_H
 #define ZVD_STATICSINGLETON_H
 
-#include "core/zvdbasedefs.h"
+#include "core/base/zvdbasedefs.h"
 
 
 //-----------------------------------------------------------------------------

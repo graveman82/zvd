@@ -47,46 +47,10 @@ Purpose: base definitions.
 #ifndef ZVD_BASEDEFS_H
 #define ZVD_BASEDEFS_H
 
+#include "zvdconfig.h"
+
 #ifndef __cplusplus
 #error "This project is for C++ language only!"
-#endif
-
-#if __cplusplus == 202302L
-#define ZVD_CPP23
-#define ZVD_CPP20
-#define ZVD_CPP17
-#define ZVD_CPP14
-#define ZVD_CPP11
-#define ZVD_CPP03
-#pragma message("C++23")
-#elif __cplusplus == 202002L
-#define ZVD_CPP20
-#define ZVD_CPP17
-#define ZVD_CPP14
-#define ZVD_CPP11
-#define ZVD_CPP03
-#pragma message("C++20")
-#elif __cplusplus == 201703L
-#define ZVD_CPP17
-#define ZVD_CPP14
-#define ZVD_CPP11
-#define ZVD_CPP03
-#pragma message("C++17")
-#elif __cplusplus == 201402L
-#define ZVD_CPP14
-#define ZVD_CPP11
-#define ZVD_CPP03
-#pragma message("C++14")
-#elif __cplusplus == 201103L
-#define ZVD_CPP11
-#define ZVD_CPP03
-#pragma message("C++11")
-#elif __cplusplus == 199711L
-#define ZVD_CPP98
-#pragma message("C++98")
-#else
-#error "No any standart of C++ detected. You can comment this line for your own risk!"
-//#define ZVD_CPP98 // 98/03 ?
 #endif
 
 
@@ -94,35 +58,12 @@ Purpose: base definitions.
 #	include <cstdint>
 #endif
 
-#ifdef ZVD_DLL_EXPORTS
-#define ZVD_API __declspec(dllexport)
-#else
-#define ZVD_API __declspec(dllimport)
-#endif
+
 
 //-----------------------------------------------------------------------------
 // Compilers family detection
 
-#if defined(_MSC_VER) && !defined(ZVD_MSVC)
-// Microsoft Visual C++ compiler
-#	define ZVD_COMPILER_MSVC
-#	define ZVD_COMPILER_VER _MSC_VER
-#	define ZVD_MSVC _MSC_VER
-
-#elif defined(__GNUC__) && !defined(ZVD_GNUC)
-#	define ZVD_COMPILER_GCC
-#	define ZVD_COMPILER_VER __GNUC__
-#	define ZVD_GNUC __GNUC__// GNU C compilers
-#	define ZVD_GNUC_VER \
-(__GNUC__ * 10000  + __GNUC_MINOR__ * 100  + __GNUC_PATCHLEVEL__)
-...
-/* Test for GCC > 3.2.0 */
-//#if ZVD_GNUC_VER > 30200
-
-#else
-#	error "No supported compiler was found."
-
-#endif // compiler
+#include "core/base/zvdcompiler.h"
 
 //-----------------------------------------------------------------------------
 // OS detection
@@ -207,16 +148,28 @@ typedef unsigned __int64 ZvdUInt64;
 //++++++++++++++++++++++++++
 
 union ZvdU16U8Converter {
+	ZvdU16U8Converter()
+	{
+		m_u16 = 0u;
+	}
 	ZvdUInt16 m_u16;
 	ZvdUInt8 m_u8[2];
 };
 
 union ZvdU32U8Converter {
+	ZvdU32U8Converter()
+	{
+		m_u32 = 0u;
+	}
 	ZvdUInt32 m_u32;
 	ZvdUInt8 m_u8[4];
 };
 
 union ZvdU32U16Converter {
+	ZvdU32U16Converter()
+	{
+		m_u32 = 0u;
+	}
 	ZvdUInt32 m_u32;
 	ZvdUInt16 m_u16[2];
 };
@@ -263,18 +216,21 @@ inline bool ZvdIsLittleEndian()
 //++++++++++++++++++++++++++++++++++++
 #ifdef ZVD_CPP11 
 #	define kZVD_NULLPTR(argType) nullptr
-#	define kZVD_NULLVOID nullptr
 #	define kZVD_NULLFPTR(argType) nullptr
-
+#	define kZVD_NULLVOID nullptr
+#	define kZVD_NULLCSTR nullptr
 #else
 #	define kZVD_NULLPTR(argType) ((argType*)0)
-#	define kZVD_NULLVOID ((void*)0)
 #	define kZVD_NULLFPTR(argType) ((argType)0)
+#	define kZVD_NULLVOID ((void*)0)
+#	define kZVD_NULLCSTR ((const char*)0)
 #endif
 
 
 
-
+// Reals
+typedef float ZvdReal32;
+typedef double ZvdReal64;
 
 
 
@@ -336,5 +292,13 @@ ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
 #endif
 
 
+struct ZvdsDefaultTag {};
+
+
+#ifdef ZVD_DLL_EXPORTS
+#define ZVD_API __declspec(dllexport)
+#else
+#define ZVD_API __declspec(dllimport)
+#endif
 
 #endif // ZVD_BASEDEFS_H

@@ -53,7 +53,7 @@ Purpose: assert implementation.
 #   error "Feature is not implemented yet"
 #endif
 
-#include "core/zvdassert.h"
+#include "core/base/zvdassert.h"
 
 #ifdef ZVD_USE_MSGBOX_FOR_ASSERT
 #   ifndef ZVD_OS_WINDOWS

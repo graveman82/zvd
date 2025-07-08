@@ -36,7 +36,7 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: error handling related definitions.
+Purpose: error processing & reporting.
 
 ----------------------
  For developers notes
@@ -47,8 +47,8 @@ Purpose: error handling related definitions.
 #ifndef ZVD_ERROR_H
 #define ZVD_ERROR_H
 
-#include "core/zvdbasedefs.h"
-#include "core/zvdbyteutils.h"
+#include "core/base/zvderrorcodes.h"
+#include "core/base/zvdbyteutils.h"
 
 //=============================================================================
 // Error format
@@ -88,7 +88,8 @@ enum ZvdeErrorControlBits
 	kZVD_EF_UNKNOWN = kZVD_BAD_MARKER_U3,
 	kZVD_EF_CANCEL = kZVD_EF_STOP | kZVD_EF_SPECIAL,
 	kZVD_EF_FATAL = kZVD_EF_FAIL | kZVD_EF_SPECIAL,
-
+	///  Abort program. Error is in design.
+	kZVD_EF_ABORT = kZVD_EF_FATAL | kZVD_EF_CRASH,
 	/// error was raised at external code (in 1st byte if begin since 0)
 	kZVD_EF_EXTLIB = (1 << 7)
 };
@@ -97,47 +98,59 @@ enum ZvdeErrorControlBits
 //------------------------
 
 /// nothing known about some error case
-const ZvdByte kZVD_B_UNKNOWN = kZVD_EF_UNKNOWN;
+const ZvdByte kZVD_ES_UNKNOWN = kZVD_EF_UNKNOWN;
 
 /// operation succeeded
-const ZvdByte kZVD_B_OK = kZVD_EF_SUCCESS;
+const ZvdByte kZVD_ES_OK = kZVD_EF_SUCCESS;
 
 /// operation succeeded (did nothing)
-const ZvdByte kZVD_B_NOTHING = kZVD_EF_STOP;
+const ZvdByte kZVD_ES_NOTHING = kZVD_EF_STOP;
 
 /// operation failed
-const ZvdByte kZVD_B_ERROR = kZVD_EF_FAIL;
+const ZvdByte kZVD_ES_ERROR = kZVD_EF_FAIL;
 
 /// operation canceled by caller (user)
-const ZvdByte kZVD_B_CANCEL = kZVD_EF_CANCEL;
+const ZvdByte kZVD_ES_CANCEL = kZVD_EF_CANCEL;
 
 /// operation failed
-const ZvdByte kZVD_B_FATAL = kZVD_EF_FATAL;
+const ZvdByte kZVD_ES_FATAL = kZVD_EF_FATAL;
 
 // Returned value limits
 //----------------------
 
 /// source mask
-const ZvdByte kZVD_E_SOURCEMASK = 0x7F;
-const ZvdByte kZVD_E_SOURCEMASKEXT = 0x80;
+const ZvdByte kZVD_EM_SOURCEMASK = 0x7F;
+const ZvdByte kZVD_EM_SOURCEMASKEXT = 0x80;
 
-/// code mask LE
-const ZvdUInt16 kZVD_E_CODE_MAX = 32767u;
 
 #pragma pack(push, 1)
 //-----------------------------------------------------------------------------
 class ZvdPackedError
 {
 public:
-	ZvdPackedError(ZvdRetVal retVal = 0u) : m_retVal{ retVal } {}
+	ZvdPackedError();
+	ZvdPackedError(ZvdRetVal retVal) : m_retVal{ retVal } {}
 	ZvdPackedError(ZvdByte nStatus, ZvdByte nSource, ZvdUInt16 nCode, bool bExt = false);
+	ZvdPackedError(const ZvdPackedError& oth)
+		: m_retVal(oth.RetVal())
+	{
 
+	}
+
+	// setters
+	void SetStatusFlag(ZvdUInt8 statusFlag);
+	void AddStatusFlag(ZvdUInt8 statusFlag);
+	void AddCrashFlag();
+
+	// getters
 	ZvdRetVal RetVal() const { return m_retVal; }
 	ZvdByte Status() const;
 	ZvdByte Source(bool& bExt) const;
 	ZvdUInt16 Code() const;
 
-	static ZvdPackedError Ok();
+	bool IsOk() const;
+	static const ZvdPackedError& Ok();
+	static bool HasErrorMarker(ZvdRetVal val);
 private:
 	static void Pack(ZvdRetVal& retVal, ZvdByte nStatus, ZvdByte nSource, ZvdUInt16 nCode, bool bExt);
 	ZvdRetVal m_retVal;
@@ -145,7 +158,6 @@ private:
 #pragma pack(pop)
 
 
-struct ZvdResultDescOnlyTag {};
 struct ZvdResultIndexTag {};
 
 
@@ -155,22 +167,43 @@ struct ZvdResult;
 
 #pragma pack(push, 1)
 template <>
-struct ZvdResult<ZvdResultDescOnlyTag>
+struct ZvdResult<ZvdsDefaultTag>
 {
-	ZvdResult()
+	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
+		: m_packedError(packedError)
+		, m_pText(kZVD_NULLCSTR)
 	{
 	}
 
+	const ZvdPackedError& Error() const 
+	{
+		return m_packedError;
+	}
+
+	ZvdPackedError& Error()
+	{
+		return m_packedError;
+	}
+
+	bool IsOk() const { return m_packedError.IsOk(); }
+
+	const char* Text() const { return m_pText; }
+	void SetText(const char* pText) { m_pText = pText; }
+
 	ZvdPackedError m_packedError;
+	const char* m_pText;
 };
 #pragma pack(pop)
 
+typedef ZvdResult<ZvdsDefaultTag> ZvdRegularResult;
+
 #pragma pack(push, 1)
 template <>
-struct ZvdResult <ZvdResultIndexTag> : ZvdResult<ZvdResultDescOnlyTag>
+struct ZvdResult <ZvdResultIndexTag> : ZvdRegularResult
 {
-	ZvdResult()
-		: m_nIndex(0)
+	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
+		: ZvdResult<ZvdsDefaultTag>(packedError)
+		, m_nIndex(0)
 	{
 #if defined(ZVD_ARCH_X64)
 		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];
@@ -182,21 +215,34 @@ struct ZvdResult <ZvdResultIndexTag> : ZvdResult<ZvdResultDescOnlyTag>
 #if defined(ZVD_ARCH_X64)
 	ZvdByte m_pad[4];
 #endif
-};
+}; 
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 template <typename T>
-struct ZvdResult <T*> : ZvdResult <ZvdResultDescOnlyTag>
+struct ZvdResult<T*> : ZvdRegularResult
 {
-	ZvdResult()
-		: m_ptr(kZVD_NULLPTR(T))
+	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
+		: ZvdRegularResult(packedError)
+		, m_ptr(kZVD_NULLPTR(T))
 	{
 #if defined(ZVD_ARCH_X64)
 		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];
 #endif
 	}
 
+	ZvdResult(const ZvdPackedError& packedError, T* ptr)
+		: ZvdRegularResult(packedError)
+		, m_ptr(ptr)
+	{
+#if defined(ZVD_ARCH_X64)
+		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];
+#endif
+	}
+
+	
+	T* Get() { return m_ptr; }
+	void Set(T* ptr) { m_ptr = ptr; }
 	T* m_ptr;
 
 #if defined(ZVD_ARCH_X64)
@@ -209,7 +255,9 @@ struct ZvdResult <T*> : ZvdResult <ZvdResultDescOnlyTag>
 //-----------------------------------------------------------------------------
 enum ZvdErrorSource
 {
-	kCore,
+	kZVD_ESRC_UNDEFINED,
+	kZVD_ESRC_CORE_MEMORY,
+	kZVD_ESRC_CORE_DARRAY,
 	kLangLib,
 	kEngine,
 	kSystem,

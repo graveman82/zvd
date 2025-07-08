@@ -1,0 +1,66 @@
+========================
+Files and dirs
+========================
+
+Header and source file names must start with the prefix "zvd" and be written in lower case.
+Example: zvdblank.h
+
+You can use "zvdblank.h" as the start blank file for headers. Just rename it and guard inside it.
+
+
+
+-----------------------
+Subsystems and modules
+-----------------------
+core -- core of zvd as library and as engine
+|_ base -- base definitions and utils
+|_ math -- math library
+
+world -- world system
+gfx -- graphics
+gui -- user interface
+
+
+
+************
+Common rules
+************
+Excluding macros, the words make up an identifier are separated using Camel Casing. That is, each new word in identifier name starts with an uppercase letter. 
+
+************
+Type Naming
+************
+
+The type name starts with an uppercase letter. All zvd classes in global namespace are prefixed by "Zvd" string. To distinguish between types of same name in different subsystems (modules) in global namespace that subsytem (module) short name is used right after the "Zvd" prefix before the base name of type. This is the common way to name zvd types.
+
+For example:
+
+ZvdMathCircleF64 - math description of a circle with double to store coords
+ZvdWorldCircle - circle as object in world
+ZvdGfxCircle3D - circle render data
+
+----------------
+Var naming
+----------------
+Class members are named with "m_" prefix followed base name of member starting with a lowercase letter.
+
+For example,
+float m_centerX;
+void* m_pData;
+
+Local variables names start with a lowercase letter.
+
+----------------
+Function naming
+----------------
+The names of the class methods all start with a Uppercase letter. The getter and setter methods of the member m_memberName are named MemberName(getter) and SetMemberName(setter). 
+The names of the global functions all start with a "Zvd_" prefix.
+
+For example, 
+void* Zvd_AllocMem();
+
+----------------------
+Third-party extensions
+----------------------
+
+Some third-party libraries use the ZvdnnClassName naming convention, which means that the class belongs to a library extending zvd. The nn from the prefix tells you which library the class belongs to. For example, ... .
