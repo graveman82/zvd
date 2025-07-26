@@ -58,4 +58,14 @@ Created:            jan 11, 2012
 #include "zvddefaultconfig.h"
 #endif // zvd config selection
 
+
+//-----------------------------------------------------------------------------
+
+// Verifies that a build configuration has been selected.
+#if !defined(ZVD_CFG_BUILD_DEBUG) && \
+    !defined(ZVD_CFG_BUILD_RELEASE) && \
+    !defined(ZVD_CFG_BUILD_SHIPPING)
+#error One of ZVD_CFG_BUILD_DEBUG, ZVD_CFG_BUILD_RELEASE, or ZVD_CFG_BUILD_SHIPPING must be defined
+#endif
+
 #endif // ZVD_CONFIG_H

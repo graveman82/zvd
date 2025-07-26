@@ -67,31 +67,30 @@ Purpose: base definitions.
 
 //-----------------------------------------------------------------------------
 // OS detection
+
 #if defined ZVD_COMPILER_GNUC
-#   if defined (_WIN32) && !defined (ZVD_OS_WINDOWS)
-#       define ZVD_OS_WINDOWS
-#       define ZVD_OS_WINDOWS32
-#       if defined (_WIN64)
-#           define ZVD_OS_WINDOWS64
-#           if !defined (ZVD_OS_64)
-#               define ZVD_OS_64
-#           endif
-#       endif
-#   endif   // end of Windows OS detection in gnu C
+#	include "core/base/zvdplatformcheckgcc.h"
 
 #elif defined ZVD_COMPILER_MSVC
-#   if defined (_WIN32) && !defined (ZVD_OS_WINDOWS)
-#       define ZVD_OS_WINDOWS
-#       define ZVD_OS_WINDOWS32
-#       if defined (_WIN64)
-#           define ZVD_OS_WINDOWS64
-#           if !defined (ZVD_OS_64)
-#               define ZVD_OS_64
-#           endif
-#       endif
-#   endif   // end of Windows OS detection in MSVC
+#	include "core/base/zvdplatformcheckmsvc.h"
 
 #endif      // eof if gnu C
+
+#if defined(ZVD_PLATFORM_WIN32) || defined(ZVD_PLATFORM_WIN64)
+#   if !defined(ZVD_PLATFORM_WIN)
+#       define ZVD_PLATFORM_WIN
+#		define ZVD_OS_WINDOWS
+#   endif
+
+#endif
+
+// Verifies that a supported platform is detected.
+#if !defined(ZVD_PLATFORM_WIN32) && \
+    !defined(ZVD_PLATFORM_WIN64) && \
+    !defined(ZVD_PLATFORM_LINUX)
+#	error "For now windows and linux platforms are supported only."
+#endif
+
 
 // Test to define how much bit processor architecture has.
 //--------------------------------------------------------
