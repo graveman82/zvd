@@ -109,6 +109,58 @@ Purpose: base definitions.
 
 #endif // how much bit processor architecture tests
 
+//-----------------------------------------------------------------------------
+// API macros, Library type
+#if defined(ZVD_OS_WINDOWS) || defined(ZVD_PLATFORM_XBOX360)
+
+#ifdef ZVD_DLL_EXPORTS
+#	define ZVD_API __declspec(dllexport)
+#else
+#	define ZVD_API __declspec(dllimport)
+#endif
+
+// Used for dll exporting and importing functions
+#define  ZVD_DLL_EXPORTED_FUNCLIST_BEGIN	extern "C" { 
+#define  ZVD_DLL_EXPORTED_FUNCLIST_END }
+
+// Used for dll exporting and importing globals
+#define  ZVD_DLL_GLOBAL_EXPORT	extern __declspec(dllexport) 
+#define  ZVD_DLL_GLOBAL_IMPORT	extern __declspec(dllimport)
+
+#elif defined ZVD_OS_LINUX
+
+#ifdef ZVD_DLL_EXPORTS
+#	define ZVD_API
+#else
+#	define ZVD_API
+#endif
+
+// Used for dll exporting and importing functions
+#define  ZVD_DLL_EXPORTED_FUNCLIST_BEGIN	extern "C" { 
+#define  ZVD_DLL_EXPORTED_FUNCLIST_END }  
+
+// Used for dll exporting and importing globals
+#define  ZVD_DLL_GLOBAL_EXPORT	extern
+#define  ZVD_DLL_GLOBAL_IMPORT	extern 
+
+#else
+
+#error "Unsupported Platform."
+
+#endif
+
+
+// Used for standard calling conventions
+#ifdef ZVD_OS_WINDOWS
+	#define  ZVD_STDCALL			__stdcall
+	#define  ZVD_FASTCALL			__fastcall
+	#define  ZVD_FORCEINLINE		__forceinline	
+#else
+	#define  ZVD_STDCALL
+	#define  ZVD_FASTCALL			   
+	#define  ZVD_FORCEINLINE		   inline
+#endif
+
 
 // fixed size integers
 //---------------------
@@ -294,10 +346,6 @@ ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
 struct ZvdsDefaultTag {};
 
 
-#ifdef ZVD_DLL_EXPORTS
-#define ZVD_API __declspec(dllexport)
-#else
-#define ZVD_API __declspec(dllimport)
-#endif
+
 
 #endif // ZVD_BASEDEFS_H
