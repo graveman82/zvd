@@ -47,6 +47,9 @@ Purpose: detect the target operating system.
 #ifndef ZVD_PLATFORMCHECKMSVC_H
 #define ZVD_PLATFORMCHECKMSVC_H
 
+#ifndef ZVD_COMPILER_MSVC
+#error "This file is for microsoft c++ compiler only"
+#endif
 //-------------------------------
 // Identify the Operating System
 
@@ -111,5 +114,21 @@ appeared.
 #endif
 
 
+// Test to define how much bit processor architecture has.
+//--------------------------------------------------------
+
+// test x86
+#if defined(_M_IX86)
+#	if !defined(ZVD_ARCH_X86)
+#		define ZVD_ARCH_X86
+#	endif
+#endif
+
+// test x64
+#if defined(_M_X64)
+#	if !defined(ZVD_ARCH_X64)
+#		define ZVD_ARCH_X64
+#	endif
+#endif
 
 #endif // ZVD_PLATFORMCHECKMSVC_H

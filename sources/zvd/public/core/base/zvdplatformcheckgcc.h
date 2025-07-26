@@ -47,6 +47,10 @@ Purpose: detect the target operating system.
 #ifndef ZVD_PLATFORMCHECKGCC_H
 #define ZVD_PLATFORMCHECKGCC_H
 
+#ifndef ZVD_COMPILER_GNUC
+#error "This file is for gnu c++ compiler only"
+#endif
+
 //-------------------------------
 // Identify the Operating System
 
@@ -97,5 +101,20 @@ Purpose: detect the target operating system.
 #   error "Your platform is not identified"
 #endif
 
+
+// Test to define how much bit processor architecture has.
+//--------------------------------------------------------
+
+#if defined(__i386__) || defined(__i386)
+#	if !defined(ZVD_ARCH_X86)
+#		define ZVD_ARCH_X86
+#	endif
+#endif
+
+#if defined(__x86_64__)
+#	if !defined(ZVD_ARCH_X64)
+#		define ZVD_ARCH_X64
+#	endif
+#endif
 
 #endif // ZVD_PLATFORMCHECKGCC_H

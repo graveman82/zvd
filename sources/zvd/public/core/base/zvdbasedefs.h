@@ -92,22 +92,28 @@ Purpose: base definitions.
 #endif
 
 
-// Test to define how much bit processor architecture has.
-//--------------------------------------------------------
-#if defined(ZVD_MSVC)
-// test x86
-#	ifdef _M_IX86
-#		define ZVD_ARCH_X86
-#		define ZVD_LITTLE_ENDIAN
+//-----------------------------------------------------------------------------
+// Endiannes
+#if !defined (ZVD_BIG_ENDIAN) && !defined (ZVD_LITTLE_ENDIAN)
+#	if defined (_MIPSEB) || defined (__sparc) || defined (_AIX) || \
+	   defined (__hpux) || defined (macintosh) || defined (_MAC) || \
+	   defined (_XBOX)
+#		define ZVD_BIG_ENDIAN 1
+#	elif defined (__i386) || defined (_M_IX86) || defined (_M_ARM) || \
+         defined (__amd64__) || defined (_M_AMD64) || defined (__x86_64__) || \
+         defined (__alpha__)
+#		define ZVD_LITTLE_ENDIAN 1
+#  elif defined (__ia64__)
+	// itanium allows both settings - so, a seperate check is needed */
+#		if defined (__BIG_ENDIAN__)
+#			define ZVD_BIG_ENDIAN 1
+#		else
+#			define ZVD_LITTLE_ENDIAN 1
+#		endif
+#	else
+#		error "endianness couldn't be determined"
 #	endif
-
-// test x64
-#	ifdef _M_X64
-#		define ZVD_ARCH_X64
-#		define ZVD_LITTLE_ENDIAN
-#	endif
-
-#endif // how much bit processor architecture tests
+#endif /* ZVD_BIG_ENDIAN */
 
 //-----------------------------------------------------------------------------
 // API macros, Library type
