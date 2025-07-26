@@ -64,6 +64,7 @@ appeared.
 #       define ZVD_PLATFORM_PS3
 #		define ZVD_OS_PS3
 #		define ZVD_OS_STRING "PS3"
+#		define ZVD_BIG_ENDIAN 1
 #		pragma message("Platform: PS3")
 #   endif
 
@@ -76,6 +77,7 @@ appeared.
 #			define ZVD_PLATFORM_XBOX360
 #			define ZVD_OS_XBOX360
 #			define ZVD_OS_STRING "XBox360"
+#			define ZVD_BIG_ENDIAN 1
 #			pragma message("Platform: XBox360")
 #		endif
 #	else
@@ -83,6 +85,7 @@ appeared.
 #			define ZVD_PLATFORM_XBOX
 #			define ZVD_OS_XBOX
 #			define ZVD_OS_STRING "XBox"
+#			define ZVD_BIG_ENDIAN 1
 #			pragma message("Platform: XBox")
 #		endif
 #	endif
@@ -121,6 +124,7 @@ appeared.
 #if defined(_M_IX86)
 #	if !defined(ZVD_ARCH_X86)
 #		define ZVD_ARCH_X86
+#		define ZVD_LITTLE_ENDIAN 1
 #	endif
 #endif
 
@@ -128,6 +132,7 @@ appeared.
 #if defined(_M_X64)
 #	if !defined(ZVD_ARCH_X64)
 #		define ZVD_ARCH_X64
+#		define ZVD_LITTLE_ENDIAN 1
 #	endif
 #endif
 

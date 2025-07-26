@@ -86,6 +86,7 @@ Purpose: detect the target operating system.
 #       define ZVD_PLATFORM_PS3
 #		define ZVD_OS_PS3
 #		define ZVD_OS_STRING "PS3"
+#		define ZVD_BIG_ENDIAN 1
 #   endif
 
 
@@ -105,15 +106,17 @@ Purpose: detect the target operating system.
 // Test to define how much bit processor architecture has.
 //--------------------------------------------------------
 
-#if defined(__i386__) || defined(__i386)
+#if defined(__i386__) || defined(__i386) || defined(i386)
 #	if !defined(ZVD_ARCH_X86)
 #		define ZVD_ARCH_X86
+#		define ZVD_LITTLE_ENDIAN 1
 #	endif
 #endif
 
 #if defined(__x86_64__)
 #	if !defined(ZVD_ARCH_X64)
 #		define ZVD_ARCH_X64
+#		define ZVD_LITTLE_ENDIAN 1
 #	endif
 #endif
 
