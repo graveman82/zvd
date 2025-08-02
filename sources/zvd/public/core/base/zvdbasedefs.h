@@ -234,6 +234,13 @@ union ZvdU32U16Converter {
 // Human readable convenient integers
 //-----------------------------------
 typedef ZvdUInt8 ZvdByte;
+typedef ZvdUInt16 ZvdWord;
+typedef ZvdUInt32 ZvdDword;
+
+typedef ZvdInt8 ZvdSByte;
+typedef ZvdInt16 ZvdSWord;
+typedef ZvdInt32 ZvdSDword;
+
 typedef ZvdUInt32 ZvdSize32;
 typedef ZvdUInt32 ZvdUIndex32;
 typedef ZvdInt32 ZvdIndex32;
