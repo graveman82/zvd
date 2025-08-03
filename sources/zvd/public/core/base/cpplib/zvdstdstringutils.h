@@ -58,6 +58,7 @@ Purpose: std-like string utils.
 #endif
 
 ZvdSize Zvdf_strlen(const char* str);
+void Zvdf_strcpy(char* pDest, ZvdSize nDestSize, const char* pSrc);
 ZvdSize Zvdf_snprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, ...);
 ZvdSize Zvdf_vsnprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, va_list params);
 #endif // ZVD_STD_STRING_UTILS_H

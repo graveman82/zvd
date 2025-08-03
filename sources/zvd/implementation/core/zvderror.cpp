@@ -48,7 +48,14 @@ Created:            jan 13, 2012
 #include "core/base/zvderror.h"
 #include "core/base/zvdassert.h"
 #include "core/base/zvdbyteutils.h"
+#include "core/base/zvdstaticsingleton.h"
+#include "core/base/cpplib/zvdstdstringutils.h"
 
+#ifdef ZVD_MSVC
+#include <Windows.h>
+#endif
+
+#include <new>
 
 #if 0
 const char* ZvdErrorStatusToCString(ZvdByte nStatus)
@@ -144,4 +151,143 @@ bool ZvdPackedError::IsOk() const
 bool ZvdPackedError::HasErrorMarker(ZvdRetVal val)
 {
 	return (ZvdGetByte(val, 0) & kZVD_EF_FAIL) != 0;
+}
+
+
+//=============================================================================
+// Error handling.
+//=============================================================================
+
+
+
+namespace zvd
+{
+	namespace details
+	{
+		class ErrorReporter;
+		struct ErrorReporterCtor
+		{
+			ErrorReporter* operator()(void* p);
+		};
+		
+		// for size calculation
+		struct ErrorReporterData
+		{
+			enum Constants
+			{
+				kDESC_BUF_SIZE = 1024
+			};
+			typedef ZVD_ASSERT_CHARTYPE CharType;
+			typedef const CharType* ConstStringType;
+
+		private:
+			CharType m_descBuffer[kDESC_BUF_SIZE];
+			ZvdUInt32 m_bInReporting{ kZVD_NO_U32 };
+			ConstStringType m_fileAndLine;
+		};
+
+		typedef ZvdStaticSingleton<ErrorReporter,
+			ZVD_ALIGNED_TYPE_SIZE(ErrorReporterData, 0, 16),
+			ErrorReporterCtor> ErrorReporterBase;
+
+		class ErrorReporter : public ErrorReporterBase
+		{
+		public:
+			enum Constants
+			{
+				kDESC_BUF_SIZE = ErrorReporterData::kDESC_BUF_SIZE
+			};
+			typedef ErrorReporterData::CharType CharType;
+			typedef ErrorReporterData::ConstStringType ConstStringType;
+
+			friend class ZvdStaticSingleton<ErrorReporter,
+				ZVD_ALIGNED_TYPE_SIZE(ErrorReporterData, 0, 16),
+				ErrorReporterCtor>;
+			friend struct ErrorReporterCtor;
+
+			ErrorReporter()
+				: m_bInReporting( kZVD_NO_U32 )
+				, m_fileAndLine(ZVD_ASSERT_TEXT("")) {}
+
+			ZvdUInt32 Report(ZvdeErrorLevel level, ZvdUInt32 bLog, const char* pFormat, va_list params)
+			{
+				// disable recursion
+				if (m_bInReporting)
+					return kZVD_NO_U32;
+				m_bInReporting = kZVD_YES_U32;
+				
+				const char* pTitle = "Warning: \n";
+				if ((ZvdInt32)level == kZVD_FATAL)
+				{
+					pTitle = "FatalError:\n";
+				}
+				else if ((ZvdInt32)level == kZVD_ERROR)
+				{
+					pTitle = "Error:\n";
+				}
+				
+				// format the message and save it in buffer
+				
+				Zvdf_strcpy(m_descBuffer, kDESC_BUF_SIZE, pTitle);
+				ZvdSize nTitleLen = Zvdf_strlen(pTitle);
+				ZvdSize nBufSize = kDESC_BUF_SIZE - nTitleLen;
+				char* pBuf = m_descBuffer + nTitleLen;
+				Zvdf_vsnprintf(pBuf, nBufSize, nBufSize - 1, pFormat, params);
+				
+				// print the buffer to the console
+				/// @todo
+				if (bLog)
+				{
+					/// @todo
+				}
+				
+#ifdef ZVD_MSVC
+				
+				::MessageBoxA(kZVD_NULLVOID, m_descBuffer, "Fatal Error",
+					MB_OK | MB_ICONHAND | MB_SETFOREGROUND | MB_TASKMODAL);
+#endif
+				m_descBuffer[0] = '\0';
+				m_bInReporting = kZVD_NO_U32;
+				return kZVD_YES_U32;
+			}
+
+			void Set(ConstStringType fileAndLine)
+			{
+				m_fileAndLine = fileAndLine;
+			}
+
+			ConstStringType FileAndLine() const { return m_fileAndLine; }
+
+			ZvdUInt32 IsInReporting() const { return m_bInReporting; }
+
+		private:
+			CharType m_descBuffer[kDESC_BUF_SIZE];
+			ZvdUInt32 m_bInReporting;
+			ConstStringType m_fileAndLine;
+		};
+
+		ErrorReporter* ErrorReporterCtor::operator()(void* p)
+		{
+			return ::new(p) ErrorReporter();
+		}
+	} // eof details
+} // eof zvd
+
+
+void ZvdfFatalError(const char* pFormat, ...)
+{
+	zvd::details::ErrorReporter& errorReporter = zvd::details::ErrorReporter::Instance();
+
+	// disable recursion
+	if (errorReporter.IsInReporting())
+		return;
+
+	va_list args;
+	va_start(args, pFormat);
+	errorReporter.Report(kZVD_FATAL, kZVD_YES_U32, pFormat, args);
+	va_end(args);
+	
+	
+	// exit program
+	//exit(EXIT_FAILURE);
 }

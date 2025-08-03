@@ -62,6 +62,21 @@ ZvdSize Zvdf_strlen(const char* str)
 	return 0;
 }
 
+void Zvdf_strcpy(char* pDest, ZvdSize nDestSize, const char* pSrc)
+{
+	if (!pDest || !pSrc || nDestSize == 0)
+		return;
+#if !defined(ZVD_CFG_USE_NOSECURE_VSNPRINTF) && \
+defined(ZVD_MSVC) && ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2005_8_x_0)
+	strcpy_s(pDest, nDestSize, pSrc);
+#else
+	ZvdSize nSrcLen = Zvdf_strlen(pSrc);
+	ZvdSize nCopy = ZvdfMin<ZvdSize>(nDestSize - 1, nSrcLen);
+	strncpy(pDest, pSrc, nCopy);
+	pDest[nCopy] = 0;
+#endif
+}
+
 ZvdSize Zvdf_snprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, ...)
 {
 	va_list args;
@@ -88,7 +103,8 @@ ZvdSize Zvdf_vsnprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char cons
 	}
 	ZVD_ASSERT_HIGH_NOMSG(pFormat);
 	ZVD_ASSERT_HIGH_NOMSG(nCount < nDestSize);
-#if !defined(ZVD_CFG_USE_NOSECURE_VSNPRINTF) && defined(ZVD_MSVC) && ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2005_8_x_0)
+#if !defined(ZVD_CFG_USE_NOSECURE_VSNPRINTF) && \
+defined(ZVD_MSVC) && ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2005_8_x_0)
 	int nRetVal = _vsnprintf_s(pDest, nDestSize, nCount, pFormat, params);	
 #else
 	int nRetVal = _vsnprintf(pDest, nCount, pFormat, params);

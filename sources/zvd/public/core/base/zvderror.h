@@ -50,6 +50,17 @@ Purpose: error processing & reporting.
 #include "core/base/zvderrorcodes.h"
 #include "core/base/zvdbyteutils.h"
 
+enum ZvdeErrorLevel
+{
+	kZVD_WARN,
+	kZVD_ERROR,
+	kZVD_FATAL
+};
+
+/** Reports error and terminates program.
+ */
+void ZvdfFatalError(const char* pFormat, ...);
+
 //=============================================================================
 // Error format
 
@@ -122,7 +133,7 @@ const ZvdByte kZVD_ES_FATAL = kZVD_EF_FATAL;
 const ZvdByte kZVD_EM_SOURCEMASK = 0x7F;
 const ZvdByte kZVD_EM_SOURCEMASKEXT = 0x80;
 
-
+const ZvdUInt32 kZVD_E_CODE_MAX = 32767;
 #pragma pack(push, 1)
 //-----------------------------------------------------------------------------
 class ZvdPackedError

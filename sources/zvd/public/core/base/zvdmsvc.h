@@ -90,5 +90,10 @@ Purpose: Microsoft Visual C++ compiler related definitions.
 */
 
 #define ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ver) (ZVD_COMPILER_MSVC_VERSION >= ver)
+#define ZVD_COMPILER_MSVC_VERSION_LESS_THAN(ver) (ZVD_COMPILER_MSVC_VERSION < ver)
+
+#if defined ZVD_CFG_DISABLE_WARN4996
+#pragma warning(disable:4996)
+#endif
 
 #endif // ZVD_MSVC_H
