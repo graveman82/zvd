@@ -36,7 +36,7 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: common macros defs.
+Purpose: std-like string utils.
 
 ----------------------
  For developers notes
@@ -44,11 +44,20 @@ Purpose: common macros defs.
 
 */
 
-#ifndef ZVD_COMMON_MACROS_H
-#define ZVD_COMMON_MACROS_H
+#ifndef ZVD_STD_STRING_UTILS_H
+#define ZVD_STD_STRING_UTILS_H
 
-/// A helper macro that declares the argument of function as unused. 
-#define ZVD_UNUSED_ARG(arg) ((void)(arg))
-#define ZVD_UNUSED(someVar) {(void)(someVar);}
+#include "core/base/zvdbasedefs.h"
 
-#endif // ZVD_COMMON_MACROS_H
+
+
+#if defined(ZVD_MSVC) && ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2005_8_x_0)
+#define ZVD_CSTR_TRUNCATE _TRUNCATE
+#else
+#define ZVD_CSTR_TRUNCATE ((ZVD_CFG_MAX_CSTR_LEN)-1)
+#endif
+
+ZvdSize Zvdf_strlen(const char* str);
+ZvdSize Zvdf_snprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, ...);
+ZvdSize Zvdf_vsnprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, va_list params);
+#endif // ZVD_STD_STRING_UTILS_H

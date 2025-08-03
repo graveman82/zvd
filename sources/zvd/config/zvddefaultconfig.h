@@ -54,4 +54,17 @@ Created:            jan 11, 2012
 #define ZVD_CFG_MIN_GNUC_MAJOR 8
 #define ZVD_CFG_MIN_GNUC_MINOR 1
 #define ZVD_CFG_MIN_GNUC_PATCHLEVEL 0
+
+// Compiler warnings (msvc)
+//#define ZVD_CFG_DISABLE_WARN4996
+
+
+//== std string utils =========================================================
+#ifdef ZVD_CFG_DISABLE_WARN4996
+#	define ZVD_CFG_USE_NOSECURE_VSNPRINTF
+
+#endif
+
+#define ZVD_CFG_MAX_CSTR_LEN 16384
+
 #endif // ZVD_DEFAULT_CONFIG_H

@@ -36,7 +36,7 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: common macros defs.
+Purpose: common utilities.
 
 ----------------------
  For developers notes
@@ -44,11 +44,14 @@ Purpose: common macros defs.
 
 */
 
-#ifndef ZVD_COMMON_MACROS_H
-#define ZVD_COMMON_MACROS_H
+#ifndef ZVD_COMMONUTILS_H
+#define ZVD_COMMONUTILS_H
 
-/// A helper macro that declares the argument of function as unused. 
-#define ZVD_UNUSED_ARG(arg) ((void)(arg))
-#define ZVD_UNUSED(someVar) {(void)(someVar);}
+#include "core/base/zvdbasedefs.h"
 
-#endif // ZVD_COMMON_MACROS_H
+template <typename TRetVal, typename T1, typename T2>
+TRetVal ZvdfMin(const T1& a, const T2& b)
+{
+	return (a < b) ? a : b;
+}
+#endif // ZVD_COMMONUTILS_H

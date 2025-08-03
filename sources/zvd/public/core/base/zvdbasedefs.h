@@ -54,16 +54,21 @@ Purpose: base definitions.
 #endif
 
 
-#if defined(ZVD_HAS_STDINT_H)
-#	include <cstdint>
-#endif
-
-
 
 //-----------------------------------------------------------------------------
 // Compilers family detection
 
 #include "core/base/zvdcompiler.h"
+
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cstdlib>
+
+
+#if defined(ZVD_HAS_STDINT_H)
+#	include <cstdint>
+#endif
 
 //-----------------------------------------------------------------------------
 // OS detection
