@@ -36,28 +36,36 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: common utilities.
+Purpose: memory management related definitions (windows based systems).
 
 ----------------------
  For developers notes
 ----------------------
-
+Attention: don't include this file directly! Use zvdmemdefs.h instead.
 */
 
-#ifndef ZVD_COMMONUTILS_H
-#define ZVD_COMMONUTILS_H
+#ifndef ZVD_MEMDEFSWIN_H
+#define ZVD_MEMDEFSWIN_H
 
 #include "core/base/zvdbasedefs.h"
 
-template <typename TRetVal, typename T1, typename T2>
-TRetVal ZvdfMin(const T1& a, const T2& b)
-{
-	return (a < b) ? a : b;
-}
+#if defined(ZVD_PLATFORM_XBOX360) || defined(ZVD_PLATFORM_WIN32) || defined(ZVD_PLATFORM_WIN64) 
 
-template <typename T>
-T ZvdfMin(const T& a, const T& b)
-{
-	return (a < b) ? a : b;
-}
-#endif // ZVD_COMMONUTILS_H
+//-----------------------------------------------------------------------------
+// Macro utils
+#define ZVD_ALIGN_OF(T) __alignof(T)
+#define ZVD_ALIGN_CLASS_BEGIN(T) __declspec(align(T))
+#define ZVD_ALIGN_CLASS_END(T)
+
+//-----------------------------------------------------------------------------
+// Memory allocation functions prototypes pointers
+typedef void* (__cdecl* Zvdfpt_aligned_malloc)(ZvdSize nBytes, ZvdSize nAlignment);
+typedef void* (__cdecl* Zvdfpt_aligned_realloc)(void* pMemBlock, ZvdSize nBytes, ZvdSize nAlignment);
+typedef void(__cdecl* Zvdfpt_aligned_free)(void* pMemBlock);
+
+typedef void* (__cdecl *Zvdfpt_malloca)(ZvdSize nBytes);
+typedef void (__cdecl* Zvdfpt_freea)(void* pMemBlock);
+
+#endif // eof (XBox or Win32 or Win64)
+
+#endif // ZVD_MEMDEFSWIN_H

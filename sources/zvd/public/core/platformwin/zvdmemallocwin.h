@@ -36,28 +36,28 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: common utilities.
+Purpose: memory allocation routines (windows based systems).
 
 ----------------------
  For developers notes
 ----------------------
-
+Attention: don't include this file directly! Use zvdmemalloc.h instead.
 */
 
-#ifndef ZVD_COMMONUTILS_H
-#define ZVD_COMMONUTILS_H
+#ifndef ZVD_MEMALLOCWIN_H
+#define ZVD_MEMALLOCWIN_H
 
-#include "core/base/zvdbasedefs.h"
+#include "core/system/memory/zvdmemdefs.h"
 
-template <typename TRetVal, typename T1, typename T2>
-TRetVal ZvdfMin(const T1& a, const T2& b)
-{
-	return (a < b) ? a : b;
-}
+#if defined(ZVD_PLATFORM_XBOX360) || defined(ZVD_PLATFORM_WIN32) || defined(ZVD_PLATFORM_WIN64) 
 
-template <typename T>
-T ZvdfMin(const T& a, const T& b)
-{
-	return (a < b) ? a : b;
-}
-#endif // ZVD_COMMONUTILS_H
+extern Zvdfpt_aligned_malloc Zvdfp_aligned_malloc;
+extern Zvdfpt_aligned_realloc Zvdfp_aligned_realloc;
+extern Zvdfpt_aligned_free Zvdfp_aligned_free;
+
+extern Zvdfpt_malloca Zvdfp_malloca;
+extern Zvdfpt_freea Zvdfp_freea;
+
+#endif // eof (XBox or Win32 or Win64)
+
+#endif // ZVD_MEMALLOCWIN_H

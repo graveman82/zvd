@@ -60,15 +60,28 @@ Purpose: base definitions.
 
 #include "core/base/zvdcompiler.h"
 
+#if defined(ZVD_MSVC) 
+#	ifdef _DEBUG
+#		ifndef ZVD_DEBUG
+#			define ZVD_DEBUG
+#		endif
+#	endif
+
+#endif
+
+
+
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
 #include <cstdlib>
 
 
-#if defined(ZVD_HAS_STDINT_H)
+#if defined(ZVD_HAS_STDINT_H_FILE)
 #	include <cstdint>
 #endif
+
+#include <cstddef>
 
 //-----------------------------------------------------------------------------
 // OS detection
@@ -96,6 +109,9 @@ Purpose: base definitions.
 #	error "For now windows and linux platforms are supported only."
 #endif
 
+#if defined(ZVD_PLATFORM_PS3)
+#error "Isn't implemented yet"
+#endif
 
 //-----------------------------------------------------------------------------
 // Endiannes
@@ -175,7 +191,7 @@ Purpose: base definitions.
 
 // fixed size integers
 //---------------------
-#if defined(ZVD_HAS_STDINT_H)
+#if defined(ZVD_HAS_STDINT_H_FILE)
 typedef int8_t ZvdInt8;
 typedef int16_t ZvdInt16;
 typedef int32_t ZvdInt32;
@@ -201,6 +217,21 @@ typedef unsigned __int32 ZvdUInt32;
 #	if defined(ZVD_ARCH_X64) // Нужен ли этот макрос здесь?
 typedef __int64 ZvdInt64;
 typedef unsigned __int64 ZvdUInt64;
+#	endif
+
+#else
+
+typedef signed char ZvdInt8;
+typedef short ZvdInt16;
+typedef int ZvdInt32;
+
+typedef unsigned char ZvdUInt8;
+typedef unsigned short ZvdUInt16;
+typedef unsigned int ZvdUInt32;
+
+#	if defined(ZVD_ARCH_X64)
+typedef long long ZvdInt64;
+typedef unsigned long long ZvdUInt64;
 #	endif
 
 #endif // fixed size integers
@@ -250,19 +281,29 @@ typedef ZvdUInt32 ZvdSize32;
 typedef ZvdUInt32 ZvdUIndex32;
 typedef ZvdInt32 ZvdIndex32;
 
-#if defined(ZVD_ARCH_X64)
-typedef ZvdUInt64 ZvdSize;
-typedef ZvdInt64 ZvdPtrDiff;
-
-#elif defined(ZVD_ARCH_X86)
-typedef ZvdUInt32 ZvdSize;
-typedef ZvdInt32 ZvdPtrDiff;
-
+#ifdef ZVD_HAS_STD_DEFS
+typedef size_t ZvdSize;
+typedef ptrdiff_t ZvdPtrDiff;
+typedef intptr_t ZvdIntPtr;
 #else
-typedef ZvdUInt16 ZvdSize;
-typedef ZvdInt16 ZvdPtrDiff;
+#	if defined(ZVD_ARCH_X64)
+		typedef ZvdUInt64 ZvdSize;
+		typedef ZvdInt64 ZvdPtrDiff;
+		typedef ZvdInt64 ZvdIntPtr;
 
-#endif // arch
+#	elif defined(ZVD_ARCH_X86)
+		typedef ZvdUInt32 ZvdSize;
+		typedef ZvdInt32 ZvdPtrDiff;
+		typedef ZvdInt32 ZvdIntPtr;
+
+#	else
+		typedef ZvdUInt16 ZvdSize;
+		typedef ZvdInt16 ZvdPtrDiff;
+		typedef ZvdInt16 ZvdIntPtr;
+
+#	endif // arch
+
+#endif
 
 typedef ZvdSize ZvdUIndex;
 

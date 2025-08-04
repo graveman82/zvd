@@ -95,5 +95,14 @@ Purpose: Microsoft Visual C++ compiler related definitions.
 #if defined ZVD_CFG_DISABLE_WARN4996
 #pragma warning(disable:4996)
 #endif
+#pragma warning(disable:26495)
+
+#ifndef ZVD_HAS_STDINT_H_FILE
+#	if ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2010_10_x_0)
+#		define ZVD_HAS_STDINT_H_FILE
+
+#	endif
+
+#endif // ! ZVD_HAS_STDINT_H
 
 #endif // ZVD_MSVC_H

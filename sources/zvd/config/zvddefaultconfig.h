@@ -58,6 +58,9 @@ Created:            jan 11, 2012
 // Compiler warnings (msvc)
 //#define ZVD_CFG_DISABLE_WARN4996
 
+/** Comment this if no size_t, ptrdiff_t etc in your compiler's library
+*/ 
+#define ZVD_HAS_STD_DEFS
 
 //== std string utils =========================================================
 #ifdef ZVD_CFG_DISABLE_WARN4996
@@ -67,4 +70,7 @@ Created:            jan 11, 2012
 
 #define ZVD_CFG_MAX_CSTR_LEN 16384
 
+//== memory ===================================================================
+
+#define ZVD_CFG_ALLOC_UP_LIMIT (256 * 1024 * 1024)
 #endif // ZVD_DEFAULT_CONFIG_H
