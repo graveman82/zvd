@@ -142,8 +142,11 @@ Purpose: base definitions.
 
 #ifdef ZVD_DLL_EXPORTS
 #	define ZVD_API __declspec(dllexport)
-#else
+#elif ZVD_DLL_IMPORTS
 #	define ZVD_API __declspec(dllimport)
+#else
+// static library use this
+#	define ZVD_API 
 #endif
 
 // Used for dll exporting and importing functions
