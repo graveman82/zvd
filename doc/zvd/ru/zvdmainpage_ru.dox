@@ -1,0 +1,25 @@
+/*! \file zvdmainpage_ru.dox
+    \brief Главная страница документации Zv3D (русская версия)
+*/
+
+/**
+\mainpage Документация по игровому движку Zv3D
+\tableofcontents
+
+- \ref Page_Zv3DIntro
+- \ref Page_Zv3DConcept
+
+*/
+
+
+/**
+\page Page_Zv3DIntro Введение
+\section features_sec Возможности
+\section start_sec Быстрый старт
+*/ 
+
+
+/**
+\page Page_Zv3DConcept Основные концепции
+- \ref Page_Zv3DMemoryManagement
+*/ 
