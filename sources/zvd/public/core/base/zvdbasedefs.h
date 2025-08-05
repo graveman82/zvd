@@ -183,6 +183,7 @@ Purpose: base definitions.
 // Used for standard calling conventions
 #ifdef ZVD_OS_WINDOWS
 	#define  ZVD_STDCALL			__stdcall
+#	define	 ZVD_CDECL				__cdecl
 	#define  ZVD_FASTCALL			__fastcall
 	#define  ZVD_FORCEINLINE		__forceinline	
 #else

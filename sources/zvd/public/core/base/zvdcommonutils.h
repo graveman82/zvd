@@ -48,6 +48,7 @@ Purpose: common utilities.
 #define ZVD_COMMONUTILS_H
 
 #include "core/base/zvdbasedefs.h"
+#include "core/base/zvdcommonmacros.h"
 
 template <typename TRetVal, typename T1, typename T2>
 TRetVal ZvdfMin(const T1& a, const T2& b)

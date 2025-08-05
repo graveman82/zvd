@@ -51,4 +51,5 @@ Purpose: common macros defs.
 #define ZVD_UNUSED_ARG(arg) ((void)(arg))
 #define ZVD_UNUSED(someVar) {(void)(someVar);}
 
+#define ZVD_MAKE_BIT_FLAG_VALUE(idxStartBit, nValue) ((nValue)<<(idxStartBit))
 #endif // ZVD_COMMON_MACROS_H
