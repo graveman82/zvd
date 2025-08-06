@@ -36,7 +36,7 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: this file declares ZvdObject - the root class of Zv3D's object model that provides:
+Purpose: this file declares ZvdñObject - the root class of Zv3D's object model that provides:
   - core runtime type information (RTTI)
   - object lifecycle management
   - hierarchical ownership
@@ -55,22 +55,85 @@ Purpose: this file declares ZvdObject - the root class of Zv3D's object model th
 #define ZVD_OBJECT_H
 
 #include "core/base/zvdbasedefs.h"
+#include "core/system/memory/zvdmemflags.h"
 
-/**
- * @brief Base class for all Zv3D engine objects with runtime behavior or complex structure.
- *
- * ZvdObject serves as the root class for all entities that:
- * - Require dynamic memory management
- * - Participate in the object hierarchy
- * - Need RTTI (Run-Time Type Information)
- * - Support serialization/deserialization
- *
- * @note Simple data containers (vectors, matrices) should NOT inherit from this class.
+
+
+
+// Forward declaration of the base class for Zv3D objects. 
+class ZVD_API ZvdcObject;
+
+/** @brief Type alias for a raw pointer to a ZvdcObject. */
+typedef ZvdcObject* ZvdcpObject;
+typedef const ZvdcObject* ZvdcpkObject;
+
+
+
+/** @brief Class for storing metadata about classes in the ZvdcObject hierarchy, 
+managing object creation, deletion, and cloning.
  */
-
-class ZVD_API ZvdObject
+class ZVD_API ZvdcClass
 {
+public:
+    /** @brief Function pointer type for creating a new instance of an object.
+ *  @param memFlags Memory allocation flags specifying how the object should be allocated.
+ *  @return A pointer to the newly created object, or nullptr on failure.
+ */
+    typedef ZvdcpObject(ZVD_STDCALL* ZvdfptCreateInstance)(ZvdcMemFlags memFlags);
 
+    /** @brief Function pointer type for deleting an object instance.
+     *  @param pObject Pointer to the object to be deleted.
+     */
+    typedef void (ZVD_STDCALL* ZvdfptDeleteInstance)(ZvdcpObject pObject);
+
+    /** @brief Function pointer type for cloning an existing object instance.
+     *  @param pObject Pointer to the source object to be cloned.
+     *  @return A pointer to the cloned object, or nullptr on failure.
+     */
+    typedef ZvdcpObject(ZVD_STDCALL* ZvdfptCloneInstance)(ZvdcpkObject pObject);
+
+    /** @brief Constructs a ZvdcClass with metadata and function pointers for object management.
+     *  @param pClassName Name of the class as a null-terminated string.
+     *  @param pCreateInstance Function pointer to create a new instance.
+     *  @param pDeleteInstance Function pointer to delete an instance.
+     *  @param pCloneInstance Function pointer to clone an instance.
+     */
+    ZvdcClass(ZvdCString pClassName,
+        ZvdfptCreateInstance pCreateInstance,
+        ZvdfptDeleteInstance pDeleteInstance,
+        ZvdfptCloneInstance pCloneInstance) ZVD_NOEXCEPT;
+
+    /** @brief Creates a new instance of the associated class.
+     *  @param memFlags Memory allocation flags.
+     *  @return Pointer to the created object, or nullptr if creation fails.
+     */
+    ZvdcpObject CreateInstance(ZvdcMemFlags memFlags) const ZVD_NOEXCEPT;
+
+    /** @brief Deletes an instance of the associated class.
+     *  @param pObject Pointer to the object to delete.
+     */
+    void DeleteInstance(ZvdcpObject pObject) const ZVD_NOEXCEPT;
+
+    /** @brief Clones an existing instance of the associated class.
+     *  @param pObject Pointer to the source object to clone.
+     *  @return Pointer to the cloned object, or nullptr if cloning fails.
+     */
+    ZvdcpObject CloneInstance(ZvdcpkObject pObject) const ZVD_NOEXCEPT;
+
+    /** @brief Gets the name of the associated class.
+     *  @return The class name as a null-terminated string.
+     */
+    ZvdCString GetClassName() const ZVD_NOEXCEPT
+    {
+        return m_pClassName;
+    }
+
+private:
+    ZvdCString m_pClassName;
+    ZvdfptCreateInstance m_pCreateInstance;
+    ZvdfptDeleteInstance m_pDeleteInstance;
+    ZvdfptCloneInstance m_pCloneInstance;
 };
+
 
 #endif // ZVD_OBJECT_H

@@ -418,6 +418,6 @@ ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
 struct ZvdsDefaultTag {};
 
 
-
+typedef const char* ZvdCString;
 
 #endif // ZVD_BASEDEFS_H

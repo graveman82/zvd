@@ -53,7 +53,7 @@ Purpose: blank file for headers.
 /**
  Memory allocation flags (bitfield)
  */
-class ZVD_API ZvdMemFlags
+class ZVD_API ZvdcMemFlags
 {
 public:
 
