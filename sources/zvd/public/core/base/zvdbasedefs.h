@@ -182,17 +182,26 @@ Purpose: base definitions.
 
 // Used for standard calling conventions
 #ifdef ZVD_OS_WINDOWS
-	#define  ZVD_STDCALL			__stdcall
-#	define	 ZVD_CDECL				__cdecl
-	#define  ZVD_FASTCALL			__fastcall
-	#define  ZVD_FORCEINLINE		__forceinline	
+#	define  ZVD_STDCALL			__stdcall
+#	define	ZVD_CDECL			__cdecl
+#	define  ZVD_FASTCALL		__fastcall
+#	define  ZVD_FORCEINLINE		__forceinline	
+
 #else
-	#define  ZVD_STDCALL
-	#define  ZVD_FASTCALL			   
-	#define  ZVD_FORCEINLINE		   inline
+#	define  ZVD_STDCALL
+#	define	ZVD_CDECL
+#	define  ZVD_FASTCALL			   
+#	define  ZVD_FORCEINLINE		   inline
+
 #endif
 
+#ifdef ZVD_CPP11
+#	define ZVD_NOEXCEPT noexcept
 
+#else
+#	define ZVD_NOEXCEPT
+
+#endif
 // fixed size integers
 //---------------------
 #if defined(ZVD_HAS_STDINT_H_FILE)
