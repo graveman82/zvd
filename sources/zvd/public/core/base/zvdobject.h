@@ -190,6 +190,18 @@ public:
      */
     static void operator delete[](void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
 
+    /** @brief Gets the current reference count.
+      *  @return The current reference count.
+      */
+    ZvdSize ZVD_STDCALL GetRefCount() const ZVD_NOEXCEPT
+    {
+#ifdef ZVD_CPP11
+            return m_nRefCount.load(std::memory_order_seq_cst);
+#else
+            return m_nRefCount;
+#endif
+    }
+
 private:
     static ZvdcClass* m_pClass;
 #ifdef ZVD_CPP11

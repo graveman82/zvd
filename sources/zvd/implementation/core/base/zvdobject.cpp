@@ -46,12 +46,7 @@ Purpose: ZvdcObject and ZvdcClass implementations.
 
 #include "core/base/zvdobject.h"
 #include "core/base/zvdassert.h"
-
-#ifndef ZVD_CPP11
-#   if defined(ZVD_PLATFORM_WIN64) || defined(ZVD_PLATFORM_WIN32)
-#       include <windows.h> //  InterlockedIncrement, InterlockedDecrement
-#   endif
-#endif
+#include "core/base/zvdatomic.h"
 
 //-----------------------------------------------------------------------------
 ZvdcClass::ZvdcClass(ZvdCString pClassName,
@@ -132,34 +127,14 @@ ZvdcObject::ZvdcObject() ZVD_NOEXCEPT
 void ZvdcObject::AddRef() ZVD_NOEXCEPT
 {
     ZVD_ASSERT_HIGH_NOMSG(m_nRefCount >= 0);
-#ifdef ZVD_CPP11
-    ++m_nRefCount;
-#else
-#if defined(ZVD_PLATFORM_WIN64) || defined(ZVD_PLATFORM_WIN32)
-    return InterlockedIncrement(&m_refCount);
-#elif defined(ZVD_PLATFORM_LINUX)
-    return __sync_add_and_fetch(&m_refCount, 1);
-#else
-#   error "Unsupported platform for atomic operations"
-#endif
-#endif
+    ZvdfAtomicIncrementSize(m_nRefCount);
 }
 
 //-----------------------------------------------------------------------------
 void ZvdcObject::Release() ZVD_NOEXCEPT
 {
     ZVD_ASSERT_HIGH_NOMSG(m_nRefCount > 0);
-#ifdef ZVD_CPP11
-    --m_nRefCount;
-#else
-#if defined(ZVD_PLATFORM_WIN64) || defined(ZVD_PLATFORM_WIN32)
-    InterlockedDecrement(&m_refCount);
-#elif defined(ZVD_PLATFORM_LINUX)
-    __sync_sub_and_fetch(&m_refCount, 1);
-#else
-#error "Unsupported platform for atomic operations"
-#endif
-#endif
+    ZvdfAtomicDecrementSize(m_nRefCount);
     if (m_nRefCount == 0)
     {
         this->GetClass().DeleteInstance(this);
