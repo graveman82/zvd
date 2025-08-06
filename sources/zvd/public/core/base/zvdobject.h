@@ -58,6 +58,9 @@ Purpose: this file declares ZvdñObject - the root class of Zv3D's object model t
 #include "core/system/memory/zvdmemflags.h"
 
 
+#ifdef ZVD_CPP11
+#include <atomic>
+#endif
 
 
 // Forward declaration of the base class for Zv3D objects. 
@@ -134,6 +137,68 @@ private:
     ZvdfptDeleteInstance m_pDeleteInstance;
     ZvdfptCloneInstance m_pCloneInstance;
 };
+
+
+//-----------------------------------------------------------------------------
+/** @brief Base class for Zv3D objects, providing RTTI, polymorphic object management, and reference counting.
+ */
+class ZVD_API ZvdcObject
+{
+public:
+    static ZvdcClass& ZVD_STDCALL GetClass() ZVD_NOEXCEPT;
+ 
+    /** @brief Default constructor for ZvdcObject.
+     *  Initializes the reference count to 1.
+     */
+    ZvdcObject() ZVD_NOEXCEPT;
+
+    /** @brief Virtual destructor for ZvdcObject.
+     */
+    virtual ~ZvdcObject() = default;
+
+    /** @brief Increments the reference count atomically.
+     */
+    void AddRef() ZVD_NOEXCEPT;
+
+    /** @brief Decrements the reference count atomically and deletes the object if the count reaches zero.
+     */
+    void Release() ZVD_NOEXCEPT;
+
+    /** @brief Allocates memory for a single object with custom memory flags.
+     *  @param nSize Size of the memory to allocate.
+     *  @param memFlags Memory allocation flags.
+     *  @return Pointer to the allocated memory.
+     */
+    static void* operator new(ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+
+    /** @brief Frees memory for a single object with custom memory flags.
+     *  @param ptr Pointer to the memory to free.
+     *  @param memFlags Memory allocation flags used during allocation.
+     */
+    static void operator delete(void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+
+    /** @brief Allocates memory for an array of objects with custom memory flags.
+     *  @param nSize Size of the memory to allocate.
+     *  @param memFlags Memory allocation flags.
+     *  @return Pointer to the allocated memory.
+     */
+    static void* operator new[](ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+
+    /** @brief Frees memory for an array of objects with custom memory flags.
+     *  @param ptr Pointer to the memory to free.
+     *  @param memFlags Memory allocation flags used during allocation.
+     */
+    static void operator delete[](void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+
+private:
+    static ZvdcClass* m_pClass;
+#ifdef ZVD_CPP11
+    std::atomic<ZvdSize> m_nRefCount;
+#else
+    ZvdSize m_nRefCount;
+#endif
+};
+
 
 
 #endif // ZVD_OBJECT_H

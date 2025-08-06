@@ -47,6 +47,12 @@ Purpose: ZvdcObject and ZvdcClass implementations.
 #include "core/base/zvdobject.h"
 #include "core/base/zvdassert.h"
 
+#ifndef ZVD_CPP11
+#   if defined(ZVD_PLATFORM_WIN64) || defined(ZVD_PLATFORM_WIN32)
+#       include <windows.h> //  InterlockedIncrement, InterlockedDecrement
+#   endif
+#endif
+
 //-----------------------------------------------------------------------------
 ZvdcClass::ZvdcClass(ZvdCString pClassName,
     ZvdfptCreateInstance pCreateInstance,
@@ -94,4 +100,114 @@ ZvdcpObject ZvdcClass::CloneInstance(ZvdcpkObject pObject) const ZVD_NOEXCEPT
         return kZVD_NULLPTR(ZvdcObject);
     }
     return m_pCloneInstance(pObject);
+}
+
+//-----------------------------------------------------------------------------
+// Static member definition
+ZvdcClass* ZvdcObject::m_pClass = kZVD_NULLPTR(ZvdcClass);
+
+//-----------------------------------------------------------------------------
+// Static method implementations
+ZvdcClass& ZVD_STDCALL ZvdcObject::GetClass() ZVD_NOEXCEPT
+{
+    /// Will be set by @todo during engine initialization
+    // Temporary assertion for debugging
+    if (!m_pClass)
+    {
+        // Replace with proper error handling in production
+        ZVD_ASSERT_HIGH(false, "ZvdcClass not registered for this class");
+    }
+    return *m_pClass;
+}
+
+//-----------------------------------------------------------------------------
+// 
+ZvdcObject::ZvdcObject() ZVD_NOEXCEPT
+    : m_nRefCount(1)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+void ZvdcObject::AddRef() ZVD_NOEXCEPT
+{
+    ZVD_ASSERT_HIGH_NOMSG(m_nRefCount >= 0);
+#ifdef ZVD_CPP11
+    ++m_nRefCount;
+#else
+#if defined(ZVD_PLATFORM_WIN64) || defined(ZVD_PLATFORM_WIN32)
+    return InterlockedIncrement(&m_refCount);
+#elif defined(ZVD_PLATFORM_LINUX)
+    return __sync_add_and_fetch(&m_refCount, 1);
+#else
+#   error "Unsupported platform for atomic operations"
+#endif
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void ZvdcObject::Release() ZVD_NOEXCEPT
+{
+    ZVD_ASSERT_HIGH_NOMSG(m_nRefCount > 0);
+#ifdef ZVD_CPP11
+    --m_nRefCount;
+#else
+#if defined(ZVD_PLATFORM_WIN64) || defined(ZVD_PLATFORM_WIN32)
+    InterlockedDecrement(&m_refCount);
+#elif defined(ZVD_PLATFORM_LINUX)
+    __sync_sub_and_fetch(&m_refCount, 1);
+#else
+#error "Unsupported platform for atomic operations"
+#endif
+#endif
+    if (m_nRefCount == 0)
+    {
+        this->GetClass().DeleteInstance(this);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void* ZvdcObject::operator new(ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+{
+    ZVD_ASSERT_HIGH(nSize >= sizeof(ZvdcObject), "Invalid size for object allocation");
+    void* ptr = kZVD_NULLVOID;
+    // allocate and assign to ptr
+    if (!ptr)
+    {
+        // Error("Memory allocation failed for object");
+        return nullptr;
+    }
+    return ptr;
+}
+
+//-----------------------------------------------------------------------------
+void ZvdcObject::operator delete(void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+{
+    if (ptr)
+    {
+        // deallocate
+    }
+}
+
+//-----------------------------------------------------------------------------
+void* ZvdcObject::operator new[](ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+{
+    ZVD_ASSERT_HIGH(nSize >= sizeof(ZvdcObject), "Invalid size for object array allocation");
+    void* ptr = kZVD_NULLVOID;
+    // allocate and assign to ptr
+    if (!ptr)
+    {
+        // Error("Memory allocation failed for object array");
+        return nullptr;
+    }
+    return ptr;
+}
+
+//-----------------------------------------------------------------------------
+void ZvdcObject::operator delete[](void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+{
+    if (ptr)
+    {
+        // deallocate
+    }
 }
