@@ -47,14 +47,14 @@ Purpose: dynamic arrays templates.
 #ifndef ZVD_DARRAY_H
 #define ZVD_DARRAY_H
 
-#include "core/system/zvdimemoryallocator.h"
+#include "core/system/memory/zvdimemoryallocator.h"
 #include "core/base/zvdassert.h"
 #include "core/base/cpplib/zvdcppobj.h"
 
 template <typename TElement, 
 	typename TMemoryAllocator,
 	typename TUtil = ZvdRegularCppObjectUtil<TElement>>
-class ZvdDArray
+class ZvdñDArray
 {
 public:
 	typedef ZvdSize SizeType;
@@ -62,7 +62,7 @@ public:
 	typedef TElement* Pointer;
 	typedef TElement* Iterator;
 
-	ZvdDArray()
+	ZvdñDArray()
 		: m_pData(kZVD_NULLPTR(TElement))
 		, m_nCount(0)
 		, m_nCapacity(0)
@@ -70,7 +70,7 @@ public:
 
 	}
 
-	~ZvdDArray()
+	~ZvdñDArray()
 	{
 		Clear();
 		ZvdRegularResult retVal = ResizeMemory(0);
