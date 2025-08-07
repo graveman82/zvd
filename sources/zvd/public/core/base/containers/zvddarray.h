@@ -78,6 +78,7 @@ public:
 		{
 			/// @todo
 			// abort program
+			ZvdfFatalError("ZvdñDArray destructor, ResizeMemory(0) returned %x", retVal.Error().RetVal());
 		}
 	}
 
