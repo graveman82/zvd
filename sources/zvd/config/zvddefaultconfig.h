@@ -48,7 +48,10 @@ Created:            jan 11, 2012
 #ifndef ZVD_DEFAULT_CONFIG_H
 #define ZVD_DEFAULT_CONFIG_H
 
+//#define ZVD_CFG_USE_EXCEPTIONS
 #define ZVD_CFG_BUILD_DEBUG
+
+#define ZVD_CFG_DEBUG_MEMORY
 
 #define ZVD_CFG_MIN_MSVC_VER 1921
 #define ZVD_CFG_MIN_GNUC_MAJOR 8

@@ -55,41 +55,41 @@ public:
 	typedef ZvdSize SizeType;
 	typedef ZvdResult<ZvdiMemoryAllocator*> ResultType;
 
-	virtual ~ZvdiMemoryAllocator() {}
+	virtual ~ZvdiMemoryAllocator() ZVD_NOEXCEPT {}
 
-	virtual ZvdResult<void*> Allocate(SizeType nBytes) = 0;
+	virtual ZvdResult<void*> Allocate(SizeType nBytes) ZVD_NOEXCEPT = 0;
 
-	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes) = 0;
+	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes) ZVD_NOEXCEPT = 0;
 
-	virtual ZvdRegularResult Deallocate(void* p) = 0;
+	virtual ZvdRegularResult Deallocate(void* p) ZVD_NOEXCEPT = 0;
 
 	// Methods to be used when allocator is template parameter
 	//--------------------------------------------------------
-	static ZvdUInt32 IsSingleton() { return kZVD_NO_U32; }
+	static ZvdUInt32 IsSingleton() ZVD_NOEXCEPT { return kZVD_NO_U32; }
 	// If singleton implement these methods:
-	static ResultType Instance() 
+	static ResultType Instance() ZVD_NOEXCEPT
 	{ 
 		return ResultType(
 			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
 	}
 
 	/// If true this memory allocator is subsystem of some larger system (engine).
-	static ZvdUInt32 IsSubsystem() { return kZVD_NO_U32; }
+	static ZvdUInt32 IsSubsystem() ZVD_NOEXCEPT { return kZVD_NO_U32; }
 	// If subsystem implement these methods:
 	// 
 	//	You can request to engine class for example 
-	static ResultType AsSubsystem() 
+	static ResultType AsSubsystem() ZVD_NOEXCEPT
 	{ 
 		return ResultType(
 			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
 	}
 		//
-	virtual ZvdUInt32 IsReady() const { return kZVD_NO_U32; }
-	virtual ZvdUInt32 IsInitialized() const { return kZVD_NO_U32; }
+	virtual ZvdUInt32 IsReady() const ZVD_NOEXCEPT { return kZVD_NO_U32; }
+	virtual ZvdUInt32 IsInitialized() const ZVD_NOEXCEPT { return kZVD_NO_U32; }
 
-	static ZvdUInt32 CanBeCreatedOnStack() { return kZVD_YES_U32; }
+	static ZvdUInt32 CanBeCreatedOnStack() ZVD_NOEXCEPT { return kZVD_YES_U32; }
 	// If subsystem implement these methods:
-	static ResultType CreateOnStack(void* pStackMem)
+	static ResultType CreateOnStack(void* pStackMem) ZVD_NOEXCEPT
 	{
 		return ResultType(
 			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));

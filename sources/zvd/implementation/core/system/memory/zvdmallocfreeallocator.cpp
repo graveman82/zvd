@@ -48,7 +48,7 @@ Purpose: blank file for implementations (.cpp files).
 #include <new>
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdcMallocFreeMemoryAllocator::~ZvdcMallocFreeMemoryAllocator() ZVD_NOEXCEPT
 {
 
@@ -79,7 +79,7 @@ ZvdcMallocFreeMemoryAllocator::Deallocate(void* p) ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdUInt32
 ZvdcMallocFreeMemoryAllocator::IsSingleton() ZVD_NOEXCEPT 
 { 
@@ -87,7 +87,7 @@ ZvdcMallocFreeMemoryAllocator::IsSingleton() ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdcMallocFreeMemoryAllocator::ResultType
 ZvdcMallocFreeMemoryAllocator::Instance() ZVD_NOEXCEPT
 {
@@ -96,7 +96,7 @@ ZvdcMallocFreeMemoryAllocator::Instance() ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdUInt32
 ZvdcMallocFreeMemoryAllocator::IsSubsystem() ZVD_NOEXCEPT 
 { 
@@ -104,7 +104,7 @@ ZvdcMallocFreeMemoryAllocator::IsSubsystem() ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdcMallocFreeMemoryAllocator::ResultType
 ZvdcMallocFreeMemoryAllocator::AsSubsystem() ZVD_NOEXCEPT
 {
@@ -113,7 +113,7 @@ ZvdcMallocFreeMemoryAllocator::AsSubsystem() ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdUInt32
 ZvdcMallocFreeMemoryAllocator::IsReady() const ZVD_NOEXCEPT 
 { 
@@ -121,7 +121,7 @@ ZvdcMallocFreeMemoryAllocator::IsReady() const ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdUInt32
 ZvdcMallocFreeMemoryAllocator::IsInitialized() const ZVD_NOEXCEPT 
 { 
@@ -129,7 +129,7 @@ ZvdcMallocFreeMemoryAllocator::IsInitialized() const ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdUInt32
 ZvdcMallocFreeMemoryAllocator::CanBeCreatedOnStack() ZVD_NOEXCEPT 
 { 
@@ -137,7 +137,7 @@ ZvdcMallocFreeMemoryAllocator::CanBeCreatedOnStack() ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-inline
+
 ZvdcMallocFreeMemoryAllocator::ResultType 
 ZvdcMallocFreeMemoryAllocator::CreateOnStack(void* pStackMem) ZVD_NOEXCEPT
 {

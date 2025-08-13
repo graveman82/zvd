@@ -195,13 +195,7 @@ Purpose: base definitions.
 
 #endif
 
-#ifdef ZVD_CPP11
-#	define ZVD_NOEXCEPT noexcept
 
-#else
-#	define ZVD_NOEXCEPT
-
-#endif
 // fixed size integers
 //---------------------
 #if defined(ZVD_HAS_STDINT_H_FILE)
@@ -415,7 +409,21 @@ ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
 #endif
 
 
+#if !defined(ZVD_CFG_USE_EXCEPTIONS)
+#	if defined(ZVD_CPP11)
+#		define ZVD_NOEXCEPT noexcept
+#	else
+#		define ZVD_NOEXCEPT throw()
+#	endif
+#else
+#	define ZVD_NOEXCEPT // can throw exceptions
+#endif
 
+#ifdef ZVD_CPP11
+#	define ZVD_DELETED_METHOD = delete
+#else
+#	define ZVD_DELETED_METHOD
+#endif
 
 struct ZvdsDefaultTag {};
 

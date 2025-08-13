@@ -59,6 +59,8 @@ public:
 
     enum Bits
     {
+        kNOFLAGS = 0x00000000,
+
         /// No requirements or hints set (default)
         kNO_REQ_OR_HINT = ZVD_MAKE_BIT_FLAG_VALUE(0, 0x00),
 
@@ -78,6 +80,24 @@ public:
         kLIFETIME_MASK = 0x0E  ///< Binary 00001110
     };
  
+    inline ZvdcMemFlags();
+    inline ZvdcMemFlags(Bits eValue);
+
+protected:
+    // The flags storage
+    Bits m_nValue;
 };
 
+
+//-----------------------------------------------------------------------------
+inline ZvdcMemFlags::ZvdcMemFlags()
+{
+    m_nValue = kNOFLAGS;
+}
+
+//-----------------------------------------------------------------------------
+inline ZvdcMemFlags::ZvdcMemFlags(Bits nValue)
+{
+    m_nValue = nValue;
+}
 #endif // ZVD_MEMFLAGS_H

@@ -58,3 +58,6 @@ lib/
 *.idb
 *.pdb
 *.pch
+html
+build
+tmp
