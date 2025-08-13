@@ -57,11 +57,24 @@ public:
 
 	virtual ~ZvdiMemoryAllocator() ZVD_NOEXCEPT {}
 
-	virtual ZvdResult<void*> Allocate(SizeType nBytes) ZVD_NOEXCEPT = 0;
+	virtual ZvdResult<void*> Allocate(SizeType nBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+	) 
+	ZVD_NOEXCEPT = 0;
 
-	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes) ZVD_NOEXCEPT = 0;
+	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+	) ZVD_NOEXCEPT = 0;
 
-	virtual ZvdRegularResult Deallocate(void* p) ZVD_NOEXCEPT = 0;
+	virtual ZvdRegularResult Deallocate(void* p
+#ifdef ZVD_CFG_DEBUG_MEMORY
+		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+	) ZVD_NOEXCEPT = 0;
 
 	// Methods to be used when allocator is template parameter
 	//--------------------------------------------------------

@@ -54,7 +54,7 @@ Purpose: dynamic arrays templates.
 template <typename TElement, 
 	typename TMemoryAllocator,
 	typename TUtil = ZvdRegularCppObjectUtil<TElement>>
-class ZvdñDArray
+class ZvdcDArray
 {
 public:
 	typedef ZvdSize SizeType;
@@ -62,7 +62,7 @@ public:
 	typedef TElement* Pointer;
 	typedef TElement* Iterator;
 
-	ZvdñDArray()
+	ZvdcDArray()
 		: m_pData(kZVD_NULLPTR(TElement))
 		, m_nCount(0)
 		, m_nCapacity(0)
@@ -70,7 +70,7 @@ public:
 
 	}
 
-	~ZvdñDArray()
+	~ZvdcDArray()
 	{
 		Clear();
 		ZvdRegularResult retVal = ResizeMemory(0);
@@ -78,7 +78,7 @@ public:
 		{
 			/// @todo
 			// abort program
-			ZvdfFatalError("ZvdñDArray destructor, ResizeMemory(0) returned %x", retVal.Error().RetVal());
+			ZvdfFatalError("ZvdcDArray destructor, ResizeMemory(0) returned %x", retVal.Error().RetVal());
 		}
 	}
 

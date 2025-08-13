@@ -429,5 +429,6 @@ struct ZvdsDefaultTag {};
 
 
 typedef const char* ZvdCString;
-
+typedef void* ZvdpVoid;
+typedef const void* ZvdpCVoid;
 #endif // ZVD_BASEDEFS_H

@@ -51,6 +51,10 @@ Attention: don't include this file directly! Use zvdmemalloc.h instead.
 
 #if defined(ZVD_PLATFORM_XBOX360) || defined(ZVD_PLATFORM_WIN32) || defined(ZVD_PLATFORM_WIN64) 
 
+extern Zvdfpt_malloc Zvdfp_malloc;
+extern Zvdfpt_realloc Zvdfp_realloc;
+extern Zvdfpt_free Zvdfp_free;
+
 extern Zvdfpt_aligned_malloc Zvdfp_aligned_malloc;
 extern Zvdfpt_aligned_realloc Zvdfp_aligned_realloc;
 extern Zvdfpt_aligned_free Zvdfp_aligned_free;

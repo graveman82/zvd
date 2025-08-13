@@ -6,8 +6,8 @@
 \mainpage Документация по игровому движку Zv3D
 \tableofcontents
 
-- \ref Page_Zv3DIntro
-- \ref Page_Zv3DConcept
+\li \ref Page_Zv3DIntro
+\li \ref Page_Zv3DConcept
 
 */
 
@@ -21,5 +21,5 @@
 
 /**
 \page Page_Zv3DConcept Основные концепции
-- \ref Page_Zv3DMemoryManagement
+\li \ref Page_Zv3DMemoryManagement
 */ 

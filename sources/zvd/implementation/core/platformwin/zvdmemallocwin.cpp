@@ -54,6 +54,10 @@ Purpose: memory allocation implementation (windows based systems).
 
 #if defined(ZVD_PLATFORM_XBOX360) || defined(ZVD_PLATFORM_WIN32) || defined(ZVD_PLATFORM_WIN64)
 
+Zvdfpt_malloc Zvdfp_malloc = std::malloc;
+Zvdfpt_realloc Zvdfp_realloc = std::realloc;
+Zvdfpt_free Zvdfp_free = std::free;
+
 Zvdfpt_aligned_malloc Zvdfp_aligned_malloc = _aligned_malloc;
 Zvdfpt_aligned_realloc Zvdfp_aligned_realloc = _aligned_realloc;
 Zvdfpt_aligned_free Zvdfp_aligned_free = _aligned_free;
@@ -67,9 +71,41 @@ Zvdfpt_freea Zvdfp_freea = _freea;
 #endif
 
 //-----------------------------------------------------------------------------
-void* __cdecl ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
+ZvdpVoid ZVD_CDECL ZvdfMalloc(ZvdSize nBytes)
 {
-    void* pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = kZVD_NULLVOID;
+
+    pResultMem = Zvdfp_malloc(nBytes);
+
+    return pResultMem;
+}
+
+//-----------------------------------------------------------------------------
+ZvdpVoid ZVD_CDECL ZvdfRealloc(ZvdpVoid pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes)
+{
+    ZvdpVoid pResultMem = kZVD_NULLVOID;
+
+    ZVD_UNUSED_ARG(nOldBytes);
+    pResultMem = Zvdfp_realloc(pMemblockOld, nBytes);
+
+    return pResultMem;
+}
+
+//-----------------------------------------------------------------------------
+void ZVD_CDECL ZvdfFree(ZvdpVoid pMemblock)
+{
+    if (!pMemblock)
+        return;
+
+    Zvdfp_free(pMemblock);
+
+}
+
+
+//-----------------------------------------------------------------------------
+ZvdpVoid ZVD_CDECL ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
+{
+    ZvdpVoid pResultMem = kZVD_NULLVOID;
 
 	pResultMem = Zvdfp_aligned_malloc(nBytes, nAlignment);
 
@@ -77,9 +113,9 @@ void* __cdecl ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
 }
 
 //-----------------------------------------------------------------------------
-void* __cdecl ZvdfAlignedRealloc(void* pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes, ZvdSize nAlignment)
+ZvdpVoid ZVD_CDECL ZvdfAlignedRealloc(ZvdpVoid pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes, ZvdSize nAlignment)
 {
-    void* pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = kZVD_NULLVOID;
 
     ZVD_UNUSED_ARG(nOldBytes);
     pResultMem = Zvdfp_aligned_realloc(pMemblockOld, nBytes, nAlignment);
@@ -88,7 +124,7 @@ void* __cdecl ZvdfAlignedRealloc(void* pMemblockOld, ZvdSize nOldBytes, ZvdSize 
 }
 
 //-----------------------------------------------------------------------------
-void __cdecl ZvdfAlignedFree(void* pMemblock)
+void ZVD_CDECL ZvdfAlignedFree(ZvdpVoid pMemblock)
 {
     if (!pMemblock)
         return;
@@ -98,9 +134,9 @@ void __cdecl ZvdfAlignedFree(void* pMemblock)
 }
 
 //-----------------------------------------------------------------------------
-void* __cdecl ZvdfStackAlloc(ZvdSize nBytes)
+ZvdpVoid ZVD_CDECL ZvdfStackAlloc(ZvdSize nBytes)
 {
-    void* pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = kZVD_NULLVOID;
 
     pResultMem = Zvdfp_malloca(nBytes);
     
@@ -108,7 +144,7 @@ void* __cdecl ZvdfStackAlloc(ZvdSize nBytes)
 }
 
 //----------------------------------------------------------------------------- 
-void __cdecl ZvdfStackFree(void* pMemblock)
+void ZVD_CDECL ZvdfStackFree(ZvdpVoid pMemblock)
 {
     if (!pMemblock)
         return;

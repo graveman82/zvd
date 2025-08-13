@@ -64,10 +64,19 @@ Purpose: memory allocation routines.
 
 #endif
 
-void* __cdecl ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment);
-void* __cdecl ZvdfAlignedRealloc(void* pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes, ZvdSize nAlignment);
-void __cdecl ZvdfAlignedFree(void* pMemblock);
+/** @name Platform-Independent Memory Allocation Functions
+* Unified platform-independent memory allocation and deallocation functions, akin to C++ standard library procedures.
+*/
+//@{
+ZvdpVoid ZVD_CDECL ZvdfMalloc(ZvdSize nBytes);
+ZvdpVoid ZVD_CDECL ZvdfRealloc(ZvdpVoid pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes);
+void ZVD_CDECL ZvdfFree(ZvdpVoid pMemblock);
 
-void* __cdecl ZvdfStackAlloc(ZvdSize nBytes);
-void __cdecl ZvdfStackFree(void* pMemblock);
+ZvdpVoid ZVD_CDECL ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment);
+ZvdpVoid ZVD_CDECL ZvdfAlignedRealloc(ZvdpVoid pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes, ZvdSize nAlignment);
+void ZVD_CDECL ZvdfAlignedFree(ZvdpVoid pMemblock);
+
+ZvdpVoid ZVD_CDECL ZvdfStackAlloc(ZvdSize nBytes);
+void ZVD_CDECL ZvdfStackFree(ZvdpVoid pMemblock);
+//@}
 #endif // ZVD_MEMALLOC_H

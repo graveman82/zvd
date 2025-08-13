@@ -59,12 +59,16 @@ Attention: don't include this file directly! Use zvdmemdefs.h instead.
 
 //-----------------------------------------------------------------------------
 // Memory allocation functions prototypes pointers
-typedef void* (__cdecl* Zvdfpt_aligned_malloc)(ZvdSize nBytes, ZvdSize nAlignment);
-typedef void* (__cdecl* Zvdfpt_aligned_realloc)(void* pMemBlock, ZvdSize nBytes, ZvdSize nAlignment);
-typedef void(__cdecl* Zvdfpt_aligned_free)(void* pMemBlock);
+typedef ZvdpVoid	(ZVD_CDECL* Zvdfpt_malloc)(ZvdSize nBytes);
+typedef ZvdpVoid	(ZVD_CDECL* Zvdfpt_realloc)(ZvdpVoid pMemBlock, ZvdSize nNewBytes);
+typedef void		(ZVD_CDECL* Zvdfpt_free)(ZvdpVoid _Memory);
 
-typedef void* (__cdecl *Zvdfpt_malloca)(ZvdSize nBytes);
-typedef void (__cdecl* Zvdfpt_freea)(void* pMemBlock);
+typedef ZvdpVoid	(ZVD_CDECL* Zvdfpt_aligned_malloc)(ZvdSize nBytes, ZvdSize nAlignment);
+typedef ZvdpVoid	(ZVD_CDECL* Zvdfpt_aligned_realloc)(ZvdpVoid pMemBlock, ZvdSize nBytes, ZvdSize nAlignment);
+typedef void		(ZVD_CDECL* Zvdfpt_aligned_free)(ZvdpVoid pMemBlock);
+
+typedef ZvdpVoid	(ZVD_CDECL* Zvdfpt_malloca)(ZvdSize nBytes);
+typedef void		(ZVD_CDECL* Zvdfpt_freea)(ZvdpVoid pMemBlock);
 
 #endif // eof (XBox or Win32 or Win64)
 
