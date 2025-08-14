@@ -243,6 +243,20 @@ typedef unsigned long long ZvdUInt64;
 
 #endif // fixed size integers
 
+#ifdef ZVD_CFG_BOOL_SUPPORTED
+	typedef bool ZvdBool;
+
+#else
+#	ifdef ZVD_CFG_USE_32BIT_BOOL
+		typedef ZvdUInt32 ZvdBool;
+
+#	else
+		typedef ZvdUInt8 ZvdBool;
+
+#	endif
+
+#endif // eof bool support check
+
 //++++++++++++++++++++++++++
 // Fixed size integers utils
 //++++++++++++++++++++++++++
@@ -359,28 +373,44 @@ typedef double ZvdReal64;
 // Boolean constants
 
 // cpp lang
-const bool			kZVD_TRUE = true;
-const bool			kZVD_FALSE = false;
 
-const bool			kZVD_YES = kZVD_TRUE;
-const bool			kZVD_NO = kZVD_FALSE;
 
 // as integers
-const ZvdUInt32	kZVD_TRUE_U32 = 1;
-const ZvdUInt32	kZVD_FALSE_U32 = 0;
+const ZvdUInt32		kZVD_TRUE_U32 = 1;
+const ZvdUInt32		kZVD_FALSE_U32 = 0;
 
 const ZvdUInt8		kZVD_TRUE_U8 = 1;
 const ZvdUInt8		kZVD_FALSE_U8 = 0;
 
 // yes/no answer constants
-const ZvdUInt32	kZVD_YES_U32 = kZVD_TRUE_U32;
-const ZvdUInt32	kZVD_NO_U32 = kZVD_FALSE_U32;
+const ZvdUInt32		kZVD_YES_U32 = kZVD_TRUE_U32;
+const ZvdUInt32		kZVD_NO_U32 = kZVD_FALSE_U32;
 
 const ZvdUInt8		kZVD_YES_U8 = kZVD_TRUE_U8;
 const ZvdUInt8		kZVD_NO_U8 = kZVD_FALSE_U8;
 
 
+#ifdef ZVD_CFG_BOOL_SUPPORTED
+const bool			kZVD_TRUE = true;
+const bool			kZVD_FALSE = false;
+const bool			kZVD_YES = kZVD_TRUE;
+const bool			kZVD_NO = kZVD_FALSE;
+#else
+#	ifdef ZVD_CFG_USE_32BIT_BOOL
+const ZvdUInt32		kZVD_TRUE = kZVD_TRUE_U32;
+const ZvdUInt32		kZVD_FALSE = kZVD_FALSE_U32;
+const ZvdUInt32		kZVD_YES = kZVD_TRUE;
+const ZvdUInt32		kZVD_NO = kZVD_FALSE;
 
+#	else
+const ZvdUInt8		kZVD_TRUE = kZVD_TRUE_U8;
+const ZvdUInt8		kZVD_FALSE = kZVD_FALSE_U8;
+const ZvdUInt8		kZVD_YES = kZVD_TRUE;
+const ZvdUInt8		kZVD_NO = kZVD_FALSE;
+
+#	endif
+
+#endif
 
 // Offset, align
 //--------------
@@ -424,6 +454,13 @@ ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
 #else
 #	define ZVD_DELETED_METHOD
 #endif
+
+#ifdef ZVD_CPP11
+#	define ZVD_DEFAULT_IMPL = default;
+#else
+#	define ZVD_DEFAULT_IMPL {}
+#endif
+
 
 struct ZvdsDefaultTag {};
 
