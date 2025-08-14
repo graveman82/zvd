@@ -494,6 +494,26 @@ enum ZvdeDataUnitType
     /// Unsigned 32-bit integer (ZvdUInt32).
     kZVD_DATAUNITTYPE_UINT32,
 
+
+    /// Normalized signed 8-bit integer.
+    kZVD_DATAUNITTYPE_INT8N,
+
+    /// Normalized unsigned 8-bit integer.
+    kZVD_DATAUNITTYPE_UINT8N,
+
+    /// Normalized signed 16-bit integer.
+    kZVD_DATAUNITTYPE_INT16N,
+
+    /// Normalized unsigned 16-bit integer.
+    kZVD_DATAUNITTYPE_UINT16N,
+
+    /// Normalized signed 32-bit integer.
+    kZVD_DATAUNITTYPE_INT32N,
+
+    /// Normalized unsigned 32-bit integer.
+    kZVD_DATAUNITTYPE_UINT32N,
+
+
     /// 16-bit floating point number (No mapping).
     kZVD_DATAUNITTYPE_REAL16,
 
@@ -516,7 +536,12 @@ enum ZvdeDataUnitType
     /// Unsigned 64-bit integer (ZvdUInt64).
     kZVD_DATAUNITTYPE_UINT64,
 #endif
-    /// Type count.
-    kZVD_DATAUNITTYPE_COUNT
+    /// Predefined data unit type count.
+    kZVD_DATAUNITTYPE_PREDEFINED_COUNT,
+
+    /// User custom data unit types start.
+    kZVD_DATAUNITTYPE_USER_FIRST,
+    /// Max data unit types available.
+    kZVD_DATAUNITTYPE_MAX = 0xFFF
 };
 #endif // ZVD_BASEDEFS_H
