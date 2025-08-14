@@ -468,4 +468,55 @@ struct ZvdsDefaultTag {};
 typedef const char* ZvdCString;
 typedef void* ZvdpVoid;
 typedef const void* ZvdpCVoid;
+
+
+/// The type of a data unit in C++ terms
+enum ZvdeDataUnitType
+{
+    /// Invalid or unknown type.
+    kZVD_DATAUNITTYPE_UNKNOWN = 0,
+
+    /// Signed 8-bit integer (ZvdInt8).
+    kZVD_DATAUNITTYPE_INT8,
+
+    /// Unsigned 8-bit integer (ZvdUInt8).
+    kZVD_DATAUNITTYPE_UINT8,
+
+    /// Signed 16-bit integer (ZvdInt16).
+    kZVD_DATAUNITTYPE_INT16,
+
+    /// Unsigned 16-bit integer (ZvdUInt16).
+    kZVD_DATAUNITTYPE_UINT16,
+
+    /// Signed 32-bit integer (ZvdInt32).
+    kZVD_DATAUNITTYPE_INT32,
+
+    /// Unsigned 32-bit integer (ZvdUInt32).
+    kZVD_DATAUNITTYPE_UINT32,
+
+    /// 16-bit floating point number (No mapping).
+    kZVD_DATAUNITTYPE_REAL16,
+
+    /// 32-bit floating point number (ZvdReal32).
+    kZVD_DATAUNITTYPE_REAL32,
+
+    /// 64-bit floating point number (ZvdReal64).
+    kZVD_DATAUNITTYPE_REAL64,
+
+    /// 8-bit character
+    kZVD_DATAUNITTYPE_CHAR8,
+
+    /// 16-bit character
+    kZVD_DATAUNITTYPE_CHAR16,
+
+#ifdef ZVD_ARCH_X64
+    /// Signed 64-bit integer (ZvdInt64).
+    kZVD_DATAUNITTYPE_INT64,
+
+    /// Unsigned 64-bit integer (ZvdUInt64).
+    kZVD_DATAUNITTYPE_UINT64,
+#endif
+    /// Type count.
+    kZVD_DATAUNITTYPE_COUNT
+};
 #endif // ZVD_BASEDEFS_H
