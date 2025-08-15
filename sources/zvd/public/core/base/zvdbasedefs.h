@@ -83,6 +83,12 @@ Purpose: base definitions.
 
 #include <cstddef>
 
+#ifdef ZVD_CPP11
+#include <limits>
+#else
+#include <climits>
+#endif
+
 //-----------------------------------------------------------------------------
 // OS detection
 
@@ -326,7 +332,40 @@ typedef intptr_t ZvdIntPtr;
 
 #endif
 
+//  ZVD_SIZE_MAX
+#ifdef ZVD_HAS_STD_DEFS
+#   ifdef ZVD_CPP11
+        const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<size_t>::max();
+#   else
+        const ZvdSize kZVD_SIZE_MAX = static_cast<size_t>(-1);
+#   endif
+
+#else
+#   if defined(ZVD_ARCH_X64)
+#       ifdef ZVD_CPP11
+            const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<ZvdUInt64>::max();
+#       else
+            const ZvdSize kZVD_SIZE_MAX = ULLONG_MAX; // for 64-bit unsigned integer
+#       endif
+
+#   elif defined(ZVD_ARCH_X86)
+#       ifdef ZVD_CPP11
+            const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<ZvdUInt32>::max();
+#       else
+            const ZvdSize kZVD_SIZE_MAX = UINT_MAX; // for 32-bit unsigned integer
+#       endif
+
+#else
+#       ifdef ZVD_CPP11
+            const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<ZvdUInt16>::max();
+#       else
+            const ZvdSize kZVD_SIZE_MAX = USHRT_MAX; // for 16-bit unsigned integer
+#       endif
+#   endif // arch
+#endif
+
 typedef ZvdSize ZvdUIndex;
+const ZvdUIndex kZVD_INVALID_INDEX = kZVD_SIZE_MAX;
 
 const ZvdUInt32 kZVD_BAD_MARKER_U3 = 0x7;
 const ZvdUInt32 kZVD_BAD_MARKER_U8 = 0xFF;

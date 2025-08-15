@@ -44,10 +44,24 @@ Purpose: blank file for headers.
 
 */
 
-#ifndef ZVD_GFXRENDERERDX9_H
-#define ZVD_GFXRENDERERDX9_H
+#ifndef ZVD_GFXDEVICEDX9_H
+#define ZVD_GFXDEVICEDX9_H
 
-#include "gfx/zvdgfxrenderer.h"
+#include "gfx/zvdgfxdevice.h"
+#include "gfx/dx9based/zvdgfxdefsdx9.h"
 
+class ZvdcGfxDeviceDx9 : public ZvdcGfxDevice
+{
+public:
+    ZvdRetVal DrawPrimitives(
+        ZvdeGfxPrimitiveType iPrimitiveType,
+        ZvdUIndex iStartIndex,
+        ZvdSize nPrimitiveCount,
+        ZvdUIndex iMinIndex,
+        ZvdSize nNumVertices,
+        ZvdUIndex iBaseVertexIndex);
+private:
+    ZvdpD3dDevice9 m_pD3dDevice;
+};
 
-#endif // ZVD_GFXRENDERERDX9_H
+#endif // ZVD_GFXDEVICEDX9_H

@@ -44,10 +44,20 @@ Purpose: blank file for headers.
 
 */
 
-#ifndef ZVD_GFXRENDERERDX9_H
-#define ZVD_GFXRENDERERDX9_H
+#ifndef ZVD_GFXDEFS_H
+#define ZVD_GFXDEFS_H
 
-#include "gfx/zvdgfxrenderer.h"
+#include "core/base/zvderror.h"
+
+enum ZvdeGfxPrimitiveType
+{
+	kZVD_GFX_PRIMITIVE_POINTLIST,
+	kZVD_GFX_PRIMITIVE_TRIANGLELIST,
+	kZVD_GFX_PRIMITIVE_TRIANGLESTRIP,
+	kZVD_GFX_PRIMITIVE_TRIANGLEFAN ,
+	kZVD_GFX_PRIMITIVE_LINELIST,
+	kZVD_GFX_PRIMITIVE_LINESTRIP
+};
 
 
-#endif // ZVD_GFXRENDERERDX9_H
+#endif // ZVD_GFXDEFS_H

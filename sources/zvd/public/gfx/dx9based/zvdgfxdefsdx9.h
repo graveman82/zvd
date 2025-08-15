@@ -47,6 +47,8 @@ Purpose: blank file for headers.
 #ifndef ZVD_GFXDEFSDX9_H
 #define ZVD_GFXDEFSDX9_H
 
+#include "gfx/zvdgfxdefs.h"
+
 #include <d3d9.h>
 #include <d3dx9math.h>
 
@@ -58,5 +60,8 @@ typedef LPDIRECT3DBASETEXTURE9 ZvdpD3dBaseTexture9;
 typedef LPDIRECT3DTEXTURE9 ZvdpD3dTexture9;
 typedef LPDIRECT3DVERTEXBUFFER9 ZvdpD3dVertexBuffer9;
 typedef LPDIRECT3DINDEXBUFFER9 ZvdpD3dIndexBuffer9;
+
+
+
 
 #endif // ZVD_GFXDEFSDX9_H
