@@ -562,6 +562,17 @@ enum ZvdeDataUnitType
     /// 64-bit floating point number (ZvdReal64).
     kZVD_DATAUNITTYPE_REAL64,
 
+
+    /// Normalized 16-bit floating point number.
+    kZVD_DATAUNITTYPE_REAL16N,
+
+    /// Normalized 32-bit floating point number.
+    kZVD_DATAUNITTYPE_REAL32N,
+
+    /// Normalized 64-bit floating point number.
+    kZVD_DATAUNITTYPE_REAL64N,
+
+
     /// 8-bit character
     kZVD_DATAUNITTYPE_CHAR8,
 
