@@ -36,7 +36,7 @@ SOFTWARE.
 -------------
  Description
 -------------
-Purpose: regular mesh for graphics class definition.
+Purpose: regular mesh for graphics class implementation.
 
 ----------------------
  For developers notes
@@ -44,42 +44,37 @@ Purpose: regular mesh for graphics class definition.
 
 */
 
-#ifndef ZVD_GFXREGULARMESH_H
-#define ZVD_GFXREGULARMESH_H
+#include "gfx/zvdgfxregularmesh.h"
+#include "core/base/zvdcommonutils.h"
+#include "core/base/zvdassert.h"
 
-#include "gfx/zvdgfxdefs.h"
-
-class ZvdGfxRegularMesh
+ZvdUInt32
+ZvdGfxRegularMesh::CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, ZvdUInt32 nElements)
 {
-public:
-	/**
-
-
-	*/
-	static
-	ZvdUInt32
-	CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, ZvdUInt32 nElements);
-
-	/** Gets the primitive type of the regular mesh.
-	
-	@see ZvdeGfxPrimitiveType for details.
-	*/
-	ZvdeGfxPrimitiveType GetPrimitiveType() const
-	{
-		return m_ePrimitiveType;
-	}
-
-	/** Sets the primitive type for the regular mesh.
-
-	   @see ZvdeGfxPrimitiveType for details.
-   */
-	void SetPrimitiveType(ZvdeGfxPrimitiveType ePrimitiveType)
-	{
-		m_ePrimitiveType = ePrimitiveType;
-	}
-protected:
-	/// Primitive type for the regular mesh.
-	ZvdeGfxPrimitiveType m_ePrimitiveType;
-};
-
-#endif // ZVD_GFXREGULARMESH_H
+    ZvdUInt32 nPrimitives = 0;
+    switch (ePrimitiveType)
+    {
+    case kZVD_GFX_PRIMITIVE_TRIANGLESTRIP:
+        nPrimitives = nElements - 2;
+        break;
+    case kZVD_GFX_PRIMITIVE_TRIANGLELIST:
+        nPrimitives = nElements / 3;
+        break;
+    case kZVD_GFX_PRIMITIVE_LINELIST:
+        nPrimitives = ZvdFastDivideBy2(nElements);
+        break;
+    case kZVD_GFX_PRIMITIVE_LINESTRIP:
+        nPrimitives = nElements - 1;
+        break;
+    case kZVD_GFX_PRIMITIVE_POINTLIST:
+        nPrimitives = nElements;
+        break;
+    case kZVD_GFX_PRIMITIVE_QUADLIST:
+        nPrimitives = ZvdFastDivideBy4(nElements);
+        break;
+    default:
+        ZVD_ASSERT_HIGH(false, "can't be reached");
+        break;
+    }
+    return nPrimitives;
+}

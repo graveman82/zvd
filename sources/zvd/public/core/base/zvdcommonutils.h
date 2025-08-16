@@ -61,4 +61,28 @@ T ZvdfMin(const T& a, const T& b)
 {
 	return (a < b) ? a : b;
 }
+
+template <typename T>
+T ZvdFastDivideBy2(T x)
+{
+	return x >> 1;
+}
+
+template <typename T>
+T ZvdFastDivideBy4(T x)
+{
+	return x >> 2;
+}
+
+template <typename T>
+T ZvdFastDivideBy8(T x)
+{
+	return x >> 3;
+}
+
+template <typename T>
+T ZvdFastDivideBy16(T x)
+{
+	return x >> 4;
+}
 #endif // ZVD_COMMONUTILS_H
