@@ -47,4 +47,13 @@ Purpose: regular mesh for graphics class definition.
 #ifndef ZVD_GFXREGULARMESH_H
 #define ZVD_GFXREGULARMESH_H
 
+#include "gfx/zvdgfxdefs.h"
+
+class ZvdGfxRegularMesh
+{
+public:
+protected:
+
+};
+
 #endif // ZVD_GFXREGULARMESH_H
