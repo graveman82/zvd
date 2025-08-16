@@ -53,9 +53,20 @@ class ZvdGfxRegularMesh
 {
 public:
 	/**
-
-
-	*/
+	 * @brief Calculates the number of primitives based on the element count and primitive type.
+	 *
+	 * This static utility function determines how many complete geometric primitives
+	 * (e.g., triangles, lines) can be formed from a given number of vertices or indices
+	 * for a specific topology.
+	 *
+	 * @param[in] ePrimitiveType The primitive topology type (e.g., kZVD_GFX_PRIMITIVE_TRIANGLELIST).
+	 * @param[in] nElements The total number of elements (vertices or indices).
+	 * @return The calculated number of primitives. For incomplete primitives (e.g., 5 elements
+	 *         for a TRIANGLELIST), the remainder is discarded. Returns 0 if there are not
+	 *         enough elements to form a single primitive.
+	 * @note This function is designed for performance and does not validate the element count
+	 *       (e.g., it doesn't check if nElements is a multiple of 3 for a TRIANGLELIST).
+	 */
 	static
 	ZvdUInt32
 	CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, ZvdUInt32 nElements);

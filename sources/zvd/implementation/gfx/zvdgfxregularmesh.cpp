@@ -55,21 +55,31 @@ ZvdGfxRegularMesh::CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, ZvdUI
     switch (ePrimitiveType)
     {
     case kZVD_GFX_PRIMITIVE_TRIANGLESTRIP:
+        if (nElements < 3)
+            return 0;
         nPrimitives = nElements - 2;
         break;
     case kZVD_GFX_PRIMITIVE_TRIANGLELIST:
+        if (nElements < 3)
+            return 0;
         nPrimitives = nElements / 3;
         break;
     case kZVD_GFX_PRIMITIVE_LINELIST:
+        if (nElements < 2)
+            return 0;
         nPrimitives = ZvdFastDivideBy2(nElements);
         break;
     case kZVD_GFX_PRIMITIVE_LINESTRIP:
+        if (nElements < 2)
+            return 0;
         nPrimitives = nElements - 1;
         break;
     case kZVD_GFX_PRIMITIVE_POINTLIST:
         nPrimitives = nElements;
         break;
     case kZVD_GFX_PRIMITIVE_QUADLIST:
+        if (nElements < 4)
+            return 0;
         nPrimitives = ZvdFastDivideBy4(nElements);
         break;
     default:
