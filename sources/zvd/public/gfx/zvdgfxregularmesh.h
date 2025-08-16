@@ -52,8 +52,26 @@ Purpose: regular mesh for graphics class definition.
 class ZvdGfxRegularMesh
 {
 public:
-protected:
+	/** Gets the primitive type of the regular mesh.
+	
+	@see ZvdeGfxPrimitiveType for details.
+	*/
+	ZvdeGfxPrimitiveType GetPrimitiveType() const
+	{
+		return m_ePrimitiveType;
+	}
 
+	/** Sets the primitive type for the regular mesh.
+
+	   @see ZvdeGfxPrimitiveType for details.
+   */
+	void SetPrimitiveType(ZvdeGfxPrimitiveType ePrimitiveType)
+	{
+		m_ePrimitiveType = ePrimitiveType;
+	}
+protected:
+	/// Primitive type for the regular mesh.
+	ZvdeGfxPrimitiveType m_ePrimitiveType;
 };
 
 #endif // ZVD_GFXREGULARMESH_H
