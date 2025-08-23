@@ -65,8 +65,8 @@ private:
 	/// @name Disabled New Operators
 	/// @{
 	/// @brief Disabled in debug mode (ZVD_CFG_DEBUG_MEMORY); use overloads with debug parameters (pSrcFile, iSrcLine, pFunc).
-	static void* operator new(size_t nInstanceSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT ZVD_DELETED_METHOD;
-	static void* operator new[](size_t nInstanceSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT ZVD_DELETED_METHOD;
+	static void* operator new(size_t nInstanceSize, ZvdcMemFlags memFlags) noexcept ZVD_DELETED_METHOD;
+	static void* operator new[](size_t nInstanceSize, ZvdcMemFlags memFlags) noexcept ZVD_DELETED_METHOD;
 	/// @}
 
 public:
@@ -80,11 +80,11 @@ public:
 	/// @param pFunc Function name for debug tracking.
 	/// @return Pointer to allocated memory.
 	static void* operator new(size_t nInstanceSize, ZvdcMemFlags memFlags,
-		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) ZVD_NOEXCEPT;
+		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) noexcept;
 
 	/// @brief Allocates memory for an array via custom memory manager, with debug information.
 	static void* operator new[](size_t nInstanceSize, ZvdcMemFlags memFlags,
-		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) ZVD_NOEXCEPT;
+		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) noexcept;
 	/// @}
 
 
@@ -98,11 +98,11 @@ public:
 	/// @param iSrcLine Source line number for debug tracking.
 	/// @param pFunc Function name for debug tracking.
 	static void operator delete(void* pInstanceMem, ZvdcMemFlags memFlags,
-		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) ZVD_NOEXCEPT;
+		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) noexcept;
 
 	/// @brief Deallocates memory for an array allocated via placement new[], with debug information.
 	static void operator delete[](void* pInstanceMem, ZvdcMemFlags memFlags,
-		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) ZVD_NOEXCEPT;
+		ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) noexcept;
 	/// @}
 #else // !ZVD_CFG_DEBUG_MEMORY
 public:
@@ -112,10 +112,10 @@ public:
 	/// @param nInstanceSize Size of the memory to allocate.
 	/// @param memFlags Flags controlling allocation strategy (e.g., pool or heap).
 	/// @return Pointer to allocated memory.
-	static void* operator new(size_t nInstanceSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+	static void* operator new(size_t nInstanceSize, ZvdcMemFlags memFlags) noexcept;
 
 	/// @brief Allocates memory for an array via custom memory manager.
-	static void* operator new[](size_t nInstanceSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+	static void* operator new[](size_t nInstanceSize, ZvdcMemFlags memFlags) noexcept;
 	/// @}
 
 	/// @name Placement Delete Operators (Release Mode)
@@ -124,10 +124,10 @@ public:
 	/// Called if the constructor throws an exception.
 	/// @param pInstanceMem Pointer to the memory to deallocate.
 	/// @param memFlags Flags used during allocation.
-	static void operator delete(void* pInstanceMem, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+	static void operator delete(void* pInstanceMem, ZvdcMemFlags memFlags) noexcept;
 
 	/// @brief Deallocates memory for an array allocated via placement new[].
-	static void operator delete[](void* pInstanceMem, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+	static void operator delete[](void* pInstanceMem, ZvdcMemFlags memFlags) noexcept;
 	/// @}
 #endif // eof ZVD_CFG_DEBUG_MEMORY
 
@@ -138,10 +138,10 @@ public:
 	/// @brief Deallocates memory for a single object with sized deallocation.
 	/// @param pInstanceMem Pointer to the memory to deallocate.
 	/// @param nInstanceSize Size of the memory allocated.
-	static void operator delete(void* pInstanceMem, size_t nInstanceSize) ZVD_NOEXCEPT;
+	static void operator delete(void* pInstanceMem, size_t nInstanceSize) noexcept;
 
 	/// @brief Deallocates memory for an array with sized deallocation.
-	static void operator delete[](void* pInstanceMem, size_t nInstanceSize) ZVD_NOEXCEPT;
+	static void operator delete[](void* pInstanceMem, size_t nInstanceSize) noexcept;
 #endif
 	/// @}
 
@@ -151,18 +151,18 @@ public:
 	/// @param nInstanceSize Size of the memory (ignored, for standard compliance).
 	/// @param pPlacementMem Pointer to pre-allocated memory.
 	/// @return Pointer to pre-allocated memory.
-	static void* operator new(size_t nInstanceSize, void* pPlacementMem) ZVD_NOEXCEPT;
+	static void* operator new(size_t nInstanceSize, void* pPlacementMem) noexcept;
 
 	/// @brief Placement new for constructing an array in pre-allocated memory.
-	static void* operator new[](size_t nInstanceSize, void* pPlacementMem) ZVD_NOEXCEPT;
+	static void* operator new[](size_t nInstanceSize, void* pPlacementMem) noexcept;
 
 	/// @brief Placement delete for a single object, called if constructor throws.
 	/// @param pInstanceMem Pointer to the memory to deallocate (ignored).
 	/// @param pPlacementMem Pointer to pre-allocated memory (ignored).
-	static void operator delete(void* pInstanceMem, void* pPlacementMem) ZVD_NOEXCEPT;
+	static void operator delete(void* pInstanceMem, void* pPlacementMem) noexcept;
 
 	/// @brief Placement delete for an array, called if constructor throws.
-	static void operator delete[](void* pInstanceMem, void* pPlacementMem) ZVD_NOEXCEPT;
+	static void operator delete[](void* pInstanceMem, void* pPlacementMem) noexcept;
 	/// @}
 };
 
@@ -171,7 +171,7 @@ public:
 
 //-----------------------------------------------------------------------------
 inline
-void* ZvdcMemoryManageable::operator new(size_t nInstantSize, void* pPlacementMem) ZVD_NOEXCEPT
+void* ZvdcMemoryManageable::operator new(size_t nInstantSize, void* pPlacementMem) noexcept
 {
 	ZVD_UNUSED_ARG(nInstantSize);
 	return pPlacementMem;
@@ -179,7 +179,7 @@ void* ZvdcMemoryManageable::operator new(size_t nInstantSize, void* pPlacementMe
 
 //-----------------------------------------------------------------------------
 inline
-void* ZvdcMemoryManageable::operator new[](size_t nInstantSize, void* pPlacementMem) ZVD_NOEXCEPT
+void* ZvdcMemoryManageable::operator new[](size_t nInstantSize, void* pPlacementMem) noexcept
 {
 	ZVD_UNUSED_ARG(nInstantSize);
 	return pPlacementMem;
@@ -187,7 +187,7 @@ void* ZvdcMemoryManageable::operator new[](size_t nInstantSize, void* pPlacement
 
 //-----------------------------------------------------------------------------
 inline
-void ZvdcMemoryManageable::operator delete(void* pInstanceMem, void* pPlacementMem) ZVD_NOEXCEPT
+void ZvdcMemoryManageable::operator delete(void* pInstanceMem, void* pPlacementMem) noexcept
 {
 	ZVD_UNUSED_ARG(pInstanceMem);
 	ZVD_UNUSED_ARG(pPlacementMem);
@@ -196,7 +196,7 @@ void ZvdcMemoryManageable::operator delete(void* pInstanceMem, void* pPlacementM
 
 //-----------------------------------------------------------------------------
 inline
-void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, void* pPlacementMem) ZVD_NOEXCEPT
+void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, void* pPlacementMem) noexcept
 {
 	ZVD_UNUSED_ARG(pInstanceMem);
 	ZVD_UNUSED_ARG(pPlacementMem);
@@ -206,7 +206,7 @@ void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, void* pPlacemen
 
 #ifdef ZVD_CFG_DEBUG_MEMORY
 inline void ZvdcMemoryManageable::operator delete(void* pInstanceMem, ZvdcMemFlags memFlags,
-	ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) ZVD_NOEXCEPT
+	ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) noexcept
 {
 #if defined(ZVD_CFG_USE_EXCEPTIONS)
 #else
@@ -220,7 +220,7 @@ inline void ZvdcMemoryManageable::operator delete(void* pInstanceMem, ZvdcMemFla
 }
 
 inline void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, ZvdcMemFlags memFlags,
-	ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) ZVD_NOEXCEPT
+	ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc) noexcept
 {
 #if defined(ZVD_CFG_USE_EXCEPTIONS)
 #else
@@ -235,7 +235,7 @@ inline void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, ZvdcMemF
 
 #else // !ZVD_CFG_DEBUG_MEMORY
 
-inline void ZvdcMemoryManageable::operator delete(void* pInstanceMem, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+inline void ZvdcMemoryManageable::operator delete(void* pInstanceMem, ZvdcMemFlags memFlags) noexcept
 {
 #if defined(ZVD_CFG_USE_EXCEPTIONS)
 #else
@@ -245,7 +245,7 @@ inline void ZvdcMemoryManageable::operator delete(void* pInstanceMem, ZvdcMemFla
 #endif
 }
 
-inline void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+inline void ZvdcMemoryManageable::operator delete[](void* pInstanceMem, ZvdcMemFlags memFlags) noexcept
 {
 #if defined(ZVD_CFG_USE_EXCEPTIONS)
 #else

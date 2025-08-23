@@ -55,9 +55,9 @@ Purpose: memory management related definitions.
 // Constants
 
 #ifdef ZVD_CFG_ALLOC_UP_LIMIT
-const ZvdSize kZVD_ALLOC_UP_LIMIT = ZVD_CFG_ALLOC_UP_LIMIT;
+const size_t kZVD_ALLOC_UP_LIMIT = ZVD_CFG_ALLOC_UP_LIMIT;
 #else
-const ZvdSize kZVD_ALLOC_UP_LIMIT = (256 * 1024 * 1024);
+const size_t kZVD_ALLOC_UP_LIMIT = (256 * 1024 * 1024);
 #endif
 
 

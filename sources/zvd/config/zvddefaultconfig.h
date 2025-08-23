@@ -53,21 +53,17 @@ Created:            jan 11, 2012
 
 #define ZVD_CFG_DEBUG_MEMORY
 
-#define ZVD_CFG_MIN_MSVC_VER 1921
-#define ZVD_CFG_MIN_GNUC_MAJOR 8
-#define ZVD_CFG_MIN_GNUC_MINOR 1
+#define ZVD_CFG_MIN_MSVC_VER 1930
+
+#define ZVD_CFG_MIN_GNUC_MAJOR 13
+#define ZVD_CFG_MIN_GNUC_MINOR 0
 #define ZVD_CFG_MIN_GNUC_PATCHLEVEL 0
 
 // Compiler warnings (msvc)
 //#define ZVD_CFG_DISABLE_WARN4996
 
-/** Comment this if no size_t, ptrdiff_t etc in your compiler's library
-*/ 
-#define ZVD_HAS_STD_DEFS
-//#define ZVD_CFG_BOOL_SUPPORTED
-#ifndef ZVD_CFG_BOOL_SUPPORTED
-#define ZVD_CFG_USE_32BIT_BOOL
-#endif
+
+
 //== std string utils =========================================================
 #ifdef ZVD_CFG_DISABLE_WARN4996
 #	define ZVD_CFG_USE_NOSECURE_VSNPRINTF

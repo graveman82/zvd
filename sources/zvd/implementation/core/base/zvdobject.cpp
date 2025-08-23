@@ -52,7 +52,7 @@ Purpose: ZvdcObject and ZvdcClass implementations.
 ZvdcClass::ZvdcClass(ZvdCString pClassName,
     ZvdfptCreateInstance pCreateInstance,
     ZvdfptDeleteInstance pDeleteInstance,
-    ZvdfptCloneInstance pCloneInstance) ZVD_NOEXCEPT
+    ZvdfptCloneInstance pCloneInstance) noexcept
     : m_pClassName(pClassName)
     , m_pCreateInstance(pCreateInstance)
     , m_pDeleteInstance(pDeleteInstance)
@@ -65,16 +65,16 @@ ZvdcClass::ZvdcClass(ZvdCString pClassName,
 }
 
 //-----------------------------------------------------------------------------
-ZvdcpObject ZvdcClass::CreateInstance(ZvdcMemFlags memFlags) const ZVD_NOEXCEPT
+ZvdcpObject ZvdcClass::CreateInstance(ZvdcMemFlags memFlags) const noexcept
 {
     ZVD_ASSERT_HIGH_NOMSG(m_pCreateInstance);
     if (!m_pCreateInstance)
-        return kZVD_NULLPTR(ZvdcObject);
+        return nullptr;
     return m_pCreateInstance(memFlags);
 }
 
 //-----------------------------------------------------------------------------
-void ZvdcClass::DeleteInstance(ZvdcpObject pObject) const ZVD_NOEXCEPT
+void ZvdcClass::DeleteInstance(ZvdcpObject pObject) const noexcept
 {
     ZVD_ASSERT_HIGH_NOMSG(pObject);
     ZVD_ASSERT_HIGH_NOMSG(m_pDeleteInstance);
@@ -86,24 +86,24 @@ void ZvdcClass::DeleteInstance(ZvdcpObject pObject) const ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-ZvdcpObject ZvdcClass::CloneInstance(ZvdcpkObject pObject) const ZVD_NOEXCEPT
+ZvdcpObject ZvdcClass::CloneInstance(ZvdcpkObject pObject) const noexcept
 {
     ZVD_ASSERT_HIGH_NOMSG(pObject);
     if (!m_pCloneInstance)
     {
         // Error: this object can be cloned
-        return kZVD_NULLPTR(ZvdcObject);
+        return nullptr;
     }
     return m_pCloneInstance(pObject);
 }
 
 //-----------------------------------------------------------------------------
 // Static member definition
-ZvdcClass* ZvdcObject::m_pClass = kZVD_NULLPTR(ZvdcClass);
+ZvdcClass* ZvdcObject::m_pClass = nullptr;
 
 //-----------------------------------------------------------------------------
 // Static method implementations
-ZvdcClass& ZVD_STDCALL ZvdcObject::GetClass() ZVD_NOEXCEPT
+ZvdcClass& ZVD_STDCALL ZvdcObject::GetClass() noexcept
 {
     /// Will be set by @todo during engine initialization
     // Temporary assertion for debugging
@@ -117,21 +117,21 @@ ZvdcClass& ZVD_STDCALL ZvdcObject::GetClass() ZVD_NOEXCEPT
 
 //-----------------------------------------------------------------------------
 // 
-ZvdcObject::ZvdcObject() ZVD_NOEXCEPT
+ZvdcObject::ZvdcObject() noexcept
     : m_nRefCount(1)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void ZvdcObject::AddRef() ZVD_NOEXCEPT
+void ZvdcObject::AddRef() noexcept
 {
     ZVD_ASSERT_HIGH_NOMSG(m_nRefCount >= 0);
     ZvdfAtomicIncrementSize(m_nRefCount);
 }
 
 //-----------------------------------------------------------------------------
-void ZvdcObject::Release() ZVD_NOEXCEPT
+void ZvdcObject::Release() noexcept
 {
     ZVD_ASSERT_HIGH_NOMSG(m_nRefCount > 0);
     ZvdfAtomicDecrementSize(m_nRefCount);
@@ -142,10 +142,10 @@ void ZvdcObject::Release() ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-void* ZvdcObject::operator new(ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+void* ZvdcObject::operator new(size_t nSize, ZvdcMemFlags memFlags) noexcept
 {
     ZVD_ASSERT_HIGH(nSize >= sizeof(ZvdcObject), "Invalid size for object allocation");
-    void* ptr = kZVD_NULLVOID;
+    void* ptr = nullptr;
     // allocate and assign to ptr
     if (!ptr)
     {
@@ -156,7 +156,7 @@ void* ZvdcObject::operator new(ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEP
 }
 
 //-----------------------------------------------------------------------------
-void ZvdcObject::operator delete(void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+void ZvdcObject::operator delete(void* ptr, ZvdcMemFlags memFlags) noexcept
 {
     if (ptr)
     {
@@ -165,10 +165,10 @@ void ZvdcObject::operator delete(void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
 }
 
 //-----------------------------------------------------------------------------
-void* ZvdcObject::operator new[](ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+void* ZvdcObject::operator new[](size_t nSize, ZvdcMemFlags memFlags) noexcept
 {
     ZVD_ASSERT_HIGH(nSize >= sizeof(ZvdcObject), "Invalid size for object array allocation");
-    void* ptr = kZVD_NULLVOID;
+    void* ptr = nullptr;
     // allocate and assign to ptr
     if (!ptr)
     {
@@ -179,7 +179,7 @@ void* ZvdcObject::operator new[](ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXC
 }
 
 //-----------------------------------------------------------------------------
-void ZvdcObject::operator delete[](void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT
+void ZvdcObject::operator delete[](void* ptr, ZvdcMemFlags memFlags) noexcept
 {
     if (ptr)
     {

@@ -49,14 +49,18 @@ Purpose: blank file for implementations (.cpp files).
 
 //-----------------------------------------------------------------------------
 
-ZvdcMallocFreeMemoryAllocator::~ZvdcMallocFreeMemoryAllocator() ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::~ZvdcMallocFreeMemoryAllocator() noexcept
 {
 
 }
 
 //-----------------------------------------------------------------------------
 ZvdResult<void*>
-ZvdcMallocFreeMemoryAllocator::Allocate(SizeType nBytes) ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::Allocate(SizeType nBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+	, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+) noexcept
 {
 	ZvdResult<void*> retVal(ZvdPackedError::Ok(), ::malloc(nBytes));
 	return retVal;
@@ -64,7 +68,11 @@ ZvdcMallocFreeMemoryAllocator::Allocate(SizeType nBytes) ZVD_NOEXCEPT
 
 //-----------------------------------------------------------------------------
 ZvdResult<void*>
-ZvdcMallocFreeMemoryAllocator::Reallocate(void* p, SizeType nBytes) ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::Reallocate(void* p, SizeType nBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+	, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+) noexcept
 {
 	ZvdResult<void*> retVal(ZvdPackedError::Ok(), ::realloc(p, nBytes));
 	return retVal;
@@ -72,7 +80,11 @@ ZvdcMallocFreeMemoryAllocator::Reallocate(void* p, SizeType nBytes) ZVD_NOEXCEPT
 
 //-----------------------------------------------------------------------------
 ZvdRegularResult
-ZvdcMallocFreeMemoryAllocator::Deallocate(void* p) ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::Deallocate(void* p
+#ifdef ZVD_CFG_DEBUG_MEMORY
+	, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+) noexcept
 {
 	::free(p);
 	return ZvdResult<void*>();
@@ -80,16 +92,16 @@ ZvdcMallocFreeMemoryAllocator::Deallocate(void* p) ZVD_NOEXCEPT
 
 //-----------------------------------------------------------------------------
 
-ZvdUInt32
-ZvdcMallocFreeMemoryAllocator::IsSingleton() ZVD_NOEXCEPT 
+bool
+ZvdcMallocFreeMemoryAllocator::IsSingleton() noexcept 
 { 
-	return kZVD_NO_U32; 
+	return false; 
 }
 
 //-----------------------------------------------------------------------------
 
 ZvdcMallocFreeMemoryAllocator::ResultType
-ZvdcMallocFreeMemoryAllocator::Instance() ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::Instance() noexcept
 {
 	return ResultType(
 		ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
@@ -97,16 +109,16 @@ ZvdcMallocFreeMemoryAllocator::Instance() ZVD_NOEXCEPT
 
 //-----------------------------------------------------------------------------
 
-ZvdUInt32
-ZvdcMallocFreeMemoryAllocator::IsSubsystem() ZVD_NOEXCEPT 
+bool
+ZvdcMallocFreeMemoryAllocator::IsSubsystem() noexcept 
 { 
-	return kZVD_NO_U32; 
+	return false; 
 }
 
 //-----------------------------------------------------------------------------
 
 ZvdcMallocFreeMemoryAllocator::ResultType
-ZvdcMallocFreeMemoryAllocator::AsSubsystem() ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::AsSubsystem() noexcept
 {
 	return ResultType(
 		ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
@@ -114,32 +126,32 @@ ZvdcMallocFreeMemoryAllocator::AsSubsystem() ZVD_NOEXCEPT
 
 //-----------------------------------------------------------------------------
 
-ZvdUInt32
-ZvdcMallocFreeMemoryAllocator::IsReady() const ZVD_NOEXCEPT 
+bool
+ZvdcMallocFreeMemoryAllocator::IsReady() const noexcept 
 { 
-	return kZVD_NO_U32; 
+	return false; 
 }
 
 //-----------------------------------------------------------------------------
 
-ZvdUInt32
-ZvdcMallocFreeMemoryAllocator::IsInitialized() const ZVD_NOEXCEPT 
+bool
+ZvdcMallocFreeMemoryAllocator::IsInitialized() const noexcept 
 { 
-	return kZVD_NO_U32; 
+	return false; 
 }
 
 //-----------------------------------------------------------------------------
 
-ZvdUInt32
-ZvdcMallocFreeMemoryAllocator::CanBeCreatedOnStack() ZVD_NOEXCEPT 
+bool
+ZvdcMallocFreeMemoryAllocator::CanBeCreatedOnStack() noexcept 
 { 
-	return kZVD_YES_U32; 
+	return true; 
 }
 
 //-----------------------------------------------------------------------------
 
 ZvdcMallocFreeMemoryAllocator::ResultType 
-ZvdcMallocFreeMemoryAllocator::CreateOnStack(void* pStackMem) ZVD_NOEXCEPT
+ZvdcMallocFreeMemoryAllocator::CreateOnStack(void* pStackMem) noexcept
 {
 	ZvdiMemoryAllocator* p = ::new(pStackMem) ZvdcMallocFreeMemoryAllocator;
 	return ResultType(ZvdPackedError::Ok(), p);

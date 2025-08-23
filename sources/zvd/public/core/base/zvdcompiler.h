@@ -88,12 +88,8 @@ Purpose: compiler detection and related definitions.
 // Microsoft Visual C++ compiler related header for further detections
 #if defined(ZVD_COMPILER_MSVC)
 #	include "core/base/zvdmsvc.h"
-#	if (!ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_CFG_MIN_MSVC_VER))
-#		if (ZVD_CFG_MIN_MSVC_VER==ZVD_VISUAL_STUDIO_2019_16_x_1)
-#			error "you need VC 2019 (16.1) or higher"
-#		else
-#			error "unsupported VC version -- its too old"
-#		endif
+#	if (ZVD_COMPILER_MSVC_VERSION_LESS_THAN(ZVD_CFG_MIN_MSVC_VER))
+#		error "unsupported VC version -- its too old; you need VC 2022 (17.0) or higher"
 #	endif
 #endif
 
@@ -158,6 +154,10 @@ Purpose: compiler detection and related definitions.
 
 #ifndef ZVD_CPP
 #   error "No required C++ standard is supported by current compiler!"
+#endif
+
+#ifndef ZVD_CPP20
+#	error "too old C++ standard, you need 20 or higher"
 #endif
 
 #endif // ZVD_COMPILER_H

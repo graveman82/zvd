@@ -57,6 +57,6 @@ public:
 
 protected:
 	//ZvdString m_name;
-	ZvdUInt32 m_bInitialized;
+	uint32_t m_bInitialized;
 };
 #endif // ZVD_IGFXSHADER_H

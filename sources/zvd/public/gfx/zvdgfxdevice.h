@@ -53,8 +53,8 @@ class ZvdcGfxDevice
 {
 public:
 protected:
-	ZvdSize m_nTotalPrimitivesRendered;
-	ZvdSize m_nDrawPrimitivesCalls;
+	size_t m_nTotalPrimitivesRendered;
+	size_t m_nDrawPrimitivesCalls;
 
 	ZvdBool m_bIndexedPrimitives;
 	ZvdUIndex32 m_nVertexBufferMaxSize;

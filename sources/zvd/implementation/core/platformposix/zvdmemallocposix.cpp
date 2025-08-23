@@ -65,9 +65,9 @@ Zvdfpt_free Zvdfp_free = free;
 Zvdfpt_alloca Zvdfp_alloca = alloca;
 
 //-----------------------------------------------------------------------------
-void* __cdecl ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
+void* __cdecl ZvdfAlignedMalloc(size_t nBytes, size_t nAlignment)
 {
-    void* pResultMem = kZVD_NULLVOID;
+    void* pResultMem = nullptr;
 
 	pResultMem = Zvdfp_aligned_malloc(nAlignment, nBytes);
 	
@@ -75,9 +75,9 @@ void* __cdecl ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
 }
 
 //-----------------------------------------------------------------------------
-void* __cdecl ZvdfAlignedRealloc(void* pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes, ZvdSize nAlignment)
+void* __cdecl ZvdfAlignedRealloc(void* pMemblockOld, size_t nOldBytes, size_t nBytes, size_t nAlignment)
 {
-    void* pResultMem = kZVD_NULLVOID;
+    void* pResultMem = nullptr;
 
     void* pMemblockNew = Zvdfp_aligned_malloc(nAlignment, nBytes);
     if (!pMemblockNew)
@@ -88,7 +88,7 @@ void* __cdecl ZvdfAlignedRealloc(void* pMemblockOld, ZvdSize nOldBytes, ZvdSize 
     // Copy data from old block to new block
     if (pMemblock) 
     {
-        ZvdSize nBytesToCopy = ZvdfMin(nOldBytes, nBytes);
+        size_t nBytesToCopy = ZvdfMin(nOldBytes, nBytes);
         Zvdf_memcpy(pMemblockNew, pMemblock, nBytesToCopy);
         Zvdfp_free(pMemblock);
     }
@@ -108,9 +108,9 @@ void __cdecl ZvdfAlignedFree(void* pMemblock)
 }
 
 //-----------------------------------------------------------------------------
-void* __cdecl ZvdfStackAlloc(ZvdSize nBytes)
+void* __cdecl ZvdfStackAlloc(size_t nBytes)
 {
-    void* pResultMem = kZVD_NULLVOID;
+    void* pResultMem = nullptr;
 
     pResultMem = Zvdfp_alloca(nBytes);
 

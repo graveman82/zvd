@@ -71,9 +71,9 @@ Zvdfpt_freea Zvdfp_freea = _freea;
 #endif
 
 //-----------------------------------------------------------------------------
-ZvdpVoid ZVD_CDECL ZvdfMalloc(ZvdSize nBytes)
+ZvdpVoid ZVD_CDECL ZvdfMalloc(size_t nBytes)
 {
-    ZvdpVoid pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = nullptr;
 
     pResultMem = Zvdfp_malloc(nBytes);
 
@@ -81,9 +81,9 @@ ZvdpVoid ZVD_CDECL ZvdfMalloc(ZvdSize nBytes)
 }
 
 //-----------------------------------------------------------------------------
-ZvdpVoid ZVD_CDECL ZvdfRealloc(ZvdpVoid pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes)
+ZvdpVoid ZVD_CDECL ZvdfRealloc(ZvdpVoid pMemblockOld, size_t nOldBytes, size_t nBytes)
 {
-    ZvdpVoid pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = nullptr;
 
     ZVD_UNUSED_ARG(nOldBytes);
     pResultMem = Zvdfp_realloc(pMemblockOld, nBytes);
@@ -103,9 +103,9 @@ void ZVD_CDECL ZvdfFree(ZvdpVoid pMemblock)
 
 
 //-----------------------------------------------------------------------------
-ZvdpVoid ZVD_CDECL ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
+ZvdpVoid ZVD_CDECL ZvdfAlignedMalloc(size_t nBytes, size_t nAlignment)
 {
-    ZvdpVoid pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = nullptr;
 
 	pResultMem = Zvdfp_aligned_malloc(nBytes, nAlignment);
 
@@ -113,9 +113,9 @@ ZvdpVoid ZVD_CDECL ZvdfAlignedMalloc(ZvdSize nBytes, ZvdSize nAlignment)
 }
 
 //-----------------------------------------------------------------------------
-ZvdpVoid ZVD_CDECL ZvdfAlignedRealloc(ZvdpVoid pMemblockOld, ZvdSize nOldBytes, ZvdSize nBytes, ZvdSize nAlignment)
+ZvdpVoid ZVD_CDECL ZvdfAlignedRealloc(ZvdpVoid pMemblockOld, size_t nOldBytes, size_t nBytes, size_t nAlignment)
 {
-    ZvdpVoid pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = nullptr;
 
     ZVD_UNUSED_ARG(nOldBytes);
     pResultMem = Zvdfp_aligned_realloc(pMemblockOld, nBytes, nAlignment);
@@ -134,9 +134,9 @@ void ZVD_CDECL ZvdfAlignedFree(ZvdpVoid pMemblock)
 }
 
 //-----------------------------------------------------------------------------
-ZvdpVoid ZVD_CDECL ZvdfStackAlloc(ZvdSize nBytes)
+ZvdpVoid ZVD_CDECL ZvdfStackAlloc(size_t nBytes)
 {
-    ZvdpVoid pResultMem = kZVD_NULLVOID;
+    ZvdpVoid pResultMem = nullptr;
 
     pResultMem = Zvdfp_malloca(nBytes);
     

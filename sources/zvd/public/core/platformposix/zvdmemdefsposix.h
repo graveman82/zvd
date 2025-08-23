@@ -56,11 +56,11 @@ Attention: don't include this file directly! Use zvdmemdefs.h instead.
 #define ZVD_ALIGN_CLASS_BEGIN(T)
 #define ZVD_ALIGN_CLASS_END(T) __attribute__((aligned(T)))
 
-typedef void* (__cdecl* Zvdfpt_aligned_malloc)(ZvdSize nBoundary, ZvdSize nBytes);
-typedef void* (__cdecl* Zvdfpt_realloc)(void* pMemblock, ZvdSize nBytes);
+typedef void* (__cdecl* Zvdfpt_aligned_malloc)(size_t nBoundary, size_t nBytes);
+typedef void* (__cdecl* Zvdfpt_realloc)(void* pMemblock, size_t nBytes);
 typedef void  (__cdecl* Zvdfpt_free)(void* pMemblock);
 
-typedef void* (__cdecl* Zvdfpt_alloca)(ZvdSize nBytes);
+typedef void* (__cdecl* Zvdfpt_alloca)(size_t nBytes);
 
 #endif // linux
 

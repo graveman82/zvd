@@ -52,57 +52,57 @@ Purpose: memory allocator interface.
 class ZvdiMemoryAllocator
 {
 public:
-	typedef ZvdSize SizeType;
+	typedef size_t SizeType;
 	typedef ZvdResult<ZvdiMemoryAllocator*> ResultType;
 
-	virtual ~ZvdiMemoryAllocator() ZVD_NOEXCEPT {}
+	virtual ~ZvdiMemoryAllocator() noexcept {}
 
 	virtual ZvdResult<void*> Allocate(SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
 	) 
-	ZVD_NOEXCEPT = 0;
+	noexcept = 0;
 
 	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
-	) ZVD_NOEXCEPT = 0;
+	) noexcept = 0;
 
 	virtual ZvdRegularResult Deallocate(void* p
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
-	) ZVD_NOEXCEPT = 0;
+	) noexcept = 0;
 
 	// Methods to be used when allocator is template parameter
 	//--------------------------------------------------------
-	static ZvdUInt32 IsSingleton() ZVD_NOEXCEPT { return kZVD_NO_U32; }
+	static bool IsSingleton() noexcept { return false; }
 	// If singleton implement these methods:
-	static ResultType Instance() ZVD_NOEXCEPT
+	static ResultType Instance() noexcept
 	{ 
 		return ResultType(
 			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
 	}
 
 	/// If true this memory allocator is subsystem of some larger system (engine).
-	static ZvdUInt32 IsSubsystem() ZVD_NOEXCEPT { return kZVD_NO_U32; }
+	static bool IsSubsystem() noexcept { return false; }
 	// If subsystem implement these methods:
 	// 
 	//	You can request to engine class for example 
-	static ResultType AsSubsystem() ZVD_NOEXCEPT
+	static ResultType AsSubsystem() noexcept
 	{ 
 		return ResultType(
 			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
 	}
 		//
-	virtual ZvdUInt32 IsReady() const ZVD_NOEXCEPT { return kZVD_NO_U32; }
-	virtual ZvdUInt32 IsInitialized() const ZVD_NOEXCEPT { return kZVD_NO_U32; }
+	virtual bool IsReady() const noexcept { return false; }
+	virtual bool IsInitialized() const noexcept { return false; }
 
-	static ZvdUInt32 CanBeCreatedOnStack() ZVD_NOEXCEPT { return kZVD_YES_U32; }
+	static bool CanBeCreatedOnStack() noexcept { return true; }
 	// If subsystem implement these methods:
-	static ResultType CreateOnStack(void* pStackMem) ZVD_NOEXCEPT
+	static ResultType CreateOnStack(void* pStackMem) noexcept
 	{
 		return ResultType(
 			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));

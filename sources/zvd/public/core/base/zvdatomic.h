@@ -49,124 +49,123 @@ Purpose: Platform-independent atomic operations for Zv3D engine.
 
 #include "core/base/zvdbasedefs.h"
 
-#ifdef ZVD_CPP11
-#   include <atomic>
-#endif
+#include <atomic>
 
-/** @brief Atomically increments an unsigned 32-bit integer value (ZvdUInt32).
+
+/** @brief Atomically increments an unsigned 32-bit integer value (uint32_t).
  *  @param value Reference to the value to increment.
  *  @return The new value after increment.
  */
-ZVD_API ZvdUInt32 ZVD_STDCALL ZvdfAtomicIncrement(ZvdUInt32& value) ZVD_NOEXCEPT;
+ZVD_API uint32_t ZVD_STDCALL ZvdfAtomicIncrement(uint32_t& value) noexcept;
 
-/** @brief Atomically decrements an unsigned 32-bit integer value (ZvdUInt32).
+/** @brief Atomically decrements an unsigned 32-bit integer value (uint32_t).
  *  @param value Reference to the value to decrement.
  *  @return The new value after decrement.
  */
-ZVD_API ZvdUInt32 ZVD_STDCALL ZvdfAtomicDecrement(ZvdUInt32& value) ZVD_NOEXCEPT;
+ZVD_API uint32_t ZVD_STDCALL ZvdfAtomicDecrement(uint32_t& value) noexcept;
 
-/** @brief Atomically increments a signed 32-bit integer value (ZvdInt32).
+/** @brief Atomically increments a signed 32-bit integer value (int32_t).
  *  @param value Reference to the value to increment.
  *  @return The new value after increment.
  */
-ZVD_API ZvdInt32 ZVD_STDCALL ZvdfAtomicIncrement(ZvdInt32& value) ZVD_NOEXCEPT;
+ZVD_API int32_t ZVD_STDCALL ZvdfAtomicIncrement(int32_t& value) noexcept;
 
-/** @brief Atomically decrements a signed 32-bit integer value (ZvdInt32).
+/** @brief Atomically decrements a signed 32-bit integer value (int32_t).
  *  @param value Reference to the value to decrement.
  *  @return The new value after decrement.
  */
-ZVD_API ZvdInt32 ZVD_STDCALL ZvdfAtomicDecrement(ZvdInt32& value) ZVD_NOEXCEPT;
+ZVD_API int32_t ZVD_STDCALL ZvdfAtomicDecrement(int32_t& value) noexcept;
 
-/** @brief Atomically increments an unsigned 64-bit integer value (ZvdUInt64).
+/** @brief Atomically increments an unsigned 64-bit integer value (uint64_t).
  *  @param value Reference to the value to increment.
  *  @return The new value after increment.
  */
-ZVD_API ZvdUInt64 ZVD_STDCALL ZvdfAtomicIncrement(ZvdUInt64& value) ZVD_NOEXCEPT;
+ZVD_API uint64_t ZVD_STDCALL ZvdfAtomicIncrement(uint64_t& value) noexcept;
 
-/** @brief Atomically decrements an unsigned 64-bit integer value (ZvdUInt64).
+/** @brief Atomically decrements an unsigned 64-bit integer value (uint64_t).
  *  @param value Reference to the value to decrement.
  *  @return The new value after decrement.
  */
-ZVD_API ZvdUInt64 ZVD_STDCALL ZvdfAtomicDecrement(ZvdUInt64& value) ZVD_NOEXCEPT;
+ZVD_API uint64_t ZVD_STDCALL ZvdfAtomicDecrement(uint64_t& value) noexcept;
 
-/** @brief Atomically increments a signed 64-bit integer value (ZvdInt64).
+/** @brief Atomically increments a signed 64-bit integer value (int64_t).
  *  @param value Reference to the value to increment.
  *  @return The new value after increment.
  */
-ZVD_API ZvdInt64 ZVD_STDCALL ZvdfAtomicIncrement(ZvdInt64& value) ZVD_NOEXCEPT;
+ZVD_API int64_t ZVD_STDCALL ZvdfAtomicIncrement(int64_t& value) noexcept;
 
-/** @brief Atomically decrements a signed 64-bit integer value (ZvdInt64).
+/** @brief Atomically decrements a signed 64-bit integer value (int64_t).
  *  @param value Reference to the value to decrement.
  *  @return The new value after decrement.
  */
-ZVD_API ZvdInt64 ZVD_STDCALL ZvdfAtomicDecrement(ZvdInt64& value) ZVD_NOEXCEPT;
+ZVD_API int64_t ZVD_STDCALL ZvdfAtomicDecrement(int64_t& value) noexcept;
 
-/** @brief Atomically increments an unsigned integer value (ZvdSize).
+/** @brief Atomically increments an unsigned integer value (size_t).
  *  @param value Reference to the value to increment.
  *  @return The new value after increment.
  */
-ZVD_API ZvdSize ZVD_STDCALL ZvdfAtomicIncrementSize(ZvdSize& value) ZVD_NOEXCEPT;
+ZVD_API size_t ZVD_STDCALL ZvdfAtomicIncrementSize(size_t& value) noexcept;
 
-/** @brief Atomically decrements an unsigned integer value (ZvdSize).
+/** @brief Atomically decrements an unsigned integer value (size_t).
  *  @param value Reference to the value to decrement.
  *  @return The new value after decrement.
  */
-ZVD_API ZvdSize ZVD_STDCALL ZvdfAtomicDecrementSize(ZvdSize& value) ZVD_NOEXCEPT;
+ZVD_API size_t ZVD_STDCALL ZvdfAtomicDecrementSize(size_t& value) noexcept;
 
-#ifdef ZVD_CPP11
-/** @brief Atomically increments an unsigned 32-bit atomic integer value (std::atomic<ZvdUInt32>).
+
+/** @brief Atomically increments an unsigned 32-bit atomic integer value (std::atomic<uint32_t>).
  *  @param value Reference to the atomic value to increment.
  *  @return The new value after increment.
  */
-inline ZVD_API ZvdUInt32 ZVD_STDCALL ZvdfAtomicIncrement(std::atomic<ZvdUInt32>& value) ZVD_NOEXCEPT
+inline ZVD_API uint32_t ZVD_STDCALL ZvdfAtomicIncrement(std::atomic<uint32_t>& value) noexcept
 {
     return value.fetch_add(1, std::memory_order_seq_cst) + 1;
 }
 
-/** @brief Atomically decrements an unsigned 32-bit atomic integer value (std::atomic<ZvdUInt32>).
+/** @brief Atomically decrements an unsigned 32-bit atomic integer value (std::atomic<uint32_t>).
  *  @param value Reference to the atomic value to decrement.
  *  @return The new value after decrement.
  */
-inline ZVD_API ZvdUInt32 ZVD_STDCALL ZvdfAtomicDecrement(std::atomic<ZvdUInt32>& value) ZVD_NOEXCEPT
+inline ZVD_API uint32_t ZVD_STDCALL ZvdfAtomicDecrement(std::atomic<uint32_t>& value) noexcept
 {
     return value.fetch_sub(1, std::memory_order_seq_cst) - 1;
 }
 
-/** @brief Atomically increments an unsigned 64-bit atomic integer value (std::atomic<ZvdUInt64>).
+/** @brief Atomically increments an unsigned 64-bit atomic integer value (std::atomic<uint64_t>).
  *  @param value Reference to the atomic value to increment.
  *  @return The new value after increment.
  */
-inline ZVD_API ZvdUInt64 ZVD_STDCALL ZvdfAtomicIncrement(std::atomic<ZvdUInt64>& value) ZVD_NOEXCEPT
+inline ZVD_API uint64_t ZVD_STDCALL ZvdfAtomicIncrement(std::atomic<uint64_t>& value) noexcept
 {
     return value.fetch_add(1, std::memory_order_seq_cst) + 1;
 }
 
-/** @brief Atomically decrements an unsigned 64-bit atomic integer value (std::atomic<ZvdUInt64>).
+/** @brief Atomically decrements an unsigned 64-bit atomic integer value (std::atomic<uint64_t>).
  *  @param value Reference to the atomic value to decrement.
  *  @return The new value after decrement.
  */
-inline ZVD_API ZvdUInt64 ZVD_STDCALL ZvdfAtomicDecrement(std::atomic<ZvdUInt64>& value) ZVD_NOEXCEPT
+inline ZVD_API uint64_t ZVD_STDCALL ZvdfAtomicDecrement(std::atomic<uint64_t>& value) noexcept
 {
     return value.fetch_sub(1, std::memory_order_seq_cst) - 1;
 }
 
-/** @brief Atomically increments an unsigned atomic integer value (std::atomic<ZvdSize>).
+/** @brief Atomically increments an unsigned atomic integer value (std::atomic<size_t>).
  *  @param value Reference to the atomic value to increment.
  *  @return The new value after increment.
  */
-inline ZVD_API ZvdSize ZVD_STDCALL ZvdfAtomicIncrementSize(std::atomic<ZvdSize>& value) ZVD_NOEXCEPT
+inline ZVD_API size_t ZVD_STDCALL ZvdfAtomicIncrementSize(std::atomic<size_t>& value) noexcept
 {
     return value.fetch_add(1, std::memory_order_seq_cst) + 1;
 }
 
-/** @brief Atomically decrements an unsigned atomic integer value (std::atomic<ZvdSize>).
+/** @brief Atomically decrements an unsigned atomic integer value (std::atomic<size_t>).
  *  @param value Reference to the atomic value to decrement.
  *  @return The new value after decrement.
  */
-inline ZVD_API ZvdSize ZVD_STDCALL ZvdfAtomicDecrementSize(std::atomic<ZvdSize>& value) ZVD_NOEXCEPT
+inline ZVD_API size_t ZVD_STDCALL ZvdfAtomicDecrementSize(std::atomic<size_t>& value) noexcept
 {
     return value.fetch_sub(1, std::memory_order_seq_cst) - 1;
 }
-#endif
+
 
 #endif // ZVD_ATOMIC_H_

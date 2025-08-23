@@ -54,42 +54,23 @@ Purpose: detect the target operating system.
 // Identify the Operating System
 
 
-/*.  
-Detect for PS3 before win32 to avoid the situation when devenv.exe is used
-to batch build a SN VSI project because difficult compile errors  can be 
-appeared.
-*/
-#if defined(SN_TARGET_PS3) || defined(_PS3) || defined(PS3)
-#   if !defined(ZVD_PLATFORM_PS3)
-#       define ZVD_PLATFORM_PS3
-#		define ZVD_OS_PS3
-#		define ZVD_OS_STRING "PS3"
-#		define ZVD_BIG_ENDIAN 1
-#		pragma message("Platform: PS3")
-#   endif
 
-/*
-*  Warning: _XBOX_VER check must precede _WIN32 check
-*/
-#elif defined( _XBOX_VER ) || defined(_XENON)
-#	if _XBOX_VER >= 200 || defined(_XENON)
-#		if !defined(ZVD_PLATFORM_XBOX360)
-#			define ZVD_PLATFORM_XBOX360
-#			define ZVD_OS_XBOX360
-#			define ZVD_OS_STRING "XBox360"
-#			define ZVD_BIG_ENDIAN 1
-#			pragma message("Platform: XBox360")
-#		endif
-#	else
-#		if !defined(ZVD_PLATFORM_XBOX)
-#			define ZVD_PLATFORM_XBOX
+#ifdef _GAMING_XBOX
+// all Xbox 
+
+#	ifdef _GAMING_XBOX_SCARLETT
+#		if !defined(ZVD_PLATFORM_XBOX_SCARLETT)
+#			define ZVD_PLATFORM_XBOX_SCARLETT
 #			define ZVD_OS_XBOX
-#			define ZVD_OS_STRING "XBox"
-#			define ZVD_BIG_ENDIAN 1
-#			pragma message("Platform: XBox")
+#			define ZVD_OS_STRING "XBoxScarlett"
+#			define ZVD_LITTLE_ENDIAN 1
+#			pragma message("Platform: XBoxScarlett")
 #		endif
-#	endif
 
+#	else
+#		error "too old xbox version - unsupported"
+
+#	endif
 
 #elif defined(_WIN64)
 #	if !defined(ZVD_PLATFORM_WIN64)
@@ -104,16 +85,11 @@ appeared.
 
 
 #elif (defined(_WIN32) || defined(__WIN32__) || defined(WIN32)) && !defined ( _WIN64 )
-#	if !defined(ZVD_PLATFORM_WIN32)
-#		define ZVD_PLATFORM_WIN32
-#		define ZVD_OS_WINDOWS32
-#		define ZVD_OS_STRING "Win32"
-#		pragma message("Platform: Win32")
-#	endif
-
+#   error "32 bit platform is not supported"
 
 #else
 #   error "Your platform is not identified"
+
 #endif
 
 

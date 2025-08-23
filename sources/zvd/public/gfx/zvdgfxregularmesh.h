@@ -68,8 +68,8 @@ public:
 	 *       (e.g., it doesn't check if nElements is a multiple of 3 for a TRIANGLELIST).
 	 */
 	static
-	ZvdUInt32
-	CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, ZvdUInt32 nElements);
+	uint32_t
+	CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, uint32_t nElements);
 
 	/** Gets the primitive type of the regular mesh.
 	

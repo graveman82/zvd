@@ -70,24 +70,14 @@ Purpose: base definitions.
 #endif
 
 
-
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
 #include <cstdlib>
-
-
-#if defined(ZVD_HAS_STDINT_H_FILE)
-#	include <cstdint>
-#endif
-
+#include <cstdint>
 #include <cstddef>
-
-#ifdef ZVD_CPP11
 #include <limits>
-#else
-#include <climits>
-#endif
+
 
 //-----------------------------------------------------------------------------
 // OS detection
@@ -100,7 +90,7 @@ Purpose: base definitions.
 
 #endif      // eof if gnu C
 
-#if defined(ZVD_PLATFORM_WIN32) || defined(ZVD_PLATFORM_WIN64)
+#if defined(ZVD_PLATFORM_WIN64)
 #   if !defined(ZVD_PLATFORM_WIN)
 #       define ZVD_PLATFORM_WIN
 #		define ZVD_OS_WINDOWS
@@ -109,13 +99,12 @@ Purpose: base definitions.
 #endif
 
 // Verifies that a supported platform is detected.
-#if !defined(ZVD_PLATFORM_WIN32) && \
-    !defined(ZVD_PLATFORM_WIN64) && \
+#if !defined(ZVD_PLATFORM_WIN64) && \
     !defined(ZVD_PLATFORM_LINUX)
 #	error "For now windows and linux platforms are supported only."
 #endif
 
-#if defined(ZVD_PLATFORM_PS3)
+#if defined(ZVD_PLATFORM_PS4) || defined(ZVD_PLATFORM_PS5) || defined(ZVD_PLATFORM_XBOX_SCARLETT)
 #error "Isn't implemented yet"
 #endif
 
@@ -142,9 +131,13 @@ Purpose: base definitions.
 #	endif
 #endif /* ZVD_BIG_ENDIAN */
 
+#if defined (ZVD_BIG_ENDIAN) && !defined (ZVD_LITTLE_ENDIAN)
+#   error "big endian based platforms is not supported"
+#endif
+
 //-----------------------------------------------------------------------------
 // API macros, Library type
-#if defined(ZVD_OS_WINDOWS) || defined(ZVD_PLATFORM_XBOX360)
+#if defined(ZVD_OS_WINDOWS) || defined(ZVD_PLATFORM_XBOX_SCARLETT)
 
 #ifdef ZVD_DLL_EXPORTS
 #	define ZVD_API __declspec(dllexport)
@@ -202,67 +195,6 @@ Purpose: base definitions.
 #endif
 
 
-// fixed size integers
-//---------------------
-#if defined(ZVD_HAS_STDINT_H_FILE)
-typedef int8_t ZvdInt8;
-typedef int16_t ZvdInt16;
-typedef int32_t ZvdInt32;
-
-typedef uint8_t ZvdUInt8;
-typedef uint16_t ZvdUInt16;
-typedef uint32_t ZvdUInt32;
-
-#	if defined(ZVD_ARCH_X64)
-typedef int64_t ZvdInt64;
-typedef uint64_t ZvdUInt64;
-#	endif
-
-#elif defined(ZVD_MSVC)
-typedef __int8 ZvdInt8;
-typedef __int16 ZvdInt16;
-typedef __int32 ZvdInt32;
-
-typedef unsigned __int8 ZvdUInt8;
-typedef unsigned __int16 ZvdUInt16;
-typedef unsigned __int32 ZvdUInt32;
-
-#	if defined(ZVD_ARCH_X64) // Нужен ли этот макрос здесь?
-typedef __int64 ZvdInt64;
-typedef unsigned __int64 ZvdUInt64;
-#	endif
-
-#else
-
-typedef signed char ZvdInt8;
-typedef short ZvdInt16;
-typedef int ZvdInt32;
-
-typedef unsigned char ZvdUInt8;
-typedef unsigned short ZvdUInt16;
-typedef unsigned int ZvdUInt32;
-
-#	if defined(ZVD_ARCH_X64)
-typedef long long ZvdInt64;
-typedef unsigned long long ZvdUInt64;
-#	endif
-
-#endif // fixed size integers
-
-#ifdef ZVD_CFG_BOOL_SUPPORTED
-	typedef bool ZvdBool;
-
-#else
-#	ifdef ZVD_CFG_USE_32BIT_BOOL
-		typedef ZvdUInt32 ZvdBool;
-
-#	else
-		typedef ZvdUInt8 ZvdBool;
-
-#	endif
-
-#endif // eof bool support check
-
 //++++++++++++++++++++++++++
 // Fixed size integers utils
 //++++++++++++++++++++++++++
@@ -272,8 +204,8 @@ union ZvdU16U8Converter {
 	{
 		m_u16 = 0u;
 	}
-	ZvdUInt16 m_u16;
-	ZvdUInt8 m_u8[2];
+	uint16_t m_u16;
+	uint8_t m_u8[2];
 };
 
 union ZvdU32U8Converter {
@@ -281,8 +213,8 @@ union ZvdU32U8Converter {
 	{
 		m_u32 = 0u;
 	}
-	ZvdUInt32 m_u32;
-	ZvdUInt8 m_u8[4];
+	uint32_t m_u32;
+	uint8_t m_u8[4];
 };
 
 union ZvdU32U16Converter {
@@ -290,111 +222,50 @@ union ZvdU32U16Converter {
 	{
 		m_u32 = 0u;
 	}
-	ZvdUInt32 m_u32;
-	ZvdUInt16 m_u16[2];
+	uint32_t m_u32;
+	uint16_t m_u16[2];
 };
 
 // Human readable convenient integers
 //-----------------------------------
-typedef ZvdUInt8 ZvdByte;
-typedef ZvdUInt16 ZvdWord;
-typedef ZvdUInt32 ZvdDword;
+typedef uint8_t ZvdByte;
+typedef uint16_t ZvdWord;
+typedef uint32_t ZvdDword;
 
-typedef ZvdInt8 ZvdSByte;
-typedef ZvdInt16 ZvdSWord;
-typedef ZvdInt32 ZvdSDword;
+typedef int8_t ZvdSByte;
+typedef int16_t ZvdSWord;
+typedef int32_t ZvdSDword;
 
-typedef ZvdUInt32 ZvdSize32;
-typedef ZvdUInt32 ZvdUIndex32;
-typedef ZvdInt32 ZvdIndex32;
+typedef uint32_t ZvdSize32;
+typedef uint32_t ZvdUIndex32;
+typedef int32_t ZvdIndex32;
 
-#ifdef ZVD_HAS_STD_DEFS
-typedef size_t ZvdSize;
-typedef ptrdiff_t ZvdPtrDiff;
-typedef intptr_t ZvdIntPtr;
-#else
-#	if defined(ZVD_ARCH_X64)
-		typedef ZvdUInt64 ZvdSize;
-		typedef ZvdInt64 ZvdPtrDiff;
-		typedef ZvdInt64 ZvdIntPtr;
 
-#	elif defined(ZVD_ARCH_X86)
-		typedef ZvdUInt32 ZvdSize;
-		typedef ZvdInt32 ZvdPtrDiff;
-		typedef ZvdInt32 ZvdIntPtr;
-
-#	else
-		typedef ZvdUInt16 ZvdSize;
-		typedef ZvdInt16 ZvdPtrDiff;
-		typedef ZvdInt16 ZvdIntPtr;
-
-#	endif // arch
-
-#endif
 
 //  ZVD_SIZE_MAX
-#ifdef ZVD_HAS_STD_DEFS
-#   ifdef ZVD_CPP11
-        const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<size_t>::max();
-#   else
-        const ZvdSize kZVD_SIZE_MAX = static_cast<size_t>(-1);
-#   endif
+const size_t kZVD_SIZE_MAX = std::numeric_limits<size_t>::max();
 
-#else
-#   if defined(ZVD_ARCH_X64)
-#       ifdef ZVD_CPP11
-            const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<ZvdUInt64>::max();
-#       else
-            const ZvdSize kZVD_SIZE_MAX = ULLONG_MAX; // for 64-bit unsigned integer
-#       endif
-
-#   elif defined(ZVD_ARCH_X86)
-#       ifdef ZVD_CPP11
-            const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<ZvdUInt32>::max();
-#       else
-            const ZvdSize kZVD_SIZE_MAX = UINT_MAX; // for 32-bit unsigned integer
-#       endif
-
-#else
-#       ifdef ZVD_CPP11
-            const ZvdSize kZVD_SIZE_MAX = std::numeric_limits<ZvdUInt16>::max();
-#       else
-            const ZvdSize kZVD_SIZE_MAX = USHRT_MAX; // for 16-bit unsigned integer
-#       endif
-#   endif // arch
-#endif
-
-typedef ZvdSize ZvdUIndex;
+typedef size_t ZvdUIndex;
 const ZvdUIndex kZVD_INVALID_INDEX = kZVD_SIZE_MAX;
 
-const ZvdUInt32 kZVD_BAD_MARKER_U3 = 0x7;
-const ZvdUInt32 kZVD_BAD_MARKER_U8 = 0xFF;
-const ZvdUInt32 kZVD_BAD_MARKER_U16 = 0xFFFF;
-const ZvdUInt32 kZVD_BAD_MARKER_U32 = 0xFFFFFFFF;
+const uint32_t kZVD_BAD_MARKER_U3 = 0x7;
+const uint32_t kZVD_BAD_MARKER_U8 = 0xFF;
+const uint32_t kZVD_BAD_MARKER_U16 = 0xFFFF;
+const uint32_t kZVD_BAD_MARKER_U32 = 0xFFFFFFFF;
 
-const ZvdUInt32 kZVD_ONE_U8 = 0x01;
-const ZvdUInt32 kZVD_ONE_U32LE = 0x00000001;
+const uint32_t kZVD_ONE_U8 = 0x01;
+const uint32_t kZVD_ONE_U32LE = 0x00000001;
 
 
 inline bool ZvdIsLittleEndian()
 {
-	return ((*static_cast<const ZvdUInt8*>(static_cast<const void*>(&kZVD_ONE_U32LE))) == kZVD_ONE_U8);
+	return ((*static_cast<const uint8_t*>(static_cast<const void*>(&kZVD_ONE_U32LE))) == kZVD_ONE_U8);
 }
 
 //++++++++++++++++++++++++++++++++++++
 // Language standard dependent things
 //++++++++++++++++++++++++++++++++++++
-#ifdef ZVD_CPP11 
-#	define kZVD_NULLPTR(argType) nullptr
-#	define kZVD_NULLFPTR(argType) nullptr
-#	define kZVD_NULLVOID nullptr
-#	define kZVD_NULLCSTR nullptr
-#else
-#	define kZVD_NULLPTR(argType) ((argType*)0)
-#	define kZVD_NULLFPTR(argType) ((argType)0)
-#	define kZVD_NULLVOID ((void*)0)
-#	define kZVD_NULLCSTR ((const char*)0)
-#endif
+
 
 
 
@@ -411,45 +282,13 @@ typedef double ZvdReal64;
 //-----------------------------------------------------------------------------
 // Boolean constants
 
-// cpp lang
 
-
-// as integers
-const ZvdUInt32		kZVD_TRUE_U32 = 1;
-const ZvdUInt32		kZVD_FALSE_U32 = 0;
-
-const ZvdUInt8		kZVD_TRUE_U8 = 1;
-const ZvdUInt8		kZVD_FALSE_U8 = 0;
-
-// yes/no answer constants
-const ZvdUInt32		kZVD_YES_U32 = kZVD_TRUE_U32;
-const ZvdUInt32		kZVD_NO_U32 = kZVD_FALSE_U32;
-
-const ZvdUInt8		kZVD_YES_U8 = kZVD_TRUE_U8;
-const ZvdUInt8		kZVD_NO_U8 = kZVD_FALSE_U8;
-
-
-#ifdef ZVD_CFG_BOOL_SUPPORTED
-const bool			kZVD_TRUE = true;
-const bool			kZVD_FALSE = false;
-const bool			kZVD_YES = kZVD_TRUE;
-const bool			kZVD_NO = kZVD_FALSE;
-#else
-#	ifdef ZVD_CFG_USE_32BIT_BOOL
-const ZvdUInt32		kZVD_TRUE = kZVD_TRUE_U32;
-const ZvdUInt32		kZVD_FALSE = kZVD_FALSE_U32;
-const ZvdUInt32		kZVD_YES = kZVD_TRUE;
-const ZvdUInt32		kZVD_NO = kZVD_FALSE;
-
-#	else
-const ZvdUInt8		kZVD_TRUE = kZVD_TRUE_U8;
-const ZvdUInt8		kZVD_FALSE = kZVD_FALSE_U8;
-const ZvdUInt8		kZVD_YES = kZVD_TRUE;
-const ZvdUInt8		kZVD_NO = kZVD_FALSE;
-
-#	endif
-
-#endif
+const bool kZVD_TRUE = true;
+const bool kZVD_FALSE = false;
+const bool kZVD_YES = true;
+const bool kZVD_NO = false;
+const bool kZVD_ON = true;
+const bool kZVD_OFF = false;
 
 // Offset, align
 //--------------
@@ -468,37 +307,6 @@ ZVD_DIV_TYPE_SIZE_INTO_ALIGN_MOD(nameOfType,padBytesCount,alignValue) : alignVal
 ZVD_TYPE_SIZE_TO_ALIGNED_DIFF(nameOfType,padBytesCount,alignValue))
 
 
-// cpp standard >= 11 feauters
-//----------------------------
-
-#ifdef ZVD_CPP11
-#	define ZVD_METHOD_OVERRIDE override
-#else
-#	define ZVD_METHOD_OVERRIDE
-#endif
-
-
-#if !defined(ZVD_CFG_USE_EXCEPTIONS)
-#	if defined(ZVD_CPP11)
-#		define ZVD_NOEXCEPT noexcept
-#	else
-#		define ZVD_NOEXCEPT throw()
-#	endif
-#else
-#	define ZVD_NOEXCEPT // can throw exceptions
-#endif
-
-#ifdef ZVD_CPP11
-#	define ZVD_DELETED_METHOD = delete
-#else
-#	define ZVD_DELETED_METHOD
-#endif
-
-#ifdef ZVD_CPP11
-#	define ZVD_DEFAULT_IMPL = default;
-#else
-#	define ZVD_DEFAULT_IMPL {}
-#endif
 
 
 struct ZvdsDefaultTag {};
@@ -515,22 +323,22 @@ enum ZvdeDataUnitType
     /// Invalid or unknown type.
     kZVD_DATAUNITTYPE_UNKNOWN = 0,
 
-    /// Signed 8-bit integer (ZvdInt8).
+    /// Signed 8-bit integer (int8_t).
     kZVD_DATAUNITTYPE_INT8,
 
-    /// Unsigned 8-bit integer (ZvdUInt8).
+    /// Unsigned 8-bit integer (uint8_t).
     kZVD_DATAUNITTYPE_UINT8,
 
-    /// Signed 16-bit integer (ZvdInt16).
+    /// Signed 16-bit integer (int16_t).
     kZVD_DATAUNITTYPE_INT16,
 
-    /// Unsigned 16-bit integer (ZvdUInt16).
+    /// Unsigned 16-bit integer (uint16_t).
     kZVD_DATAUNITTYPE_UINT16,
 
-    /// Signed 32-bit integer (ZvdInt32).
+    /// Signed 32-bit integer (int32_t).
     kZVD_DATAUNITTYPE_INT32,
 
-    /// Unsigned 32-bit integer (ZvdUInt32).
+    /// Unsigned 32-bit integer (uint32_t).
     kZVD_DATAUNITTYPE_UINT32,
 
 
@@ -579,13 +387,12 @@ enum ZvdeDataUnitType
     /// 16-bit character
     kZVD_DATAUNITTYPE_CHAR16,
 
-#ifdef ZVD_ARCH_X64
-    /// Signed 64-bit integer (ZvdInt64).
+    /// Signed 64-bit integer (int64_t).
     kZVD_DATAUNITTYPE_INT64,
 
-    /// Unsigned 64-bit integer (ZvdUInt64).
+    /// Unsigned 64-bit integer (uint64_t).
     kZVD_DATAUNITTYPE_UINT64,
-#endif
+
     /// Predefined data unit type count.
     kZVD_DATAUNITTYPE_PREDEFINED_COUNT,
 
@@ -594,4 +401,5 @@ enum ZvdeDataUnitType
     /// Max data unit types available.
     kZVD_DATAUNITTYPE_MAX = 0xFFF
 };
+
 #endif // ZVD_BASEDEFS_H

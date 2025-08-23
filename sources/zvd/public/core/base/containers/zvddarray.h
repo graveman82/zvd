@@ -57,13 +57,13 @@ template <typename TElement,
 class ZvdcDArray
 {
 public:
-	typedef ZvdSize SizeType;
+	typedef size_t SizeType;
 	typedef TElement ValueType;
 	typedef TElement* Pointer;
 	typedef TElement* Iterator;
 
 	ZvdcDArray()
-		: m_pData(kZVD_NULLPTR(TElement))
+		: m_pData(nullptr)
 		, m_nCount(0)
 		, m_nCapacity(0)
 	{
@@ -145,14 +145,14 @@ public:
 	TElement* PointerAt(SizeType idx)
 	{
 		if (idx >= m_nCount)
-			return kZVD_NULLPTR(TElement);
+			return nullptr;
 		return m_pData + idx;
 	}
 
 	const TElement* PointerAt(SizeType idx) const
 	{
 		if (idx >= m_nCount)
-			return kZVD_NULLPTR(TElement);
+			return nullptr;
 		return m_pData + idx;
 	}
 
@@ -178,22 +178,22 @@ public:
 
 	ZvdiMemoryAllocator::ResultType get_allocator()
 	{
-		return M_GetMemoryAllocator(kZVD_NO_U32);
+		return M_GetMemoryAllocator(false);
 	}
 
 private:
 	ZvdiMemoryAllocator::ResultType
 	M_GetMemoryAllocator(
-		ZvdUInt32 bUsedByThisClass = kZVD_YES_U32,
-		void* pStackMem = kZVD_NULLVOID)
+		uint32_t bUsedByThisClass = true,
+		void* pStackMem = nullptr)
 	{
 		typedef ZvdiMemoryAllocator::ResultType Result;
 		typedef TMemoryAllocator TAllocator;
 		typedef ZvdiMemoryAllocator IAllocator;
 
-		IAllocator* pAllocator = kZVD_NULLPTR(IAllocator);
+		IAllocator* pAllocator = nullptr;
 
-		if (TAllocator::IsSingleton() == kZVD_YES_U32)
+		if (TAllocator::IsSingleton() == true)
 		{
 			Result result = TAllocator::Instance();
 			pAllocator = result.Get();
@@ -224,9 +224,9 @@ private:
 				return result;
 			}
 
-			if (pAllocator->IsReady() == kZVD_NO_U32)
+			if (pAllocator->IsReady() == false)
 			{
-				if (pAllocator->IsInitialized() == kZVD_NO_U32)
+				if (pAllocator->IsInitialized() == false)
 				{
 					/// @todo log
 					return Result(ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_DARRAY, kZVD_EC_NOPRECOND));
@@ -241,10 +241,10 @@ private:
 			// create mem alloc on stack of called function
 			// This is default method if no any.
 
-			ZVD_ASSERT_HIGH_NOMSG(kZVD_YES_U32 == bUsedByThisClass);
+			ZVD_ASSERT_HIGH_NOMSG(true == bUsedByThisClass);
 			ZVD_ASSERT_HIGH_NOMSG(pStackMem);
 
-			if (TAllocator::CanBeCreatedOnStack() == kZVD_NO_U32)
+			if (TAllocator::CanBeCreatedOnStack() == false)
 			{
 				return Result(ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC, 
 					kZVD_ESRC_CORE_DARRAY, kZVD_EC_NOSTACKALLOCATOR));
@@ -287,7 +287,7 @@ private:
 				retVal.Error().AddCrashFlag();
 				return retVal;
 			}
-			m_pData = kZVD_NULLPTR(TElement);
+			m_pData = nullptr;
 			m_nCapacity = 0;
 			return retVal;
 		}
@@ -327,10 +327,10 @@ private:
 	{
 		ZVD_ASSERT_HIGH_NOMSG(nNewCap > 0);
 
-		ZvdiMemoryAllocator* pMemAlloc = kZVD_NULLPTR(ZvdiMemoryAllocator);
+		ZvdiMemoryAllocator* pMemAlloc = nullptr;
 		ZvdByte allocStorage[ZVD_ALIGNED_TYPE_SIZE(TMemoryAllocator, 0, 16)];
 		ZvdiMemoryAllocator::ResultType allocatorResult = 
-			M_GetMemoryAllocator(kZVD_YES_U32, &allocStorage[0]);
+			M_GetMemoryAllocator(true, &allocStorage[0]);
 		if (!allocatorResult.IsOk())
 		{
 			return ZvdRegularResult(allocatorResult.Error());

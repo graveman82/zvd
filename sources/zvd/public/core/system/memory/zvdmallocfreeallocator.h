@@ -52,34 +52,48 @@ Purpose: simple allocator based on malloc/realloc/free routines.
 class ZvdcMallocFreeMemoryAllocator : public ZvdiMemoryAllocator
 {
 public:
-	typedef ZvdSize SizeType;
+	typedef size_t SizeType;
 	typedef ZvdResult<ZvdiMemoryAllocator*> ResultType;
 
-	virtual ~ZvdcMallocFreeMemoryAllocator() ZVD_NOEXCEPT;
+	virtual ~ZvdcMallocFreeMemoryAllocator() noexcept;
 
-	virtual ZvdResult<void*> Allocate(SizeType nBytes) ZVD_NOEXCEPT;
+	virtual ZvdResult<void*> Allocate(SizeType nBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+	) noexcept;
 
-	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes) ZVD_NOEXCEPT;
-	virtual ZvdRegularResult Deallocate(void* p) ZVD_NOEXCEPT;
+	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+	) noexcept;
+
+	virtual ZvdRegularResult Deallocate(void* p
+#ifdef ZVD_CFG_DEBUG_MEMORY
+		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
+#endif
+	) noexcept;
+
 	// Methods to be used when allocator is template parameter
 	//--------------------------------------------------------
-	static ZvdUInt32 IsSingleton() ZVD_NOEXCEPT;
+	static bool IsSingleton() noexcept;
 	// If singleton implement these methods:
-	static ResultType Instance() ZVD_NOEXCEPT;
+	static ResultType Instance() noexcept;
 
 	/// If true this memory allocator is subsystem of some larger system (engine).
-	static ZvdUInt32 IsSubsystem() ZVD_NOEXCEPT;
+	static bool IsSubsystem() noexcept;
 	// If subsystem implement these methods:
 	// 
 	//	You can request to engine class for example 
-	static ResultType AsSubsystem() ZVD_NOEXCEPT;
+	static ResultType AsSubsystem() noexcept;
 	//
-	virtual ZvdUInt32 IsReady() const ZVD_NOEXCEPT;
-	virtual ZvdUInt32 IsInitialized() const ZVD_NOEXCEPT;
+	virtual bool IsReady() const noexcept;
+	virtual bool IsInitialized() const noexcept;
 
-	static ZvdUInt32 CanBeCreatedOnStack() ZVD_NOEXCEPT;
+	static bool CanBeCreatedOnStack() noexcept;
 	// If subsystem implement these methods:
-	static ResultType CreateOnStack(void* pStackMem) ZVD_NOEXCEPT;
+	static ResultType CreateOnStack(void* pStackMem) noexcept;
 };
 
 #endif // ZVD_MALLOCFREEALLOCATOR_H

@@ -91,9 +91,9 @@ private:
 */
 inline
 ZvdcListNode::ZvdcListNode()
-	: m_pNext(kZVD_NULLPTR(ZvdcListNode))
-	, m_pPrev(kZVD_NULLPTR(ZvdcListNode))
-	, m_pUserData(kZVD_NULLVOID)
+	: m_pNext(nullptr)
+	, m_pPrev(nullptr)
+	, m_pUserData(nullptr)
 {
 	
 }
@@ -103,8 +103,8 @@ ZvdcListNode::ZvdcListNode()
 */
 inline
 ZvdcListNode::ZvdcListNode(ZvdpVoid pUserData)
-    : m_pNext(kZVD_NULLPTR(ZvdcListNode))
-    , m_pPrev(kZVD_NULLPTR(ZvdcListNode))
+    : m_pNext(nullptr)
+    , m_pPrev(nullptr)
     , m_pUserData(pUserData)
 {
     
@@ -124,7 +124,7 @@ ZvdcListNode::GetNext() const
     if (this->m_pNext->m_pNext)
         return this->m_pNext;
     else
-        return kZVD_NULLPTR(ZvdcListNode); // last node
+        return nullptr; // last node
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ ZvdcListNode::GetPrev() const
     if (this->m_pPrev->m_pPrev)
         return this->m_pPrev;
     else
-        return kZVD_NULLPTR(ZvdcListNode); // first node
+        return nullptr; // first node
 }
 
 //-----------------------------------------------------------------------------
@@ -211,8 +211,8 @@ ZvdcListNode::UnlinkFromList()
     ZVD_ASSERT_HIGH(this->GetNext(), "must be linked in list - invalid next field");
     this->m_pNext->SetPrev(this->GetPrev());
     this->m_pPrev->SetNext(this->GetNext());
-    this->m_pNext = kZVD_NULLPTR(ZvdcListNode);
-    this->m_pPrev = kZVD_NULLPTR(ZvdcListNode);;
+    this->m_pNext = nullptr;
+    this->m_pPrev = nullptr;;
 }
 
 
@@ -225,7 +225,7 @@ inline
 ZvdBool
 ZvdcListNode::IsLinked() const
 {
-    return (m_pNext != kZVD_NULLPTR(ZvdcListNode) &&
-        m_pPrev != kZVD_NULLPTR(ZvdcListNode));
+    return (m_pNext != nullptr &&
+        m_pPrev != nullptr);
 }
 #endif // ZVD_LISTNODE_H

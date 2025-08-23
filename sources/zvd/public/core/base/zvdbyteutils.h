@@ -55,61 +55,61 @@ Purpose: byte utilities.
 // Byte utils
 //++++++++++++++++++
 
-#define ZVD_ENUM2U8(enumVal) ((ZvdUInt8)(enumVal))
-#define ZVD_ENUM2U32(enumVal) ((ZvdUInt32)(enumVal))
+#define ZVD_ENUM2U8(enumVal) ((uint8_t)(enumVal))
+#define ZVD_ENUM2U32(enumVal) ((uint32_t)(enumVal))
 
 #define ZVD_C_CAST_PTR_TO_INT(val,inttype) ((inttype*)&(val)) 
 #define ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,inttype,offs) (((inttype*)&(val)) + offs)
 
 //=== unsigned ================================================================
 #ifdef ZVD_BIG_ENDIAN
-/// High ZvdUInt8 (byte) in ZvdUint16 (word)
-#	define ZVD_HIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdUInt8))  
+/// High uint8_t (byte) in ZvdUint16 (word)
+#	define ZVD_HIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,uint8_t))  
 #else // LE
-#	define ZVD_HIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt8,1)) 
+#	define ZVD_HIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint8_t,1)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// Low ZvdUInt8 (byte) in ZvdUint16 (word)
-#	define ZVD_LOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt8,1))  
+/// Low uint8_t (byte) in ZvdUint16 (word)
+#	define ZVD_LOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint8_t,1))  
 #else // LE
-#	define ZVD_LOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdUInt8)) 
+#	define ZVD_LOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,uint8_t)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// High ZvdUInt16 (word) in ZvdUInt32 (dword)
-#	define ZVD_HIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdUInt16))  
+/// High uint16_t (word) in uint32_t (dword)
+#	define ZVD_HIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,uint16_t))  
 #else // LE
-#	define ZVD_HIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt16,1)) 
+#	define ZVD_HIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint16_t,1)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// Low ZvdUInt16 (word) in ZvdUInt32 (dword)
-#	define ZVD_LOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt16,1))  
+/// Low uint16_t (word) in uint32_t (dword)
+#	define ZVD_LOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint16_t,1))  
 #else // LE
-#	define ZVD_LOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdUInt16)) 
+#	define ZVD_LOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,uint16_t)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// High ZvdUInt32 (dword) in ZvdUInt64 (qword)
-#	define ZVD_HIDWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdUInt32))  
+/// High uint32_t (dword) in uint64_t (qword)
+#	define ZVD_HIDWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,uint32_t))  
 #else // LE
 #	define ZVD_HIDWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUIn32,1)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// Low ZvdUInt32 (dword) in ZvdUInt64 (qword)
+/// Low uint32_t (dword) in uint64_t (qword)
 #	define ZVD_LODWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUIn32,1)) 
 #else // LE
-#	define ZVD_LODWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdUInt32))  
+#	define ZVD_LODWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,uint32_t))  
 #endif
 
 
 #ifdef ZVD_BIG_ENDIAN
-/// n-th ZvdUInt8 (byte) in type
-#	define ZVD_BYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt8,sizeof(t) - (n + 1)))
+/// n-th uint8_t (byte) in type
+#	define ZVD_BYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint8_t,sizeof(t) - (n + 1)))
 #else // LE
-#	define ZVD_BYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt8,n))
+#	define ZVD_BYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint8_t,n))
 #endif
 	
 #define ZVD_BYTE0(val, t)   ZVD_BYTEn(val, t,  0)
@@ -131,10 +131,10 @@ Purpose: byte utilities.
 
 
 #ifdef ZVD_BIG_ENDIAN
-/// n-th ZvdUInt16 (word) in type
-#	define ZVD_WORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt16,sizeof(t)/sizeof(ZvdUInt16) - (n + 1)))
+/// n-th uint16_t (word) in type
+#	define ZVD_WORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint16_t,sizeof(t)/sizeof(uint16_t) - (n + 1)))
 #else // LE
-#	define ZVD_WORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdUInt16,n))
+#	define ZVD_WORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,uint16_t,n))
 #endif
 
 #define ZVD_WORD0(val, t)   ZVD_WORDn(val, t,  0)
@@ -149,53 +149,53 @@ Purpose: byte utilities.
 
 //===== signed ================================================================
 #ifdef ZVD_BIG_ENDIAN
-/// High ZvdInt8 (signed byte) in 2-byte sized type
-#	define ZVD_SHIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdInt8))  
+/// High int8_t (signed byte) in 2-byte sized type
+#	define ZVD_SHIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,int8_t))  
 #else // LE
-#	define ZVD_SHIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt8,1)) 
+#	define ZVD_SHIBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int8_t,1)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// Low ZvdInt8 (byte) in 2-byte sized type
-#	define ZVD_SLOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt8,1))  
+/// Low int8_t (byte) in 2-byte sized type
+#	define ZVD_SLOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int8_t,1))  
 #else // LE
-#	define ZVD_SLOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdInt8)) 
+#	define ZVD_SLOBYTE(val)		(*ZVD_C_CAST_PTR_TO_INT(val,int8_t)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// High ZvdInt16 (signed word) in 4-byte sized type
-#	define ZVD_SHIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdInt16))  
+/// High int16_t (signed word) in 4-byte sized type
+#	define ZVD_SHIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,int16_t))  
 #else // LE
-#	define ZVD_SHIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt16,1)) 
+#	define ZVD_SHIWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int16_t,1)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// Low ZvdInt16 (signed word) in 4-byte sized type
-#	define ZVD_SLOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt16,1))  
+/// Low int16_t (signed word) in 4-byte sized type
+#	define ZVD_SLOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int16_t,1))  
 #else // LE
-#	define ZVD_SLOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,ZvdInt16)) 
+#	define ZVD_SLOWORD(val)		(*ZVD_C_CAST_PTR_TO_INT(val,int16_t)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// High ZvdInt32 (signed dword) in 8-byte sized type
-#	define ZVD_SHIDWORD(val)	(*ZVD_C_CAST_PTR_TO_INT(val,ZvdInt32))  
+/// High int32_t (signed dword) in 8-byte sized type
+#	define ZVD_SHIDWORD(val)	(*ZVD_C_CAST_PTR_TO_INT(val,int32_t))  
 #else // LE
 #	define ZVD_SHIDWORD(val)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdIn32,1)) 
 #endif
 
 #ifdef ZVD_BIG_ENDIAN
-/// Low ZvdInt32 (signed dword) in 8-byte sized type
+/// Low int32_t (signed dword) in 8-byte sized type
 #	define ZVD_SLODWORD(val)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdIn32,1)) 
 #else // LE
-#	define ZVD_SLODWORD(val)	(*ZVD_C_CAST_PTR_TO_INT(val,ZvdInt32))  
+#	define ZVD_SLODWORD(val)	(*ZVD_C_CAST_PTR_TO_INT(val,int32_t))  
 #endif
 
 
 #ifdef ZVD_BIG_ENDIAN
-/// n-th ZvdInt8 (signed byte) in type
-#	define ZVD_SBYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt8,sizeof(t) - (n + 1)))
+/// n-th int8_t (signed byte) in type
+#	define ZVD_SBYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int8_t,sizeof(t) - (n + 1)))
 #else // LE
-#	define ZVD_SBYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt8,n))
+#	define ZVD_SBYTEn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int8_t,n))
 #endif
 
 #define ZVD_SBYTE0(val, t)   ZVD_SBYTEn(val, t,  0)
@@ -217,10 +217,10 @@ Purpose: byte utilities.
 
 
 #ifdef ZVD_BIG_ENDIAN
-/// n-th ZvdInt16 (signed word) in type
-#	define ZVD_SWORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt16,sizeof(t)/sizeof(ZvdInt16) - (n + 1)))
+/// n-th int16_t (signed word) in type
+#	define ZVD_SWORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int16_t,sizeof(t)/sizeof(int16_t) - (n + 1)))
 #else // LE
-#	define ZVD_SWORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,ZvdInt16,n))
+#	define ZVD_SWORDn(val, t, n)	(*ZVD_C_CAST_PTR_TO_INT_AND_OFFSET(val,int16_t,n))
 #endif
 
 #define ZVD_SWORD0(val, t)   ZVD_SWORDn(val, t,  0)
@@ -234,7 +234,7 @@ Purpose: byte utilities.
 
 //== functions ================================================================
 //
-inline ZvdUInt8 ZvdGetByte(ZvdUInt32 v, ZvdSize idx)
+inline uint8_t ZvdGetByte(uint32_t v, size_t idx)
 {
 	ZvdU32U8Converter conv = {};
 	conv.m_u32 = v;
@@ -242,7 +242,7 @@ inline ZvdUInt8 ZvdGetByte(ZvdUInt32 v, ZvdSize idx)
 	return ZvdIsLittleEndian() ? conv.m_u8[idx] : conv.m_u8[3 - idx];
 }
 
-inline void ZvdSetByte(ZvdUInt32& v, ZvdSize idx, ZvdUInt8 val)
+inline void ZvdSetByte(uint32_t& v, size_t idx, uint8_t val)
 {
 	ZvdU32U8Converter conv = {};
 	conv.m_u32 = v;
@@ -254,7 +254,7 @@ inline void ZvdSetByte(ZvdUInt32& v, ZvdSize idx, ZvdUInt8 val)
 	v = conv.m_u32;
 }
 
-inline ZvdUInt16 ZvdGetWord(ZvdUInt32 v, ZvdSize idx)
+inline uint16_t ZvdGetWord(uint32_t v, size_t idx)
 {
 	ZvdU32U16Converter conv = {};
 	conv.m_u32 = v;
@@ -262,7 +262,7 @@ inline ZvdUInt16 ZvdGetWord(ZvdUInt32 v, ZvdSize idx)
 	return ZvdIsLittleEndian() ? conv.m_u16[idx] : conv.m_u16[1 - idx];
 }
 
-inline void ZvdSetWord(ZvdUInt32& v, ZvdSize idx, ZvdUInt16 val)
+inline void ZvdSetWord(uint32_t& v, size_t idx, uint16_t val)
 {
 	ZvdU32U16Converter conv;
 	conv.m_u32 = v;
@@ -285,12 +285,12 @@ public:
 		m_pData = reinterpret_cast<ZvdByte*>(&value);
 	}
 
-	ZvdByte get(ZvdSize byteIndex) const
+	ZvdByte get(size_t byteIndex) const
 	{
 		return m_pData[byteIndex];
 	}
 
-	ZvdByte& get(ZvdSize byteIndex)
+	ZvdByte& get(size_t byteIndex)
 	{
 		return m_pData[byteIndex];
 	}
@@ -305,20 +305,20 @@ class ZvdWordModifier
 public:
 	ZvdWordModifier(T& value)
 	{
-		m_pData = reinterpret_cast<ZvdUInt16*>(&value);
+		m_pData = reinterpret_cast<uint16_t*>(&value);
 	}
 
-	ZvdUInt16 get(ZvdSize wordIndex) const
+	uint16_t get(size_t wordIndex) const
 	{
 		return m_pData[wordIndex];
 	}
 
-	ZvdUInt16& get(ZvdSize wordIndex)
+	uint16_t& get(size_t wordIndex)
 	{
 		return m_pData[wordIndex];
 	}
 
 private:
-	ZvdUInt16* m_pData{};
+	uint16_t* m_pData{};
 };
 #endif // ZVD_BYTEUTILS_H

@@ -51,7 +51,7 @@ Purpose: std-like string utils.
 #include "core/base/zvdcommonutils.h"
 
 
-ZvdSize Zvdf_strlen(const char* str)
+size_t Zvdf_strlen(const char* str)
 {
 	if (!str)
 		return 0;
@@ -62,7 +62,7 @@ ZvdSize Zvdf_strlen(const char* str)
 	return 0;
 }
 
-void Zvdf_strcpy(char* pDest, ZvdSize nDestSize, const char* pSrc)
+void Zvdf_strcpy(char* pDest, size_t nDestSize, const char* pSrc)
 {
 	if (!pDest || !pSrc || nDestSize == 0)
 		return;
@@ -70,24 +70,24 @@ void Zvdf_strcpy(char* pDest, ZvdSize nDestSize, const char* pSrc)
 defined(ZVD_MSVC) && ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2005_8_x_0)
 	strcpy_s(pDest, nDestSize, pSrc);
 #else
-	ZvdSize nSrcLen = Zvdf_strlen(pSrc);
-	ZvdSize nCopy = ZvdfMin<ZvdSize>(nDestSize - 1, nSrcLen);
+	size_t nSrcLen = Zvdf_strlen(pSrc);
+	size_t nCopy = ZvdfMin<size_t>(nDestSize - 1, nSrcLen);
 	strncpy(pDest, pSrc, nCopy);
 	pDest[nCopy] = 0;
 #endif
 }
 
-ZvdSize Zvdf_snprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, ...)
+size_t Zvdf_snprintf(char* pDest, size_t nDestSize, size_t nCount, char const* pFormat, ...)
 {
 	va_list args;
 	va_start(args, pFormat);
-	ZvdSize nRetVal = Zvdf_vsnprintf(pDest, nDestSize, nCount, pFormat, args);
+	size_t nRetVal = Zvdf_vsnprintf(pDest, nDestSize, nCount, pFormat, args);
 	va_end(args);
 
 	return nRetVal;
 }
 
-ZvdSize Zvdf_vsnprintf(char* pDest, ZvdSize nDestSize, ZvdSize nCount, char const* pFormat, va_list params)
+size_t Zvdf_vsnprintf(char* pDest, size_t nDestSize, size_t nCount, char const* pFormat, va_list params)
 {
 	if (!pDest || nDestSize == 0)
 	{
@@ -115,6 +115,6 @@ defined(ZVD_MSVC) && ZVD_COMPILER_MSVC_VERSION_OR_HIGHER(ZVD_VISUAL_STUDIO_2005_
 		pDest[nDestSize - 1] = 0;
 		return nDestSize - 1;
 	}
-	pDest[ZvdfMin<ZvdSize>(nRetVal, nCount)] = 0;
+	pDest[ZvdfMin<size_t>(nRetVal, nCount)] = 0;
 	return nRetVal;
 }

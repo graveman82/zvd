@@ -65,7 +65,7 @@ void ZvdfFatalError(const char* pFormat, ...);
 // Error format
 
 // Use it to return from functions.
-typedef ZvdUInt32 ZvdRetVal;
+typedef uint32_t ZvdRetVal;
 
 // Main (control) bits of error value
 // Use other 6 bit for 64 codes. Error codes must be interpreted
@@ -133,7 +133,7 @@ const ZvdByte kZVD_ES_FATAL = kZVD_EF_FATAL;
 const ZvdByte kZVD_EM_SOURCEMASK = 0x7F;
 const ZvdByte kZVD_EM_SOURCEMASKEXT = 0x80;
 
-const ZvdUInt32 kZVD_E_CODE_MAX = 32767;
+const uint32_t kZVD_E_CODE_MAX = 32767;
 #pragma pack(push, 1)
 //-----------------------------------------------------------------------------
 class ZvdPackedError
@@ -141,7 +141,7 @@ class ZvdPackedError
 public:
 	ZvdPackedError();
 	ZvdPackedError(ZvdRetVal retVal) : m_retVal{ retVal } {}
-	ZvdPackedError(ZvdByte nStatus, ZvdByte nSource, ZvdUInt16 nCode, bool bExt = false);
+	ZvdPackedError(ZvdByte nStatus, ZvdByte nSource, uint16_t nCode, bool bExt = false);
 	ZvdPackedError(const ZvdPackedError& oth)
 		: m_retVal(oth.RetVal())
 	{
@@ -149,21 +149,21 @@ public:
 	}
 
 	// setters
-	void SetStatusFlag(ZvdUInt8 statusFlag);
-	void AddStatusFlag(ZvdUInt8 statusFlag);
+	void SetStatusFlag(uint8_t statusFlag);
+	void AddStatusFlag(uint8_t statusFlag);
 	void AddCrashFlag();
 
 	// getters
 	ZvdRetVal RetVal() const { return m_retVal; }
 	ZvdByte Status() const;
 	ZvdByte Source(bool& bExt) const;
-	ZvdUInt16 Code() const;
+	uint16_t Code() const;
 
 	bool IsOk() const;
 	static const ZvdPackedError& Ok();
 	static bool HasErrorMarker(ZvdRetVal val);
 private:
-	static void Pack(ZvdRetVal& retVal, ZvdByte nStatus, ZvdByte nSource, ZvdUInt16 nCode, bool bExt);
+	static void Pack(ZvdRetVal& retVal, ZvdByte nStatus, ZvdByte nSource, uint16_t nCode, bool bExt);
 	ZvdRetVal m_retVal;
 };
 #pragma pack(pop)
@@ -182,7 +182,7 @@ struct ZvdResult<ZvdsDefaultTag>
 {
 	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
 		: m_packedError(packedError)
-		, m_pText(kZVD_NULLCSTR)
+		, m_pText(nullptr)
 	{
 	}
 
@@ -235,7 +235,7 @@ struct ZvdResult<T*> : ZvdRegularResult
 {
 	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
 		: ZvdRegularResult(packedError)
-		, m_ptr(kZVD_NULLPTR(T))
+		, m_ptr(nullptr)
 	{
 #if defined(ZVD_ARCH_X64)
 		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];

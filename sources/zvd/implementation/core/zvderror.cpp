@@ -82,13 +82,13 @@ ZvdPackedError::ZvdPackedError()
 }
 
 //-----------------------------------------------------------------------------
-ZvdPackedError::ZvdPackedError(ZvdByte nStatus, ZvdByte nSource, ZvdUInt16 nCode, bool bExt)
+ZvdPackedError::ZvdPackedError(ZvdByte nStatus, ZvdByte nSource, uint16_t nCode, bool bExt)
 { 
 	Pack(m_retVal, nStatus, nSource, nCode, bExt);
 }
 
 //-----------------------------------------------------------------------------
-void ZvdPackedError::Pack(ZvdRetVal& retVal, ZvdByte nStatus, ZvdByte nSource, ZvdUInt16 nCode, bool bExt)
+void ZvdPackedError::Pack(ZvdRetVal& retVal, ZvdByte nStatus, ZvdByte nSource, uint16_t nCode, bool bExt)
 {
 	ZvdSetByte(retVal, 0, nStatus);
 	ZvdSetByte(retVal, 1, (nSource & kZVD_EM_SOURCEMASK) | (bExt ? kZVD_EF_EXTLIB : 0u));
@@ -111,7 +111,7 @@ ZvdByte ZvdPackedError::Source(bool& bExt) const
 }
 
 //-----------------------------------------------------------------------------
-ZvdUInt16 ZvdPackedError::Code() const
+uint16_t ZvdPackedError::Code() const
 {
 	return ZvdGetWord(m_retVal, 1);
 }
@@ -124,13 +124,13 @@ const ZvdPackedError& ZvdPackedError::Ok()
 }
 
 //-----------------------------------------------------------------------------
-void ZvdPackedError::SetStatusFlag(ZvdUInt8 statusFlag)
+void ZvdPackedError::SetStatusFlag(uint8_t statusFlag)
 {
 	ZvdSetByte(m_retVal, 0, statusFlag);
 }
 
 //-----------------------------------------------------------------------------
-void ZvdPackedError::AddStatusFlag(ZvdUInt8 statusFlag)
+void ZvdPackedError::AddStatusFlag(uint8_t statusFlag)
 {
 	ZvdSetByte(m_retVal, 0, ZvdGetByte(m_retVal, 0) | statusFlag);
 }
@@ -182,7 +182,7 @@ namespace zvd
 
 		private:
 			CharType m_descBuffer[kDESC_BUF_SIZE];
-			ZvdUInt32 m_bInReporting{ kZVD_NO_U32 };
+			uint32_t m_bInReporting{ false };
 			ConstStringType m_fileAndLine;
 		};
 
@@ -206,22 +206,22 @@ namespace zvd
 			friend struct ErrorReporterCtor;
 
 			ErrorReporter()
-				: m_bInReporting( kZVD_NO_U32 )
+				: m_bInReporting( false )
 				, m_fileAndLine(ZVD_ASSERT_TEXT("")) {}
 
-			ZvdUInt32 Report(ZvdeErrorLevel level, ZvdUInt32 bLog, const char* pFormat, va_list params)
+			uint32_t Report(ZvdeErrorLevel level, uint32_t bLog, const char* pFormat, va_list params)
 			{
 				// disable recursion
 				if (m_bInReporting)
-					return kZVD_NO_U32;
-				m_bInReporting = kZVD_YES_U32;
+					return false;
+				m_bInReporting = true;
 				
 				const char* pTitle = "Warning: \n";
-				if ((ZvdInt32)level == kZVD_FATAL)
+				if ((int32_t)level == kZVD_FATAL)
 				{
 					pTitle = "FatalError:\n";
 				}
-				else if ((ZvdInt32)level == kZVD_ERROR)
+				else if ((int32_t)level == kZVD_ERROR)
 				{
 					pTitle = "Error:\n";
 				}
@@ -229,8 +229,8 @@ namespace zvd
 				// format the message and save it in buffer
 				
 				Zvdf_strcpy(m_descBuffer, kDESC_BUF_SIZE, pTitle);
-				ZvdSize nTitleLen = Zvdf_strlen(pTitle);
-				ZvdSize nBufSize = kDESC_BUF_SIZE - nTitleLen;
+				size_t nTitleLen = Zvdf_strlen(pTitle);
+				size_t nBufSize = kDESC_BUF_SIZE - nTitleLen;
 				char* pBuf = m_descBuffer + nTitleLen;
 				Zvdf_vsnprintf(pBuf, nBufSize, nBufSize - 1, pFormat, params);
 				
@@ -243,12 +243,12 @@ namespace zvd
 				
 #ifdef ZVD_MSVC
 				
-				::MessageBoxA(kZVD_NULLVOID, m_descBuffer, "Fatal Error",
+				::MessageBoxA(nullptr, m_descBuffer, "Fatal Error",
 					MB_OK | MB_ICONHAND | MB_SETFOREGROUND | MB_TASKMODAL);
 #endif
 				m_descBuffer[0] = '\0';
-				m_bInReporting = kZVD_NO_U32;
-				return kZVD_YES_U32;
+				m_bInReporting = false;
+				return true;
 			}
 
 			void Set(ConstStringType fileAndLine)
@@ -258,11 +258,11 @@ namespace zvd
 
 			ConstStringType FileAndLine() const { return m_fileAndLine; }
 
-			ZvdUInt32 IsInReporting() const { return m_bInReporting; }
+			uint32_t IsInReporting() const { return m_bInReporting; }
 
 		private:
 			CharType m_descBuffer[kDESC_BUF_SIZE];
-			ZvdUInt32 m_bInReporting;
+			uint32_t m_bInReporting;
 			ConstStringType m_fileAndLine;
 		};
 
@@ -284,7 +284,7 @@ void ZvdfFatalError(const char* pFormat, ...)
 
 	va_list args;
 	va_start(args, pFormat);
-	errorReporter.Report(kZVD_FATAL, kZVD_YES_U32, pFormat, args);
+	errorReporter.Report(kZVD_FATAL, true, pFormat, args);
 	va_end(args);
 	
 	

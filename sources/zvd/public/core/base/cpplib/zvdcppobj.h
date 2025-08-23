@@ -72,7 +72,7 @@ template<typename ForwardIt>
 #ifdef ZVD_CPP14
 constexpr
 #endif
-ForwardIt ZvdDestroyN(ForwardIt itFirst, ZvdSize n)
+ForwardIt ZvdDestroyN(ForwardIt itFirst, size_t n)
 {
     for (; n > 0; (void) ++itFirst, --n)
         ZvdDestroyAt(std::addressof(*itFirst));
@@ -112,12 +112,12 @@ void ZvdCopyConstruct(T* p, const T& val)
 }
 
 template <typename T,
-    ZvdSize(*FNextCapacity)(ZvdSize),
-    ZvdSize KMinCap = 4>
+    size_t(*FNextCapacity)(size_t),
+    size_t KMinCap = 4>
 class ZvdGrowCapacity
 {
 public:
-    typedef ZvdSize SizeType;
+    typedef size_t SizeType;
 
     static SizeType Evaluate(SizeType nNewCount, SizeType nCurrentCap)
     {
@@ -138,12 +138,12 @@ public:
 
 //=============================================================================
 
-template<typename T, ZvdSize KMinCap = 4>
+template<typename T, size_t KMinCap = 4>
 class ZvdRegularCppObjectUtil
 {
 public:
 
-    typedef ZvdSize SizeType;
+    typedef size_t SizeType;
 
     static SizeType NextCapacity(SizeType nCap)
     {
@@ -161,7 +161,7 @@ public:
         ZvdDestroyAt(p);
     }
     
-    static void DestroyN(T* pFirst, ZvdSize n)
+    static void DestroyN(T* pFirst, size_t n)
     {
         ZvdDestroyN(pFirst, n);
     }

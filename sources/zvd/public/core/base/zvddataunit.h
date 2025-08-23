@@ -841,7 +841,7 @@ public:
     };
 
 private:
-    ZvdUInt32 m_nFormat;
+    uint32_t m_nFormat;
 };
 
 

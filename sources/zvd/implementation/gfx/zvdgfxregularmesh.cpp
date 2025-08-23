@@ -48,10 +48,10 @@ Purpose: regular mesh for graphics class implementation.
 #include "core/base/zvdcommonutils.h"
 #include "core/base/zvdassert.h"
 
-ZvdUInt32
-ZvdGfxRegularMesh::CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, ZvdUInt32 nElements)
+uint32_t
+ZvdGfxRegularMesh::CalcPrimitiveCount(ZvdeGfxPrimitiveType ePrimitiveType, uint32_t nElements)
 {
-    ZvdUInt32 nPrimitives = 0;
+    uint32_t nPrimitives = 0;
     switch (ePrimitiveType)
     {
     case kZVD_GFX_PRIMITIVE_TRIANGLESTRIP:

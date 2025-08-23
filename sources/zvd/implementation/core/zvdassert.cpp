@@ -76,11 +76,11 @@ namespace zvd
 				return ::new(p) AssertPoint();
 			}
 
-			template<typename T, ZvdUInt32 KSize>
+			template<typename T, uint32_t KSize>
 			class DebugString
 			{
 			public:
-				typedef ZvdUInt32 SizeType;
+				typedef uint32_t SizeType;
 				DebugString() : m_len(0)
 				{
 					m_buffer[0] = 0;
@@ -138,7 +138,7 @@ namespace zvd
 #ifndef ZVD_USE_TEMPLATE_ARGS_FOR_PRINT
 			void OutputAssertMessage(AssertPoint::ConstStringType fmt, ...)
 			{
-				const ZvdUInt32 kFmtStaticBufSize = 256;
+				const uint32_t kFmtStaticBufSize = 256;
 				typedef AssertPoint::CharType CharType;
 				typedef DebugString<AssertPoint::CharType, 1024 + kFmtStaticBufSize> StringType;
 

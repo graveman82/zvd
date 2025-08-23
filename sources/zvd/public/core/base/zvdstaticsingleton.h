@@ -85,7 +85,7 @@ This singleton is intended to be used in static allocated memory.
     @endcode
 
 */
-template <typename T, ZvdUInt32 kBufferSize, typename TPseudoCtor>
+template <typename T, uint32_t kBufferSize, typename TPseudoCtor>
 class ZvdStaticSingleton
 {
 public:
@@ -110,35 +110,28 @@ public:
         if (m_pInstance)
         {
             m_pInstance->~T();
-            m_pInstance = kZVD_NULLPTR(T);
+            m_pInstance = nullptr;
         }
     }
 
 private:
-#ifdef ZVD_CPP11
     // not allowed
     ZvdStaticSingleton(
         const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&) = delete;
     ZvdStaticSingleton& operator=(
         const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&) = delete;
-#else
-    ZvdStaticSingleton(
-        const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&);
-    ZvdStaticSingleton& operator=(
-        const ZvdStaticSingleton<T, kBufferSize, TPseudoCtor>&);
-#endif
 
     static T* m_pInstance;
     static ZvdByte m_buffer[kBufferSize];
 };
 
 //-----------------------------------------------------------------------------
-template <typename T, ZvdUInt32 kBufferSize, typename TPseudoCtor>
+template <typename T, uint32_t kBufferSize, typename TPseudoCtor>
 T* ZvdStaticSingleton<T,
-    kBufferSize, TPseudoCtor>::m_pInstance = kZVD_NULLPTR(T);
+    kBufferSize, TPseudoCtor>::m_pInstance = nullptr;
 
 //-----------------------------------------------------------------------------
-template <typename T, ZvdUInt32 kBufferSize, typename TPseudoCtor>
+template <typename T, uint32_t kBufferSize, typename TPseudoCtor>
 ZvdByte ZvdStaticSingleton<T,
     kBufferSize, TPseudoCtor>::m_buffer[kBufferSize];
 

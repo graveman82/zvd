@@ -104,29 +104,29 @@ public:
     ZvdcClass(ZvdCString pClassName,
         ZvdfptCreateInstance pCreateInstance,
         ZvdfptDeleteInstance pDeleteInstance,
-        ZvdfptCloneInstance pCloneInstance) ZVD_NOEXCEPT;
+        ZvdfptCloneInstance pCloneInstance) noexcept;
 
     /** @brief Creates a new instance of the associated class.
      *  @param memFlags Memory allocation flags.
      *  @return Pointer to the created object, or nullptr if creation fails.
      */
-    ZvdcpObject CreateInstance(ZvdcMemFlags memFlags) const ZVD_NOEXCEPT;
+    ZvdcpObject CreateInstance(ZvdcMemFlags memFlags) const noexcept;
 
     /** @brief Deletes an instance of the associated class.
      *  @param pObject Pointer to the object to delete.
      */
-    void DeleteInstance(ZvdcpObject pObject) const ZVD_NOEXCEPT;
+    void DeleteInstance(ZvdcpObject pObject) const noexcept;
 
     /** @brief Clones an existing instance of the associated class.
      *  @param pObject Pointer to the source object to clone.
      *  @return Pointer to the cloned object, or nullptr if cloning fails.
      */
-    ZvdcpObject CloneInstance(ZvdcpkObject pObject) const ZVD_NOEXCEPT;
+    ZvdcpObject CloneInstance(ZvdcpkObject pObject) const noexcept;
 
     /** @brief Gets the name of the associated class.
      *  @return The class name as a null-terminated string.
      */
-    ZvdCString GetClassName() const ZVD_NOEXCEPT
+    ZvdCString GetClassName() const noexcept
     {
         return m_pClassName;
     }
@@ -145,12 +145,12 @@ private:
 class ZVD_API ZvdcObject
 {
 public:
-    static ZvdcClass& ZVD_STDCALL GetClass() ZVD_NOEXCEPT;
+    static ZvdcClass& ZVD_STDCALL GetClass() noexcept;
  
     /** @brief Default constructor for ZvdcObject.
      *  Initializes the reference count to 1.
      */
-    ZvdcObject() ZVD_NOEXCEPT;
+    ZvdcObject() noexcept;
 
     /** @brief Virtual destructor for ZvdcObject.
      */
@@ -158,42 +158,42 @@ public:
 
     /** @brief Increments the reference count atomically.
      */
-    void AddRef() ZVD_NOEXCEPT;
+    void AddRef() noexcept;
 
     /** @brief Decrements the reference count atomically and deletes the object if the count reaches zero.
      */
-    void Release() ZVD_NOEXCEPT;
+    void Release() noexcept;
 
     /** @brief Allocates memory for a single object with custom memory flags.
      *  @param nSize Size of the memory to allocate.
      *  @param memFlags Memory allocation flags.
      *  @return Pointer to the allocated memory.
      */
-    static void* operator new(ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+    static void* operator new(size_t nSize, ZvdcMemFlags memFlags) noexcept;
 
     /** @brief Frees memory for a single object with custom memory flags.
      *  @param ptr Pointer to the memory to free.
      *  @param memFlags Memory allocation flags used during allocation.
      */
-    static void operator delete(void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+    static void operator delete(void* ptr, ZvdcMemFlags memFlags) noexcept;
 
     /** @brief Allocates memory for an array of objects with custom memory flags.
      *  @param nSize Size of the memory to allocate.
      *  @param memFlags Memory allocation flags.
      *  @return Pointer to the allocated memory.
      */
-    static void* operator new[](ZvdSize nSize, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+    static void* operator new[](size_t nSize, ZvdcMemFlags memFlags) noexcept;
 
     /** @brief Frees memory for an array of objects with custom memory flags.
      *  @param ptr Pointer to the memory to free.
      *  @param memFlags Memory allocation flags used during allocation.
      */
-    static void operator delete[](void* ptr, ZvdcMemFlags memFlags) ZVD_NOEXCEPT;
+    static void operator delete[](void* ptr, ZvdcMemFlags memFlags) noexcept;
 
     /** @brief Gets the current reference count.
       *  @return The current reference count.
       */
-    ZvdSize ZVD_STDCALL GetRefCount() const ZVD_NOEXCEPT
+    size_t ZVD_STDCALL GetRefCount() const noexcept
     {
 #ifdef ZVD_CPP11
             return m_nRefCount.load(std::memory_order_seq_cst);
@@ -205,9 +205,9 @@ public:
 private:
     static ZvdcClass* m_pClass;
 #ifdef ZVD_CPP11
-    std::atomic<ZvdSize> m_nRefCount;
+    std::atomic<size_t> m_nRefCount;
 #else
-    ZvdSize m_nRefCount;
+    size_t m_nRefCount;
 #endif
 };
 

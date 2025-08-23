@@ -52,7 +52,7 @@ Purpose: error codes.
 //-----------------------------------------------------------------------------
 // Error constants
 
-const ZvdUInt16 kZVD_EC_MAX = 32767u;
+const uint16_t kZVD_EC_MAX = 32767u;
 
 enum ZvdeErrorCodes
 {
@@ -117,16 +117,16 @@ enum ZvdeErrorCodes
 //-------------------------------------------------
 
 /// somethin was not found in search operation
-const ZvdUInt8 kZVD_R_NOTFOUND = ZVD_PACK_ERROR_S_U8(kZVD_EF_NOTFOUND);
+const uint8_t kZVD_R_NOTFOUND = ZVD_PACK_ERROR_S_U8(kZVD_EF_NOTFOUND);
 /// no error (success)
-const ZvdUInt8 kZVD_R_OK = kZVD_EF_SUCCESS;
+const uint8_t kZVD_R_OK = kZVD_EF_SUCCESS;
 /// there is no need to continue operation
-const ZvdUInt8 kZVD_R_CANCEL = kZVD_EF_SPECIAL;
+const uint8_t kZVD_R_CANCEL = kZVD_EF_SPECIAL;
 /// Not enough memory to continue operation
-const ZvdUInt8 kZVD_E_NOMEMORY = ZVD_PACK_ERROR_U8(kZVD_EF_NOMEMORY);
+const uint8_t kZVD_E_NOMEMORY = ZVD_PACK_ERROR_U8(kZVD_EF_NOMEMORY);
 
-const ZvdUInt8 kZVD_E_DONTREPEAT = ZVD_PACK_ERROR_U8(kZVD_EF_DONTREPEAT);
-const ZvdUInt8 kZVD_E_NOPRECOND = ZVD_PACK_ERROR_U8(kZVD_EF_NOPRECOND);
+const uint8_t kZVD_E_DONTREPEAT = ZVD_PACK_ERROR_U8(kZVD_EF_DONTREPEAT);
+const uint8_t kZVD_E_NOPRECOND = ZVD_PACK_ERROR_U8(kZVD_EF_NOPRECOND);
 
 
 
