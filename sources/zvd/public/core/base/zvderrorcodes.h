@@ -54,6 +54,10 @@ Purpose: error codes.
 
 const uint16_t kZVD_EC_MAX = 32767u;
 
+/// <summary>
+/// Specific error codes for different situations.
+/// This is packed into the last two bytes of a ZvdPackedError.
+/// </summary>
 enum ZvdeErrorCodes
 {
 	kZVD_EC_UNKNOWN = kZVD_EC_MAX - 1,
@@ -67,7 +71,13 @@ enum ZvdeErrorCodes
 	kZVD_EC_NOSTACKOBJECT, 
 	/// allocator instance can not be created on stack
 	kZVD_EC_NOSTACKALLOCATOR, 
-
+	/// <summary>
+	/// An operation would exceed the maximum theoretical size of a container.
+	/// This is the error-code equivalent of the std::length_error exception.
+	/// It is typically returned when a requested size (e.g., in reserve() or resize())
+	/// is greater than the container's max_size().
+	/// </summary>
+	kZVD_EC_LENGTHERROR,
 #if 0
 	
 	kZVD_EFX_SPEC0 = 1,

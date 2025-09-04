@@ -67,11 +67,18 @@ void ZvdfFatalError(const char* pFormat, ...);
 // Use it to return from functions.
 typedef uint32_t ZvdRetVal;
 
-// Main (control) bits of error value
-// Use other 6 bit for 64 codes. Error codes must be interpreted
-// in context of local operation.
-// "E" means error. "EF" means error flag.
-//-------------------------------------------------
+//-----------------------------------------------------------------------------
+/// <summary>
+/// A bitmask of flags that define the status and severity of an error.
+/// This is packed into the first byte of a ZvdPackedError.
+/// Flags can be combined using the bitwise OR operator.
+/// Error codes must be interpreted
+/// in context of local operation.
+/// "E" means error. "EF" means error flag.
+/// </summary>
+/// <example><code>
+/// ZvdByte status = kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC;
+/// </code></example>
 enum ZvdeErrorControlBits
 {
 	// 0 byte
@@ -135,7 +142,21 @@ const ZvdByte kZVD_EM_SOURCEMASKEXT = 0x80;
 
 const uint32_t kZVD_E_CODE_MAX = 32767;
 #pragma pack(push, 1)
+
 //-----------------------------------------------------------------------------
+/// <summary>
+/// A compact, 32-bit error object that packs status, source, and a specific code.
+/// This is the core error type used throughout the engine instead of exceptions.
+/// It is designed to be returned by value from functions.
+///
+/// The 32-bit value is structured as follows:
+/// - Byte 0: Status flags (e.g., success, error, fatal). See ZvdeErrorControlBits.
+/// - Byte 1: Source ID of the error (e.g., renderer, physics). See ZvdeErrorSource.
+/// - Word 1 (Bytes 2-3): Specific error code. See ZvdeErrorCodes.
+/// </summary>
+/// <example><code>
+/// ZvdPackedError error(kZVD_ES_ERROR, kZVD_ESRC_CORE_DARRAY, kZVD_EC_OUT_OF_RANGE);
+/// </code></example>
 class ZvdPackedError
 {
 public:
@@ -201,11 +222,32 @@ struct ZvdResult<ZvdsDefaultTag>
 	const char* Text() const { return m_pText; }
 	void SetText(const char* pText) { m_pText = pText; }
 
+	/// <summary>
+	/// A factory method to create a success result object for cleaner code.
+	/// </summary>
+	static ZvdRegularResult Ok()
+	{
+		// It just calls the default constructor which already defaults to an OK state.
+		return ZvdRegularResult();
+	}
+
 	ZvdPackedError m_packedError;
 	const char* m_pText;
 };
 #pragma pack(pop)
 
+/// <summary>
+/// A generic result object that wraps a ZvdPackedError.
+/// This is the primary type that functions should return to indicate success or failure.
+/// </summary>
+/// <example><code>
+/// ZvdRegularResult MyFunction()
+/// {
+///     if (error)
+///         return ZvdRegularResult(myPackedError);
+///     return ZvdRegularResult::Ok(); // or just ZvdRegularResult();
+/// }
+/// </code></example>
 typedef ZvdResult<ZvdsDefaultTag> ZvdRegularResult;
 
 #pragma pack(push, 1)
@@ -264,16 +306,22 @@ struct ZvdResult<T*> : ZvdRegularResult
 
 
 //-----------------------------------------------------------------------------
-enum ZvdErrorSource
+/// <summary>
+/// An enumeration of modules or subsystems where an error can originate.
+/// The value is packed into the second byte of a ZvdPackedError.
+/// The valid range for custom sources is from 1 to 127.
+/// </summary>
+enum class ZvdeErrorSource : uint8_t
 {
-	kZVD_ESRC_UNDEFINED,
+	kZVD_ESRC_UNDEFINED = 0, // if no error, there is no source
 	kZVD_ESRC_CORE_MEMORY,
 	kZVD_ESRC_CORE_DARRAY,
 	kLangLib,
 	kEngine,
 	kSystem,
 	kMemMng,
-	kGfxDev
+	kGfxDev,
+	kZVD_ESRC_MAX = 127
 };
 
 

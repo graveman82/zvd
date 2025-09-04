@@ -1,0 +1,73 @@
+/**
+ * @mainpage Архитектура Системы Ошибок
+ *
+ * @section Section_ErrProcIntro Введение
+ *
+ * Система обработки ошибок в движке ZVD построена на принципе возврата кодов ошибок, а не на использовании исключений C++.
+ * Это сделано для повышения производительности и предсказуемости кода, что критически важно для игровых приложений.
+ *
+ * Основная идея — каждая функция, которая может завершиться неудачно, возвращает объект-результат (обычно `ZvdRegularResult` или его специализацию),
+ * который инкапсулирует в себе информацию об успехе или провале операции.
+ *
+ * @section SubSection_ErrProCore Ключевые компоненты
+ *
+ * Система состоит из нескольких ключевых типов:
+ *
+ * @subsection SubSection_ErrProPackedError ZvdPackedError
+ *
+ * Это сердце системы. `ZvdPackedError` — это 32-битное целое число (`uint32_t`), которое используется как битовое поле для компактного хранения полной информации об ошибке.
+ *
+ * Его структура:
+ * - **Байт 0 (биты 0-7):** Статус. Хранит флаги из `ZvdeErrorControlBits`, определяющие серьезность ошибки (например, `kZVD_ES_ERROR`, `kZVD_ES_FATAL`) и ее природу (`kZVD_EF_BAD_LOGIC`, `kZVD_EF_NO_RESOURCE`). Флаги можно комбинировать.
+ * - **Байт 1 (биты 8-15):** Источник. Хранит ID подсистемы, в которой произошла ошибка, из перечисления `ZvdErrorSource` (например, `kZVD_ESRC_CORE_MEMORY`).
+ * - **Слово 1 (биты 16-31):** Код. Хранит конкретный код ошибки из перечисления `ZvdeErrorCodes` (например, `kZVD_EC_OUT_OF_MEMORY`).
+ *
+ * **Пример создания:**
+ * @code
+ * // Создаем ошибку: Фатальная логическая ошибка из динамического массива с кодом "выход за пределы".
+ * ZvdPackedError error(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC, kZVD_ESRC_CORE_DARRAY, kZVD_EC_OUT_OF_RANGE);
+ * @endcode
+ *
+ * @subsection SubSection_ErrProcResult ZvdResult
+ *
+ * `ZvdResult` (и его псевдоним `ZvdRegularResult`) — это структура-обертка, которую должны возвращать функции. Она содержит в себе `ZvdPackedError` и предоставляет удобные методы, такие как `IsOk()`.
+ *
+ * Существуют шаблонные специализации `ZvdResult` для возврата дополнительных данных вместе с кодом ошибки, например, указателя (`ZvdResult<T*>`) или индекса (`ZvdResult<ZvdResultIndexTag>`).
+ *
+ * **Пример использования:**
+ * @code
+ * ZvdRegularResult LoadFile(const char* pPath)
+ * {
+ *     if (!pPath)
+ *     {
+ *         // Возвращаем результат с ошибкой
+ *         return ZvdRegularResult(
+ *              ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_FILESYSTEM, kZVD_EC_BAD_ARGUMENT)
+ *         );
+ *     }
+ *
+ *     // ... код загрузки ...
+ *
+ *     // Возвращаем результат "успех"
+ *     return ZvdRegularResult(ZvdPackedError::Ok());
+ * }
+ *
+ * void SomeFunc()
+ * {
+ *     ZvdRegularResult result = LoadFile("my_file.txt");
+ *     if (!result.IsOk())
+ *     İ
+ *         // Обрабатываем ошибку
+ *         ZvdfFatalError("Failed to load file, error code: %u", result.Error().RetVal());
+ *     }
+ * }
+ * @endcode
+ *
+ * @section Section_ErrProcEnums Перечисления
+ *
+ * - **ZvdeErrorControlBits:** Флаги для статуса ошибки.
+ * - **ZvdErrorSource:** ID модуля-источника ошибки. Диапазон [1, 127].
+ * - **ZvdeErrorCodes:** Конкретные коды ошибок.
+ *
+ * Эта система позволяет создать детальную, но очень компактную и быструю систему отчетов об ошибках, идеально подходящую для высокопроизводительного движка.
+ */
