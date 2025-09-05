@@ -44,35 +44,30 @@ Purpose: dynamic arrays templates.
 
 */
 
-#ifndef ZVD_DARRAY_H
-#define ZVD_DARRAY_H
+#pragma once
 
 #include "core/system/memory/zvdimemoryallocator.h"
+#include "core/system/memory/zvdmallocfreeallocator.h"
 #include "core/base/zvdassert.h"
 #include "core/base/cpplib/zvdcppobj.h"
 
 template <typename TElement, 
-	typename TMemoryAllocator,
-	typename TUtil = ZvdRegularCppObjectUtil<TElement>>
+	typename TMemoryAllocator = ZvdcMallocFreeMemoryAllocator,
+	typename TPolicies = ZvdRegularContainerPolicy<TElement>>
 class ZvdcDArray
 {
 public:
-	typedef size_t SizeType;
-	typedef TElement ValueType;
-	typedef TElement* Pointer;
-	typedef TElement* Iterator;
+	typedef size_t size_type;
+	typedef TElement value_type;
+	typedef TElement* pointer;
+	typedef TElement* iterator;
+	typedef const TElement* const_iterator;
 
-	ZvdcDArray()
-		: m_pData(nullptr)
-		, m_nCount(0)
-		, m_nCapacity(0)
-	{
-
-	}
+	ZvdcDArray() = default;
 
 	~ZvdcDArray()
 	{
-		Clear();
+		clear();
 		ZvdRegularResult retVal = ResizeMemory(0);
 		if (!retVal.IsOk())
 		{
@@ -82,59 +77,115 @@ public:
 		}
 	}
 
-	void Clear()
+	void clear()
 	{
-		for (SizeType i = 0; i < m_nCount; ++i)
-		{
-			TUtil::Destroy(&m_pData[i]);
-		}
+		std::destroy_n(m_pData, m_nCount);
 		m_nCount = 0;
 	}
 
-	ZvdRegularResult Grow(SizeType nGrowBy = 1)
+	/// <summary>
+	/// Changes the number of elements stored.
+	/// If the new size is greater than the current size, new elements are default-constructed.
+	/// </summary>
+	ZvdRegularResult resize(size_type nNewCount)
 	{
-		ZvdRegularResult retVal = GrowMemory(nGrowBy);
-		if (retVal.IsOk())
+		if (nNewCount < m_nCount)
 		{
-			return retVal;
+			if constexpr (!std::is_trivially_destructible_v<TElement>)
+			{
+				std::destroy(m_pData + nNewCount, m_pData + m_nCount);
+			}
+			m_nCount = nNewCount;
+			return ZvdRegularResult::Ok();
+		}
+		else if (nNewCount > m_nCount)
+		{
+			auto nGrowBy = nNewCount - m_nCount;
+			ZvdRegularResult retVal = GrowMemory(nGrowBy);
+			if (!retVal.IsOk())
+			{
+				return retVal;
+			}
+			
+			try
+			{
+				std::uninitialized_default_construct_n(m_pData + m_nCount, nGrowBy);
+			}
+			catch (...)
+			{
+				return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR,
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+					kZVD_EC_CONSTRUCTEXCEPTION));
+			}
+
+			m_nCount = nNewCount;
 		}
 
-		SizeType nNewCount = m_nCount + nGrowBy;
-		for (SizeType i = m_nCount; i < nNewCount; ++i)
-		{
-			TUtil::Construct(m_pData + i);
-		}
-		m_nCount = nNewCount;
-		return ZvdRegularResult();
+		// If nNewCount == m_nCount, do nothing.
+		return ZvdRegularResult::Ok();
 	}
 
-	ZvdRegularResult PushBack(const TElement& val)
+	ZvdRegularResult push_back(const TElement& val)
 	{
-		ZvdRegularResult retVal = GrowMemory(1);
-		if (!retVal.IsOk())
+		size_type nNewCount = m_nCount + 1;
+
+		if (nNewCount > m_nCapacity)
 		{
-			return retVal;
+			return M_ResizeMemoryAndInsert(end(), val);
 		}
-		TUtil::CopyConstruct(m_pData + m_nCount, val);
+
+		try
+		{
+			std::construct_at(m_pData + m_nCount, val);
+		}
+		catch (...)
+		{
+			return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR,
+				static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+				kZVD_EC_CONSTRUCTEXCEPTION));
+		}
 		++m_nCount;
-		return ZvdRegularResult();
+		return ZvdRegularResult::Ok();
 	}
 
-	ZvdRegularResult Reserve(SizeType nNewCap)
+	ZvdRegularResult push_back(TElement&& val)
+	{
+		size_type nNewCount = m_nCount + 1;
+
+		if (nNewCount > m_nCapacity)
+		{
+			return M_ResizeMemoryAndInsert(end(), std::move(val));
+		}
+
+		try
+		{
+			std::construct_at(m_pData + m_nCount, std::move(val));
+		}
+		catch (...)
+		{
+			return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR,
+				static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+				kZVD_EC_CONSTRUCTEXCEPTION));
+		}
+		++m_nCount;
+		return ZvdRegularResult::Ok();
+	}
+
+	ZvdRegularResult reserve(size_type nNewCap)
 	{
 		if (nNewCap <= m_nCapacity)
-			return ZvdRegularResult();
+			return ZvdRegularResult::Ok();
 		return ResizeMemory(nNewCap);
 	}
 
 	template<typename EqPred>
-	SizeType Find(const TElement& val, const EqPred& pred,
-		SizeType startIdx = 0, SizeType endIdx = m_nCount) const
+	size_type find(const TElement& val, const EqPred& pred,
+		size_type startIdx = 0, size_type endIdx = m_nCount) const
 	{
 		if (endIdx > m_nCount)
 			endIdx = m_nCount;
 
-		for (SizeType idx = startIdx; idx < endIdx; ++idx)
+		for (size_type idx = startIdx; idx < endIdx; ++idx)
 		{
 			if (pred(m_pData[idx], val))
 				return idx;
@@ -142,39 +193,80 @@ public:
 		return m_nCount;
 	}
 
-	TElement* PointerAt(SizeType idx)
+	size_type size() const noexcept { return m_nCount; }
+	size_type capacity() const noexcept { return m_nCapacity; }
+	bool empty() const noexcept { return m_nCount == 0; }
+
+	size_type max_size() const noexcept
 	{
-		if (idx >= m_nCount)
-			return nullptr;
-		return m_pData + idx;
+		// A theoretical maximum based on size_t and element size.
+		return std::numeric_limits<size_type>::max() / sizeof(value_type);
 	}
 
-	const TElement* PointerAt(SizeType idx) const
+	TElement& operator[](size_type nIndex)
 	{
-		if (idx >= m_nCount)
-			return nullptr;
-		return m_pData + idx;
+		ZVD_ASSERT_HIGH(nIndex < m_nCount, "Index out of bounds");
+		return m_pData[nIndex];
 	}
 
-	Iterator Begin()
+	const TElement& operator[](size_type nIndex) const
 	{
-		return m_nCount ? m_pData : End();
+		ZVD_ASSERT_HIGH(nIndex < m_nCount, "Index out of bounds");
+		return m_pData[nIndex];
 	}
 
-	Iterator End()
+	TElement& at(size_type nIndex)
 	{
-		return m_pData + m_nCount;
+		if (nIndex >= m_nCount)
+		{
+			throw std::out_of_range("ZvdcDArray::at index out of bounds");
+		}
+		return m_pData[nIndex];
 	}
 
-	SizeType Size() const
+	const TElement& at(size_type nIndex) const
 	{
-		return m_nCount;
+		if (nIndex >= m_nCount)
+		{
+			throw std::out_of_range("ZvdcDArray::at index out of bounds");
+		}
+		return m_pData[nIndex];
 	}
 
-	SizeType Capacity() const
+	TElement& front()
 	{
-		return m_nCapacity;
+		ZVD_ASSERT_HIGH(!empty(), "front() called on empty array");
+		return m_pData[0];
 	}
+
+	const TElement& front() const
+	{
+		ZVD_ASSERT_HIGH(!empty(), "front() called on empty array");
+		return m_pData[0];
+	}
+
+	TElement& back()
+	{
+		ZVD_ASSERT_HIGH(!empty(), "back() called on empty array");
+		return m_pData[m_nCount - 1];
+	}
+
+	const TElement& back() const
+	{
+		ZVD_ASSERT_HIGH(!empty(), "back() called on empty array");
+		return m_pData[m_nCount - 1];
+	}
+
+	TElement* data() noexcept { return m_pData; }
+	const TElement* data() const noexcept { return m_pData; }
+
+	iterator begin() noexcept { return m_pData; }
+	iterator end() noexcept { return m_pData + m_nCount; }
+	const_iterator begin() const noexcept { return m_pData; }
+	const_iterator end() const noexcept { return m_pData + m_nCount; }
+
+	constexpr const_iterator cbegin() const noexcept { return m_pData; }
+	constexpr const_iterator cend() const noexcept { return m_pData + m_nCount; }
 
 	ZvdiMemoryAllocator::ResultType get_allocator()
 	{
@@ -184,7 +276,7 @@ public:
 private:
 	ZvdiMemoryAllocator::ResultType
 	M_GetMemoryAllocator(
-		uint32_t bUsedByThisClass = true,
+		bool bUsedByThisClass = true,
 		void* pStackMem = nullptr)
 	{
 		typedef ZvdiMemoryAllocator::ResultType Result;
@@ -229,10 +321,14 @@ private:
 				if (pAllocator->IsInitialized() == false)
 				{
 					/// @todo log
-					return Result(ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_DARRAY, kZVD_EC_NOPRECOND));
+					return Result(nullptr, ZvdPackedError(kZVD_ES_ERROR, 
+						static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+							kZVD_EC_NOPRECOND));
 				}
 				/// @todo log
-				return Result(ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_DARRAY, kZVD_EC_NOPRECOND));
+				return Result(nullptr, ZvdPackedError(kZVD_ES_ERROR, 
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+						kZVD_EC_NOPRECOND));
 			}
 		}
 #endif // ! zvd as lib only
@@ -246,22 +342,25 @@ private:
 
 			if (TAllocator::CanBeCreatedOnStack() == false)
 			{
-				return Result(ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC, 
-					kZVD_ESRC_CORE_DARRAY, kZVD_EC_NOSTACKALLOCATOR));
+				return Result(nullptr, ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC, 
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+						kZVD_EC_NOSTACKALLOCATOR));
 			}
 			return TAllocator::CreateOnStack(pStackMem);
 		}
 
-		return Result(ZvdPackedError(kZVD_ES_FATAL, kZVD_ESRC_CORE_DARRAY, kZVD_EC_UNACCEPTABLE));
+		return Result(nullptr, ZvdPackedError(kZVD_ES_FATAL, 
+			static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+				kZVD_EC_UNACCEPTABLE));
 	}
 
-	ZvdRegularResult GrowMemory(SizeType nGrowBy)
+	ZvdRegularResult GrowMemory(size_type nGrowBy)
 	{
-		SizeType nNewCount = m_nCount + nGrowBy;
+		size_type nNewCount = m_nCount + nGrowBy;
 
 		if (nNewCount > m_nCapacity)
 		{
-			SizeType nNewCap = TUtil::GrowCapacity(nNewCount, m_nCapacity);
+			size_type nNewCap = TPolicies::GrowCapacity(nNewCount, m_nCapacity);
 
 			ZvdRegularResult retVal = ResizeMemory(nNewCap);
 			if (!retVal.IsOk())
@@ -273,15 +372,215 @@ private:
 		return ZvdRegularResult();
 	}
 
-	ZvdRegularResult M_ResizeMemoryIfData(SizeType nNewCap, ZvdiMemoryAllocator* pMemAlloc)
+	template<typename... TArgs>
+	ZvdRegularResult M_ResizeMemoryAndInsert(iterator position, TArgs&&... args)
 	{
-		ZVD_ASSERT_HIGH_NOMSG(pMemAlloc);
+		static_assert(sizeof...(TArgs) > 0, "M_ResizeMemoryAndInsert requires at least one argument after position!");
+
+		ZvdiMemoryAllocator* pMemAlloc{};
+		ZvdByte allocStorage[ZVD_ALIGNED_TYPE_SIZE(TMemoryAllocator, 0, 16)];
+		ZvdiMemoryAllocator::ResultType allocatorResult = M_GetMemoryAllocator(true, &allocStorage[0]);
+		if (!allocatorResult.IsOk())
+		{
+			return ZvdRegularResult(allocatorResult.Error());
+		}
+		pMemAlloc = allocatorResult.Get();
+		ZVD_ASSERT_MEDIUM_NOMSG(pMemAlloc);
+
+		ZVD_ASSERT_HIGH_NOMSG(m_pData);
+		const size_type nGrowBy{ 1 };
+
+		size_type nNewCap = M_CalculateSafeNewCapacity(nGrowBy, "ZvdcDArray reallocation exceeds max_size()").Get();
+
+		size_type nReqBytes = sizeof(TElement) * nNewCap;
+		ZvdPointerResult<void> memResult = pMemAlloc->Allocate(nReqBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+			, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryAndInsert"
+#endif
+		);
+		if (!memResult.Get())
+		{
+			return ZvdRegularResult(memResult.Error());
+		}
+
+		TElement* pNewMemAsData = (TElement*)memResult.Get();
+		const size_type nInsertIndex = position - begin();
+		const_iterator citInsertPosition = cbegin() + nInsertIndex;
+		iterator itInsertPosition = begin() + nInsertIndex;
+		TElement* pInsertedMem = std::addressof(pNewMemAsData[nInsertIndex]);
+
+		// insert new values
+		try
+		{
+			std::construct_at(pInsertedMem, std::forward<TArgs>(args)...);
+		}
+		catch (...)
+		{
+			ZvdRegularResult retVal = pMemAlloc->Deallocate(pNewMemAsData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+				, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryAndInsert"
+#endif	
+			);
+			if (!retVal.IsOk())
+			{
+				retVal.Error().AddCrashFlag();
+				return retVal;
+			}
+			return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR, 
+				static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+					kZVD_EC_CONSTRUCTEXCEPTION));
+		}
+
+		if constexpr (std::is_nothrow_move_constructible_v<TElement>)
+		{
+			std::uninitialized_move(begin(), itInsertPosition, pNewMemAsData);
+			std::uninitialized_move(itInsertPosition, end(), pInsertedMem + nGrowBy);
+		}
+		else
+		{
+			// insert old values (before)
+			try
+			{
+				std::uninitialized_copy(cbegin(), citInsertPosition, pNewMemAsData);
+			}
+			catch (...)
+			{
+				std::destroy_at(std::addressof(*pInsertedMem));
+				ZvdRegularResult retVal = pMemAlloc->Deallocate(pNewMemAsData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+					, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryAndInsert"
+#endif
+				);
+				if (!retVal.IsOk())
+				{
+					retVal.Error().AddCrashFlag();
+					return retVal;
+				}
+				return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR, 
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+						kZVD_EC_CONSTRUCTEXCEPTION));
+			}
+
+			// insert old values (after)
+			try
+			{
+				std::uninitialized_copy(citInsertPosition, cend(), pInsertedMem + nGrowBy);
+			}
+			catch (...)
+			{
+				std::destroy(pNewMemAsData, pInsertedMem + nGrowBy);
+				ZvdRegularResult retVal = pMemAlloc->Deallocate(pNewMemAsData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+					, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryAndInsert"
+#endif
+				);
+				if (!retVal.IsOk())
+				{
+					retVal.Error().AddCrashFlag();
+					return retVal;
+				}
+				return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR, 
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+						kZVD_EC_CONSTRUCTEXCEPTION));
+			}
+		}
+
+		if (m_pData)
+		{
+			if constexpr (!std::is_trivially_destructible_v<TElement>)
+			{
+				std::destroy(begin(), end());
+			}
+	
+			ZvdRegularResult retVal = pMemAlloc->Deallocate(m_pData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+				, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryAndInsert"
+#endif
+			);
+			if (!retVal.IsOk())
+			{
+				retVal.Error().AddCrashFlag();
+				return retVal;
+			}
+		}
+
+		m_pData = pNewMemAsData;
+		m_nCapacity = nNewCap;
+		m_nCount += nGrowBy;
+
+		return ZvdRegularResult::Ok();
+	}
+
+	ZvdRegularResult ResizeMemory(size_type nNewCap)
+	{
+		if (m_pData)
+		{
+			return M_ResizeMemoryIfData(nNewCap);
+		}
+
+		ZvdiMemoryAllocator* pMemAlloc = nullptr;
+		ZvdByte allocStorage[ZVD_ALIGNED_TYPE_SIZE(TMemoryAllocator, 0, 16)];
+		ZvdiMemoryAllocator::ResultType allocatorResult =
+			M_GetMemoryAllocator(true, &allocStorage[0]);
+		if (!allocatorResult.IsOk())
+		{
+			return ZvdRegularResult(allocatorResult.Error());
+		}
+		pMemAlloc = allocatorResult.Get();
+		ZVD_ASSERT_MEDIUM_NOMSG(pMemAlloc);
+
+		ZVD_ASSERT_HIGH_NOMSG(!m_pData);
+		if (0 == nNewCap)
+		{
+			return ZvdRegularResult::Ok();
+		}
+		ZVD_ASSERT_HIGH_NOMSG(nNewCap > 0);
+
+		size_type nReqBytes = sizeof(TElement) * nNewCap;
+		ZvdPointerResult<void> memResult = pMemAlloc->Allocate(nReqBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+			, __FILE__, __LINE__, "ZvdRcDArray::ResizeMemory"
+#endif
+		);
+		if (!memResult.IsOk())
+		{
+			return ZvdRegularResult(memResult.Error());
+		}
+
+		m_pData = (TElement*)memResult.Get();
+		m_nCapacity = nNewCap;
+		return ZvdRegularResult::Ok();
+	}
+
+	ZvdRegularResult M_ResizeMemoryIfData(size_type nNewCap)
+	{
+		ZvdiMemoryAllocator* pMemAlloc{};
+		ZvdByte allocStorage[ZVD_ALIGNED_TYPE_SIZE(TMemoryAllocator, 0, 16)];
+		ZvdiMemoryAllocator::ResultType allocatorResult = M_GetMemoryAllocator(true, &allocStorage[0]);
+		if (!allocatorResult.IsOk())
+		{
+			return ZvdRegularResult(allocatorResult.Error());
+		}
+		pMemAlloc = allocatorResult.Get();
+		ZVD_ASSERT_MEDIUM_NOMSG(pMemAlloc);
+
 		ZVD_ASSERT_HIGH_NOMSG(m_pData);
 	
 		if (0 == nNewCap)
 		{
-			Clear();
-			ZvdRegularResult retVal = pMemAlloc->Deallocate(m_pData);
+			if (m_nCount > 0)
+			{
+				if constexpr (!std::is_trivially_destructible_v<TElement>)
+				{
+					std::destroy(begin(), end());
+				}
+				m_nCount = 0;
+			}
+			ZvdRegularResult retVal = pMemAlloc->Deallocate(m_pData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+				, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryIfData"
+#endif
+			);
 			if (!retVal.IsOk())
 			{
 				retVal.Error().AddCrashFlag();
@@ -293,83 +592,89 @@ private:
 		}
 
 		ZVD_ASSERT_HIGH_NOMSG(nNewCap);
-		SizeType nReqBytes = sizeof(TElement) * nNewCap;
-		ZvdResult<void*> memResult = pMemAlloc->Allocate(nReqBytes);
+		size_type nReqBytes = sizeof(TElement) * nNewCap;
+		ZvdPointerResult<void> memResult = pMemAlloc->Allocate(nReqBytes
+#ifdef ZVD_CFG_DEBUG_MEMORY
+			, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryIfData"
+#endif
+		);
 		if (!memResult.Get())
 		{
 			return ZvdRegularResult(memResult.Error());
 		}
 
-		TElement* pMemAsData = (TElement*)memResult.Get();
-		for (SizeType i = 0; i < m_nCount; ++i)
+		TElement* pNewMemAsData = (TElement*)memResult.Get();
+		
+		if constexpr (std::is_nothrow_move_constructible_v<TElement>)
 		{
-			TUtil::CopyConstruct(pMemAsData + i, m_pData[i]);
+			std::uninitialized_move(begin(), end(), pNewMemAsData);
 		}
-
-		for (SizeType i = 0; i < m_nCount; ++i)
+		else
 		{
-			TUtil::Destroy(&m_pData[i]);
+			try
+			{
+				std::uninitialized_copy(cbegin(), cend(), pNewMemAsData);
+			}
+			catch (...)
+			{
+				ZvdRegularResult retVal = pMemAlloc->Deallocate(pNewMemAsData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+					, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryIfData"
+#endif			
+				);
+				if (!retVal.IsOk())
+				{
+					retVal.Error().AddCrashFlag();
+					return retVal;
+				}
+				return ZvdRegularResult(ZvdPackedError(kZVD_ES_ERROR,
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+					kZVD_EC_CONSTRUCTEXCEPTION));
+			}
 		}
-
-		ZvdRegularResult retVal = pMemAlloc->Deallocate(m_pData);
+		
+		ZvdRegularResult retVal = pMemAlloc->Deallocate(m_pData
+#ifdef ZVD_CFG_DEBUG_MEMORY
+			, __FILE__, __LINE__, "ZvdRcDArray::M_ResizeMemoryIfData"
+#endif
+		);
 		if (!retVal.IsOk())
 		{
 			retVal.Error().AddCrashFlag();
 			return retVal;
 		}
 		
-		m_pData = pMemAsData;
+		m_pData = pNewMemAsData;
 		m_nCapacity = nNewCap;
-		return ZvdRegularResult();
+		return ZvdRegularResult::Ok();
 	}
 
-	ZvdRegularResult ResizeMemory(SizeType nNewCap)
+	/// <summary>
+	/// Calculates a new, safe capacity required to hold at least nGrowBy.
+	/// Returns the proposed new capacity.
+	/// </summary>
+	ZvdUIndexResult<size_type> M_CalculateSafeNewCapacity(size_type nGrowBy, const char* pDebugComment) const
 	{
-		ZVD_ASSERT_HIGH_NOMSG(nNewCap > 0);
-
-		ZvdiMemoryAllocator* pMemAlloc = nullptr;
-		ZvdByte allocStorage[ZVD_ALIGNED_TYPE_SIZE(TMemoryAllocator, 0, 16)];
-		ZvdiMemoryAllocator::ResultType allocatorResult = 
-			M_GetMemoryAllocator(true, &allocStorage[0]);
-		if (!allocatorResult.IsOk())
+		if (max_size() - size() < nGrowBy)
 		{
-			return ZvdRegularResult(allocatorResult.Error());
-		}
-		pMemAlloc = allocatorResult.Get();
-		ZVD_ASSERT_MEDIUM_NOMSG(pMemAlloc);
-
-		if (m_pData)
-		{
-			return M_ResizeMemoryIfData(nNewCap, pMemAlloc);
+			return ZvdUIndexResult<size_type>(kZVD_INVALID_INDEX,
+				ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC, 
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+						kZVD_EC_LENGTHERROR),
+				pDebugComment);
 		}
 
-		ZVD_ASSERT_HIGH_NOMSG(!m_pData);
+		const size_type nNewCount = m_nCount + nGrowBy;
+		size_type nNewCap = TPolicies::GrowCapacity(nNewCount, m_nCapacity);
 
-		if (nNewCap)
-		{
-			SizeType nReqBytes = sizeof(TElement) * nNewCap;
-			ZvdResult<void*> memResult = pMemAlloc->Allocate(nReqBytes);
-			if (!memResult.IsOk())
-			{
-				return ZvdRegularResult(memResult.Error());
-			}
-
-			m_pData = (TElement*)memResult.Get();
-			m_nCapacity = nNewCap;
-			return ZvdRegularResult();
-		}
-		return ZvdRegularResult(ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC, kZVD_ESRC_CORE_DARRAY, kZVD_EC_UNACCEPTABLE));
+		return (nNewCap > max_size()) ? max_size() : nNewCap;
 	}
-
 // Data members
 private:
-	TElement* m_pData;
-	SizeType m_nCount;
-	SizeType m_nCapacity;
+	TElement* m_pData{};
+	size_type m_nCount{};
+	size_type m_nCapacity{};
 #ifndef ZVD_USE_TDK_AS_LIB_ONLY
-	TMemoryAllocator* m_pMemAlloc; // cached pointer to allocator
+	TMemoryAllocator* m_pMemAlloc{}; // cached pointer to allocator
 #endif
 };
-
-
-#endif // ZVD_DARRAY_H

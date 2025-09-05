@@ -53,17 +53,17 @@ class ZvdcMallocFreeMemoryAllocator : public ZvdiMemoryAllocator
 {
 public:
 	typedef size_t SizeType;
-	typedef ZvdResult<ZvdiMemoryAllocator*> ResultType;
+	using ResultType = ZvdiMemoryAllocator::ResultType;
 
 	virtual ~ZvdcMallocFreeMemoryAllocator() noexcept;
 
-	virtual ZvdResult<void*> Allocate(SizeType nBytes
+	virtual ZvdPointerResult<void> Allocate(SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
 	) noexcept;
 
-	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes
+	virtual ZvdPointerResult<void> Reallocate(void* p, SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
@@ -94,6 +94,16 @@ public:
 	static bool CanBeCreatedOnStack() noexcept;
 	// If subsystem implement these methods:
 	static ResultType CreateOnStack(void* pStackMem) noexcept;
+
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+	static void ResetAllocationsCounter() { s_nAllocationsCount = 0; }
+	static int GetLiveAllocations() { return s_nAllocationsCount; }
+#endif
+
+private:
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+	static int s_nAllocationsCount;
+#endif
 };
 
 #endif // ZVD_MALLOCFREEALLOCATOR_H

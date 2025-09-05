@@ -51,65 +51,7 @@ Purpose: C++ object construction, destroying, moving, copying.
 
 #include "core/base/cpplib/zvdtypetraits.h"
 
-template<class T>
-#ifdef ZVD_CPP14
-constexpr 
-#endif
-void ZvdDestroyAt(T* p)
-{
-#ifdef ZVD_CPP17
-    if constexpr (std::is_array_v<T>)
-        for (auto& elem : *p)
-            (ZvdDestroyAt)(std::addressof(elem));
-    else
-        p->~T();
-#else
-    p->~T();
-#endif
-}
-
-template<typename ForwardIt>
-#ifdef ZVD_CPP14
-constexpr
-#endif
-ForwardIt ZvdDestroyN(ForwardIt itFirst, size_t n)
-{
-    for (; n > 0; (void) ++itFirst, --n)
-        ZvdDestroyAt(std::addressof(*itFirst));
-    return itFirst;
-}
-
-//-----------------------------------------------------------------------------
-template<typename T
-#ifdef ZVD_CPP11
-    , typename ... Args 
-#endif
->
-#ifdef ZVD_CPP14
-constexpr
-#endif
-void ZvdConstruct(T* p
-#ifdef ZVD_CPP11
-    , Args&&... args
-#endif
-)
-{
-    ::new (static_cast<void*>(p)) T(
-#ifdef ZVD_CPP11
-        std::forward<Args>(args)...
-#endif
-    );
-}
-
-//-----------------------------------------------------------------------------
-template<typename T>
-#ifdef ZVD_CPP14
-constexpr
-#endif
-void ZvdCopyConstruct(T* p, const T& val)
-{
-    ::new (static_cast<void*>(p)) T(val);
-}
+#include <memory>
 
 template <typename T,
     size_t(*FNextCapacity)(size_t),
@@ -135,14 +77,10 @@ public:
     }
 };
 
-
-//=============================================================================
-
 template<typename T, size_t KMinCap = 4>
-class ZvdRegularCppObjectUtil
+class ZvdRegularContainerPolicy
 {
 public:
-
     typedef size_t SizeType;
 
     static SizeType NextCapacity(SizeType nCap)
@@ -154,26 +92,6 @@ public:
     {
         return ZvdGrowCapacity<T, NextCapacity, KMinCap>::Evaluate(nNewCount,
             nCurrentCap);
-    }
-
-    static void Destroy(T* p)
-    {
-        ZvdDestroyAt(p);
-    }
-    
-    static void DestroyN(T* pFirst, size_t n)
-    {
-        ZvdDestroyN(pFirst, n);
-    }
-
-    static void Construct(T* p)
-    {
-        ZvdConstruct(p);
-    }
-
-    static void CopyConstruct(T* p, const T& val)
-    {
-        ZvdCopyConstruct(p, val);
     }
 };
 

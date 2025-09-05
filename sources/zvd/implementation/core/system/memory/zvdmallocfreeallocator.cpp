@@ -48,6 +48,10 @@ Purpose: blank file for implementations (.cpp files).
 #include <new>
 
 //-----------------------------------------------------------------------------
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+int ZvdcMallocFreeMemoryAllocator::s_nAllocationsCount;
+#endif
+//-----------------------------------------------------------------------------
 
 ZvdcMallocFreeMemoryAllocator::~ZvdcMallocFreeMemoryAllocator() noexcept
 {
@@ -55,26 +59,29 @@ ZvdcMallocFreeMemoryAllocator::~ZvdcMallocFreeMemoryAllocator() noexcept
 }
 
 //-----------------------------------------------------------------------------
-ZvdResult<void*>
+ZvdPointerResult<void>
 ZvdcMallocFreeMemoryAllocator::Allocate(SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 	, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
 ) noexcept
 {
-	ZvdResult<void*> retVal(ZvdPackedError::Ok(), ::malloc(nBytes));
+	ZvdPointerResult<void> retVal(::malloc(nBytes), ZvdPackedError::Ok());
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+	++s_nAllocationsCount;
+#endif
 	return retVal;
 }
 
 //-----------------------------------------------------------------------------
-ZvdResult<void*>
+ZvdPointerResult<void>
 ZvdcMallocFreeMemoryAllocator::Reallocate(void* p, SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 	, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
 ) noexcept
 {
-	ZvdResult<void*> retVal(ZvdPackedError::Ok(), ::realloc(p, nBytes));
+	ZvdPointerResult<void> retVal(::realloc(p, nBytes), ZvdPackedError::Ok());
 	return retVal;
 }
 
@@ -87,7 +94,10 @@ ZvdcMallocFreeMemoryAllocator::Deallocate(void* p
 ) noexcept
 {
 	::free(p);
-	return ZvdResult<void*>();
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+	--s_nAllocationsCount;
+#endif
+	return ZvdRegularResult();
 }
 
 //-----------------------------------------------------------------------------
@@ -103,8 +113,10 @@ ZvdcMallocFreeMemoryAllocator::IsSingleton() noexcept
 ZvdcMallocFreeMemoryAllocator::ResultType
 ZvdcMallocFreeMemoryAllocator::Instance() noexcept
 {
-	return ResultType(
-		ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
+	return ResultType(nullptr,
+		ZvdPackedError(kZVD_ES_ERROR, 
+			static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_MEMORY), 
+			kZVD_EC_NOIMPL));
 }
 
 //-----------------------------------------------------------------------------
@@ -120,8 +132,10 @@ ZvdcMallocFreeMemoryAllocator::IsSubsystem() noexcept
 ZvdcMallocFreeMemoryAllocator::ResultType
 ZvdcMallocFreeMemoryAllocator::AsSubsystem() noexcept
 {
-	return ResultType(
-		ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
+	return ResultType(nullptr,
+		ZvdPackedError(kZVD_ES_ERROR, 
+			static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_MEMORY), 
+			kZVD_EC_NOIMPL));
 }
 
 //-----------------------------------------------------------------------------
@@ -154,5 +168,5 @@ ZvdcMallocFreeMemoryAllocator::ResultType
 ZvdcMallocFreeMemoryAllocator::CreateOnStack(void* pStackMem) noexcept
 {
 	ZvdiMemoryAllocator* p = ::new(pStackMem) ZvdcMallocFreeMemoryAllocator;
-	return ResultType(ZvdPackedError::Ok(), p);
+	return ResultType(p, ZvdPackedError::Ok());
 }

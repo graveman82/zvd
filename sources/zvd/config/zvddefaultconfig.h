@@ -51,7 +51,7 @@ Created:            jan 11, 2012
 //#define ZVD_CFG_USE_EXCEPTIONS
 #define ZVD_CFG_BUILD_DEBUG
 
-#define ZVD_CFG_DEBUG_MEMORY
+
 
 #define ZVD_CFG_MIN_MSVC_VER 1930
 
@@ -75,4 +75,7 @@ Created:            jan 11, 2012
 //== memory ===================================================================
 
 #define ZVD_CFG_ALLOC_UP_LIMIT (256 * 1024 * 1024)
+#define ZVD_CFG_DEBUG_MEMORY
+#define ZVD_CFG_UNITTEST_MEMORY
+
 #endif // ZVD_DEFAULT_CONFIG_H

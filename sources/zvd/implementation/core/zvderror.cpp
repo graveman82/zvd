@@ -78,7 +78,9 @@ const char* ZvdErrorStatusToCString(ZvdByte nStatus)
 //-----------------------------------------------------------------------------
 ZvdPackedError::ZvdPackedError()
 {
-	Pack(m_retVal, kZVD_ES_FATAL, kZVD_ESRC_UNDEFINED, kZVD_EC_UNACCEPTABLE, false);
+	Pack(m_retVal, kZVD_ES_FATAL,
+		static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kUNDEFINED), 
+		kZVD_EC_UNACCEPTABLE, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -119,7 +121,9 @@ uint16_t ZvdPackedError::Code() const
 //-----------------------------------------------------------------------------
 const ZvdPackedError& ZvdPackedError::Ok()
 {
-	static ZvdPackedError sOk(kZVD_ES_OK, kZVD_ESRC_UNDEFINED, kZVD_EC_UNDEFINED);
+	static ZvdPackedError sOk(kZVD_ES_OK, 
+		static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kUNDEFINED),
+		kZVD_EC_UNDEFINED);
 	return sOk;
 }
 

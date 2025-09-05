@@ -62,6 +62,21 @@ enum ZvdeErrorCodes
 {
 	kZVD_EC_UNKNOWN = kZVD_EC_MAX - 1,
 	kZVD_EC_UNDEFINED = 0,
+ 
+	/// <summary>
+    /// A logic error indicating that an allegedly unreachable code path was executed.
+    /// </summary>
+    /// <remarks>
+    /// This error should be used in places that are not supposed to be reached under
+    /// any normal circumstances, such as the default case of a switch statement
+    /// that is expected to handle all possible enum values.
+    /// Reaching this code signals a critical flaw in program logic.
+    /// </remarks>
+	/// <example><code>
+	/// return ZvdRegularResult(ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC,
+	///			static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+	///			kZVD_EC_UNACCEPTABLE));
+	/// </code></example>
 	kZVD_EC_UNACCEPTABLE,
 	kZVD_EC_NOIMPL,
 	kZVD_EC_NOPRECOND,
@@ -78,6 +93,7 @@ enum ZvdeErrorCodes
 	/// is greater than the container's max_size().
 	/// </summary>
 	kZVD_EC_LENGTHERROR,
+	kZVD_EC_CONSTRUCTEXCEPTION,
 #if 0
 	
 	kZVD_EFX_SPEC0 = 1,

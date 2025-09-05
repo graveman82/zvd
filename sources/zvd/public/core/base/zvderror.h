@@ -190,20 +190,17 @@ private:
 #pragma pack(pop)
 
 
-struct ZvdResultIndexTag {};
-
-
-
-template <typename Tag>
+template <typename Tag, typename... TArgs>
 struct ZvdResult;
 
 #pragma pack(push, 1)
 template <>
 struct ZvdResult<ZvdsDefaultTag>
 {
-	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
-		: m_packedError(packedError)
-		, m_pText(nullptr)
+	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok(),
+		const char* pText = nullptr)
+		: m_packedError{ packedError }
+		, m_pText{ pText }
 	{
 	}
 
@@ -225,16 +222,18 @@ struct ZvdResult<ZvdsDefaultTag>
 	/// <summary>
 	/// A factory method to create a success result object for cleaner code.
 	/// </summary>
-	static ZvdRegularResult Ok()
+	static ZvdResult<ZvdsDefaultTag> Ok()
 	{
 		// It just calls the default constructor which already defaults to an OK state.
-		return ZvdRegularResult();
+		return ZvdResult<ZvdsDefaultTag>();
 	}
 
 	ZvdPackedError m_packedError;
-	const char* m_pText;
+	const char* m_pText{};
 };
 #pragma pack(pop)
+
+
 
 /// <summary>
 /// A generic result object that wraps a ZvdPackedError.
@@ -250,60 +249,56 @@ struct ZvdResult<ZvdsDefaultTag>
 /// </code></example>
 typedef ZvdResult<ZvdsDefaultTag> ZvdRegularResult;
 
+struct ZvdResultIndexTag {};
+
 #pragma pack(push, 1)
-template <>
-struct ZvdResult <ZvdResultIndexTag> : ZvdRegularResult
+template <typename TIndex>
+struct ZvdResult <ZvdResultIndexTag, TIndex> : ZvdResult<ZvdsDefaultTag>
 {
-	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
-		: ZvdResult<ZvdsDefaultTag>(packedError)
-		, m_nIndex(0)
+	ZvdResult(TIndex nIndex = kZVD_INVALID_INDEX, 
+		const ZvdPackedError& packedError = ZvdPackedError::Ok(),
+		const char* pText = nullptr)
+		: ZvdResult<ZvdsDefaultTag>(packedError, pText)
+		, m_nIndex{ nIndex }
 	{
-#if defined(ZVD_ARCH_X64)
 		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];
-#endif
 	}
 
-	ZvdUIndex m_nIndex;
+	TIndex Get() const { return m_nIndex; }
 
-#if defined(ZVD_ARCH_X64)
+	TIndex m_nIndex{};
 	ZvdByte m_pad[4];
-#endif
 }; 
 #pragma pack(pop)
 
+template <typename TIndex>
+using ZvdUIndexResult = ZvdResult <ZvdResultIndexTag, TIndex>;
+
+struct ZvdResultPointerTag {};
+
 #pragma pack(push, 1)
 template <typename T>
-struct ZvdResult<T*> : ZvdRegularResult
+struct ZvdResult<ZvdResultPointerTag, T*> : ZvdRegularResult
 {
-	ZvdResult(const ZvdPackedError& packedError = ZvdPackedError::Ok())
-		: ZvdRegularResult(packedError)
-		, m_ptr(nullptr)
+	ZvdResult(T* ptr = nullptr, 
+		const ZvdPackedError& packedError = ZvdPackedError::Ok(),
+		const char* pText = nullptr)
+		: ZvdRegularResult(packedError, pText)
+		, m_ptr{ptr}
 	{
-#if defined(ZVD_ARCH_X64)
 		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];
-#endif
 	}
 
-	ZvdResult(const ZvdPackedError& packedError, T* ptr)
-		: ZvdRegularResult(packedError)
-		, m_ptr(ptr)
-	{
-#if defined(ZVD_ARCH_X64)
-		m_pad[0] = m_pad[1] = m_pad[2] = m_pad[3];
-#endif
-	}
-
-	
 	T* Get() { return m_ptr; }
 	void Set(T* ptr) { m_ptr = ptr; }
-	T* m_ptr;
 
-#if defined(ZVD_ARCH_X64)
+	T* m_ptr{};
 	ZvdByte m_pad[4];
-#endif
 };
 #pragma pack(pop)
 
+template <typename T>
+using ZvdPointerResult = ZvdResult <ZvdResultPointerTag, T*>;
 
 //-----------------------------------------------------------------------------
 /// <summary>
@@ -313,15 +308,10 @@ struct ZvdResult<T*> : ZvdRegularResult
 /// </summary>
 enum class ZvdeErrorSource : uint8_t
 {
-	kZVD_ESRC_UNDEFINED = 0, // if no error, there is no source
-	kZVD_ESRC_CORE_MEMORY,
-	kZVD_ESRC_CORE_DARRAY,
-	kLangLib,
-	kEngine,
-	kSystem,
-	kMemMng,
-	kGfxDev,
-	kZVD_ESRC_MAX = 127
+	kUNDEFINED = 0, // if no error, there is no source
+	kCORE_MEMORY,
+	kCORE_DARRAY,
+	kMAX = 127
 };
 
 

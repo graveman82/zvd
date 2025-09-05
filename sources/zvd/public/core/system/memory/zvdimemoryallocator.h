@@ -49,22 +49,25 @@ Purpose: memory allocator interface.
 
 #include "core/base/zvderror.h"
 
+#include <type_traits>
+ 
+
 class ZvdiMemoryAllocator
 {
 public:
 	typedef size_t SizeType;
-	typedef ZvdResult<ZvdiMemoryAllocator*> ResultType;
+	using ResultType = ZvdPointerResult<ZvdiMemoryAllocator>;
 
 	virtual ~ZvdiMemoryAllocator() noexcept {}
 
-	virtual ZvdResult<void*> Allocate(SizeType nBytes
+	virtual ZvdPointerResult<void> Allocate(SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
 	) 
 	noexcept = 0;
 
-	virtual ZvdResult<void*> Reallocate(void* p, SizeType nBytes
+	virtual ZvdPointerResult<void> Reallocate(void* p, SizeType nBytes
 #ifdef ZVD_CFG_DEBUG_MEMORY
 		, ZvdCString pSrcFile, int iSrcLine, ZvdCString pFunc
 #endif
@@ -82,8 +85,10 @@ public:
 	// If singleton implement these methods:
 	static ResultType Instance() noexcept
 	{ 
-		return ResultType(
-			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
+		return ResultType(nullptr,
+			ZvdPackedError(kZVD_ES_ERROR | kZVD_EF_BAD_LOGIC,
+				static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_MEMORY), 
+				kZVD_EC_NOIMPL));
 	}
 
 	/// If true this memory allocator is subsystem of some larger system (engine).
@@ -93,8 +98,10 @@ public:
 	//	You can request to engine class for example 
 	static ResultType AsSubsystem() noexcept
 	{ 
-		return ResultType(
-			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
+		return ResultType(nullptr,
+			ZvdPackedError(kZVD_ES_ERROR | kZVD_EF_BAD_LOGIC,
+				static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_MEMORY), 
+				kZVD_EC_NOIMPL));
 	}
 		//
 	virtual bool IsReady() const noexcept { return false; }
@@ -104,8 +111,10 @@ public:
 	// If subsystem implement these methods:
 	static ResultType CreateOnStack(void* pStackMem) noexcept
 	{
-		return ResultType(
-			ZvdPackedError(kZVD_ES_ERROR, kZVD_ESRC_CORE_MEMORY, kZVD_EC_NOIMPL));
+		return ResultType(nullptr,
+			ZvdPackedError(kZVD_ES_ERROR | kZVD_EF_BAD_LOGIC, 
+				static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_MEMORY), 
+				kZVD_EC_NOIMPL));
 	}
 };
 
