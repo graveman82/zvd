@@ -49,7 +49,7 @@ Purpose: blank file for implementations (.cpp files).
 
 //-----------------------------------------------------------------------------
 #ifdef ZVD_CFG_UNITTEST_MEMORY
-int ZvdcMallocFreeMemoryAllocator::s_nAllocationsCount;
+std::unordered_map<void*, size_t> ZvdcMallocFreeMemoryAllocator::s_mActiveAllocations;
 #endif
 //-----------------------------------------------------------------------------
 
@@ -68,7 +68,10 @@ ZvdcMallocFreeMemoryAllocator::Allocate(SizeType nBytes
 {
 	ZvdPointerResult<void> retVal(::malloc(nBytes), ZvdPackedError::Ok());
 #ifdef ZVD_CFG_UNITTEST_MEMORY
-	++s_nAllocationsCount;
+	if (retVal.Get())
+	{
+		s_mActiveAllocations[retVal.Get()] = nBytes;
+	}
 #endif
 	return retVal;
 }
@@ -82,6 +85,20 @@ ZvdcMallocFreeMemoryAllocator::Reallocate(void* p, SizeType nBytes
 ) noexcept
 {
 	ZvdPointerResult<void> retVal(::realloc(p, nBytes), ZvdPackedError::Ok());
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+	if (retVal.Get())
+	{
+		if (p != retVal.Get())
+		{
+			s_mActiveAllocations.erase(p);
+			s_mActiveAllocations[retVal.Get()] = nBytes;
+		}
+		else
+		{
+			s_mActiveAllocations[p] = nBytes;
+		}
+	}
+#endif
 	return retVal;
 }
 
@@ -95,7 +112,10 @@ ZvdcMallocFreeMemoryAllocator::Deallocate(void* p
 {
 	::free(p);
 #ifdef ZVD_CFG_UNITTEST_MEMORY
-	--s_nAllocationsCount;
+	if (p)
+	{
+		s_mActiveAllocations.erase(p);
+	}
 #endif
 	return ZvdRegularResult();
 }

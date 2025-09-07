@@ -49,6 +49,10 @@ Purpose: simple allocator based on malloc/realloc/free routines.
 
 #include "core/system/memory/zvdimemoryallocator.h"
 
+#ifdef ZVD_CFG_UNITTEST_MEMORY
+#include <unordered_map>
+#endif
+
 class ZvdcMallocFreeMemoryAllocator : public ZvdiMemoryAllocator
 {
 public:
@@ -96,13 +100,13 @@ public:
 	static ResultType CreateOnStack(void* pStackMem) noexcept;
 
 #ifdef ZVD_CFG_UNITTEST_MEMORY
-	static void ResetAllocationsCounter() { s_nAllocationsCount = 0; }
-	static int GetLiveAllocations() { return s_nAllocationsCount; }
+	static void ResetAllocationsCounter() { s_mActiveAllocations.clear(); }
+	static size_t GetLiveAllocations() { return s_mActiveAllocations.size(); }
 #endif
 
 private:
 #ifdef ZVD_CFG_UNITTEST_MEMORY
-	static int s_nAllocationsCount;
+	static std::unordered_map<void*, size_t> s_mActiveAllocations;
 #endif
 };
 

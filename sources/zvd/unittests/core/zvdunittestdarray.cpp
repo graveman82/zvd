@@ -52,86 +52,110 @@ namespace zvd
 {
     namespace utest
     {
-        //-----------------------------------------------------------------------------
+        namespace da
+        {
+            //-----------------------------------------------------------------------------
         // Test Fixtures for different types
         //-----------------------------------------------------------------------------
 
         // A helper struct to track nConstructions, nDestructions, nCopies, and nMoves.
-        struct CDCMCounter
-        {
-            static int nConstructions;
-            static int nDestructions;
-            static int nCopies;
-            static int nMoves;
-
-            static void Reset() { nConstructions = nDestructions = nCopies = nMoves = 0; }
-        };
-        int CDCMCounter::nConstructions = 0;
-        int CDCMCounter::nDestructions = 0;
-        int CDCMCounter::nCopies = 0;
-        int CDCMCounter::nMoves = 0;
-
-
-        // SCENARIO 1: Type with a non-throwing (noexcept) move constructor.
-        struct DummyNoexceptMoveOnly : public CDCMCounter
-        {
-            int value{};
-            DummyNoexceptMoveOnly(int v = 0) : value(v) { nConstructions++; }
-            ~DummyNoexceptMoveOnly() { nDestructions++; }
-
-            DummyNoexceptMoveOnly(const DummyNoexceptMoveOnly&) = delete; // No copying allowed
-            DummyNoexceptMoveOnly& operator=(const DummyNoexceptMoveOnly&) = delete;
-
-            DummyNoexceptMoveOnly(DummyNoexceptMoveOnly&& other) noexcept : value(other.value)
+            struct CDCMCounter
             {
-                nMoves++;
-                other.value = -1; // Invalidate the source
-            }
-            DummyNoexceptMoveOnly& operator=(DummyNoexceptMoveOnly&& other) noexcept
+                static int nConstructions;
+                static int nDestructions;
+                static int nCopies;
+                static int nMoves;
+
+                static void Reset() { nConstructions = nDestructions = nCopies = nMoves = 0; }
+            };
+            int CDCMCounter::nConstructions = 0;
+            int CDCMCounter::nDestructions = 0;
+            int CDCMCounter::nCopies = 0;
+            int CDCMCounter::nMoves = 0;
+
+            struct DummyForLeakDet
             {
-                nMoves++;
-                value = other.value;
-                other.value = -1;
-                return *this;
-            }
-        };
+                int nChanges{};
+                std::pair<int, float> val;
 
-        // SCENARIO 2: Type that can only be copied.
-        struct DummyCopyOnly : public CDCMCounter
-        {
-            int value;
-            DummyCopyOnly(int v = 0) : value(v) { nConstructions++; }
-            ~DummyCopyOnly() { nDestructions++; }
-
-            DummyCopyOnly(const DummyCopyOnly& other) : value(other.value) { nCopies++; }
-            DummyCopyOnly& operator=(const DummyCopyOnly& other) { nCopies++; value = other.value; return *this; }
-
-            DummyCopyOnly(DummyCopyOnly&&) = delete; // No moving allowed
-            DummyCopyOnly& operator=(DummyCopyOnly&&) = delete;
-        };
-
-        // SCENARIO 3: Type with a throwing copy constructor.
-        struct DummyThrowingCopy : public CDCMCounter
-        {
-            int value;
-            static int s_nThrowOnCopyAttempt; // The copy construction number on which to throw (from 1)
-
-            DummyThrowingCopy(int v = 0) : value(v) { nConstructions++; }
-            ~DummyThrowingCopy() { nDestructions++; }
-
-            DummyThrowingCopy(const DummyThrowingCopy& other) : value(other.value)
-            {
-                int nAttempt = nCopies + 1;
-                if (nAttempt == s_nThrowOnCopyAttempt)
+                DummyForLeakDet(int i = 0, float f = 0) 
                 {
-                    throw std::runtime_error("Copy constructor failed as planned!");
+                    val.first = i;
+                    val.second = f;
                 }
-                nCopies++;
-            }
-            DummyThrowingCopy& operator=(const DummyThrowingCopy& other) { /*...*/ return *this; }
-        };
-        int DummyThrowingCopy::s_nThrowOnCopyAttempt = -1; // Disabled by default
 
+                DummyForLeakDet(const DummyForLeakDet& oth)
+                {
+                    nChanges++;
+                    val.first = oth.val.first;
+                    val.second = oth.val.second;
+                }
+
+                bool operator==(int i) const
+                {
+                    return val.first == i;
+                }
+            };
+            // SCENARIO 1: Type with a non-throwing (noexcept) move constructor.
+            struct DummyNoexceptMoveOnly : public CDCMCounter
+            {
+                int value{};
+                DummyNoexceptMoveOnly(int v = 0) : value(v) { nConstructions++; }
+                ~DummyNoexceptMoveOnly() { nDestructions++; }
+
+                DummyNoexceptMoveOnly(const DummyNoexceptMoveOnly&) = delete; // No copying allowed
+                DummyNoexceptMoveOnly& operator=(const DummyNoexceptMoveOnly&) = delete;
+
+                DummyNoexceptMoveOnly(DummyNoexceptMoveOnly&& other) noexcept : value(other.value)
+                {
+                    nMoves++;
+                    other.value = -1; // Invalidate the source
+                }
+                DummyNoexceptMoveOnly& operator=(DummyNoexceptMoveOnly&& other) noexcept
+                {
+                    nMoves++;
+                    value = other.value;
+                    other.value = -1;
+                    return *this;
+                }
+            };
+
+            // SCENARIO 2: Type that can only be copied.
+            struct DummyCopyOnly : public CDCMCounter
+            {
+                int value;
+                DummyCopyOnly(int v = 0) : value(v) { nConstructions++; }
+                ~DummyCopyOnly() { nDestructions++; }
+
+                DummyCopyOnly(const DummyCopyOnly& other) : value(other.value) { nCopies++; }
+                DummyCopyOnly& operator=(const DummyCopyOnly& other) { nCopies++; value = other.value; return *this; }
+
+                DummyCopyOnly(DummyCopyOnly&&) = delete; // No moving allowed
+                DummyCopyOnly& operator=(DummyCopyOnly&&) = delete;
+            };
+
+            // SCENARIO 3: Type with a throwing copy constructor.
+            struct DummyThrowingCopy : public CDCMCounter
+            {
+                int value;
+                static int s_nThrowOnCopyAttempt; // The copy construction number on which to throw (from 1)
+
+                DummyThrowingCopy(int v = 0) : value(v) { nConstructions++; }
+                ~DummyThrowingCopy() { nDestructions++; }
+
+                DummyThrowingCopy(const DummyThrowingCopy& other) : value(other.value)
+                {
+                    int nAttempt = nCopies + 1;
+                    if (nAttempt == s_nThrowOnCopyAttempt)
+                    {
+                        throw std::runtime_error("Copy constructor failed as planned!");
+                    }
+                    nCopies++;
+                }
+                DummyThrowingCopy& operator=(const DummyThrowingCopy& other) { /*...*/ return *this; }
+            };
+            int DummyThrowingCopy::s_nThrowOnCopyAttempt = -1; // Disabled by default
+        }
         
     }// eof utest
 } // eof zvd
@@ -148,8 +172,8 @@ class ZvdcUTestDArrayPushBackTest : public ::testing::Test
 protected:
     void SetUp() override 
     {
-        zvd::utest::CDCMCounter::Reset();
-        zvd::utest::DummyThrowingCopy::s_nThrowOnCopyAttempt = -1;
+        zvd::utest::da::CDCMCounter::Reset();
+        zvd::utest::da::DummyThrowingCopy::s_nThrowOnCopyAttempt = -1;
         ZvdcMallocFreeMemoryAllocator::ResetAllocationsCounter();
     }
 
@@ -160,7 +184,7 @@ protected:
     }
 };
 
-TEST_F(ZvdcUTestDArrayPushBackTest, GrowthStrategyIsCorrect)
+TEST_F(ZvdcUTestDArrayPushBackTest, PODGrowthStrategyIsCorrect)
 {
     // Check min capacity of 4 and 1.5x growth factor.
     ZvdcDArray<int> arr;
@@ -189,25 +213,54 @@ TEST_F(ZvdcUTestDArrayPushBackTest, GrowthStrategyIsCorrect)
     }
 }
 
+TEST_F(ZvdcUTestDArrayPushBackTest, GrowthStrategyIsCorrect)
+{
+    // Check min capacity of 4 and 1.5x growth factor.
+    ZvdcDArray<zvd::utest::da::DummyForLeakDet> arr;
+    EXPECT_EQ(arr.capacity(), 0);
+
+    arr.push_back(1); // 0 -> 4 (min capacity)
+    EXPECT_EQ(arr.capacity(), 4);
+
+    arr.push_back(2);
+    arr.push_back(3);
+    arr.push_back(4);
+    EXPECT_EQ(arr.capacity(), 4); // Still fits
+
+    arr.push_back(5); // 4 -> 4 + (4/2) = 6
+    EXPECT_EQ(arr.capacity(), 6);
+
+    arr.push_back(6);
+    EXPECT_EQ(arr.capacity(), 6);
+
+    arr.push_back(7); // 6 -> 6 + (6/2) = 9
+    EXPECT_EQ(arr.capacity(), 9);
+
+    // Verify content
+    for (int i = 0; i < 7; ++i) {
+        EXPECT_EQ(arr[i], i + 1);
+    }
+}
+
 TEST_F(ZvdcUTestDArrayPushBackTest, HandlesNoexceptMoveCorrectly)
 {
     // Test that the array prefers moving over copying.
-    ZvdcDArray<zvd::utest::DummyNoexceptMoveOnly> arr;
+    ZvdcDArray<zvd::utest::da::DummyNoexceptMoveOnly> arr;
     arr.reserve(2); // Start with a known capacity
 
-    arr.push_back(zvd::utest::DummyNoexceptMoveOnly(10));
-    arr.push_back(zvd::utest::DummyNoexceptMoveOnly(20));
+    arr.push_back(zvd::utest::da::DummyNoexceptMoveOnly(10));
+    arr.push_back(zvd::utest::da::DummyNoexceptMoveOnly(20));
 
     // Reset counters to ignore initial nConstructions
-    zvd::utest::CDCMCounter::Reset();
+    zvd::utest::da::CDCMCounter::Reset();
 
     // This push_back will trigger a reallocation.
     // It must use MOVE, not COPY.
-    arr.push_back(zvd::utest::DummyNoexceptMoveOnly(30));
+    arr.push_back(zvd::utest::da::DummyNoexceptMoveOnly(30));
 
-    EXPECT_EQ(zvd::utest::CDCMCounter::nConstructions, 1); // For the new object DummyNoexceptMoveOnly(30)
-    EXPECT_EQ(zvd::utest::CDCMCounter::nCopies, 0); // MUST be zero
-    EXPECT_GE(zvd::utest::CDCMCounter::nMoves, 2);  // At least 2 nMoves for the old elements
+    EXPECT_EQ(zvd::utest::da::CDCMCounter::nConstructions, 1); // For the new object DummyNoexceptMoveOnly(30)
+    EXPECT_EQ(zvd::utest::da::CDCMCounter::nCopies, 0); // MUST be zero
+    EXPECT_GE(zvd::utest::da::CDCMCounter::nMoves, 2);  // At least 2 nMoves for the old elements
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr[2].value, 30);
 }
@@ -215,24 +268,24 @@ TEST_F(ZvdcUTestDArrayPushBackTest, HandlesNoexceptMoveCorrectly)
 TEST_F(ZvdcUTestDArrayPushBackTest, HandlesCopyOnlyCorrectly)
 {
     // Test that the array falls back to copying for copy-only types.
-    ZvdcDArray<zvd::utest::DummyCopyOnly> arr;
+    ZvdcDArray<zvd::utest::da::DummyCopyOnly> arr;
     arr.reserve(2);
 
-    zvd::utest::DummyCopyOnly obj1(10);
+    zvd::utest::da::DummyCopyOnly obj1(10);
     arr.push_back(obj1);
-    zvd::utest::DummyCopyOnly obj2(20);
+    zvd::utest::da::DummyCopyOnly obj2(20);
     arr.push_back(obj2);
 
-    zvd::utest::CDCMCounter::Reset();
+    zvd::utest::da::CDCMCounter::Reset();
 
     // This push_back will trigger a reallocation.
     // It MUST use COPY.
-    zvd::utest::DummyCopyOnly obj3(30);
+    zvd::utest::da::DummyCopyOnly obj3(30);
     arr.push_back(obj3);
 
-    EXPECT_EQ(zvd::utest::CDCMCounter::nConstructions, 1); // For the new object DummyCopyOnly(30)
-    EXPECT_GE(zvd::utest::CDCMCounter::nCopies, 2);  // At least 2 nCopies for the old elements
-    EXPECT_EQ(zvd::utest::CDCMCounter::nMoves, 0); // MUST be zero
+    EXPECT_EQ(zvd::utest::da::CDCMCounter::nConstructions, 1); // For the new object DummyCopyOnly(30)
+    EXPECT_GE(zvd::utest::da::CDCMCounter::nCopies, 2);  // At least 2 nCopies for the old elements
+    EXPECT_EQ(zvd::utest::da::CDCMCounter::nMoves, 0); // MUST be zero
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr[2].value, 30);
 }
@@ -240,21 +293,21 @@ TEST_F(ZvdcUTestDArrayPushBackTest, HandlesCopyOnlyCorrectly)
 TEST_F(ZvdcUTestDArrayPushBackTest, IsExceptionSafeDuringReallocation)
 {
     // The most important test: verify strong exception safety.
-    ZvdcDArray<zvd::utest::DummyThrowingCopy> arr;
+    ZvdcDArray<zvd::utest::da::DummyThrowingCopy> arr;
     arr.reserve(4);
 
     // Let's make the 3rd copy (when copying element with value=3) throw.
     // Total nCopies: 4 old, copy new, copy elem 0, copy elem 1, copy elem 2 (throws!)
-    zvd::utest::DummyThrowingCopy::s_nThrowOnCopyAttempt = 8;
+    zvd::utest::da::DummyThrowingCopy::s_nThrowOnCopyAttempt = 8;
 
-    arr.push_back(zvd::utest::DummyThrowingCopy(1));
-    arr.push_back(zvd::utest::DummyThrowingCopy(2));
-    arr.push_back(zvd::utest::DummyThrowingCopy(3));
-    arr.push_back(zvd::utest::DummyThrowingCopy(4));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(1));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(2));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(3));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(4));
 
  
     // The next push_back will reallocate.
-    zvd::utest::DummyThrowingCopy obj5(5);
+    zvd::utest::da::DummyThrowingCopy obj5(5);
     ZvdRegularResult result;
     // We expect our push_back to catch the exception and return an error code.
     result = arr.push_back(obj5);
@@ -263,7 +316,7 @@ TEST_F(ZvdcUTestDArrayPushBackTest, IsExceptionSafeDuringReallocation)
     // 3 elements were successfully constructed in the new buffer before the exception.
     // Our exception-safe algorithm MUST destroy these 3 elements during rollback.
     // So, we expect 7 destructor calls.
-    EXPECT_EQ(zvd::utest::CDCMCounter::nDestructions, 7);
+    EXPECT_EQ(zvd::utest::da::CDCMCounter::nDestructions, 7);
 
     // Check the result
     EXPECT_FALSE(result.IsOk());
@@ -282,21 +335,21 @@ TEST_F(ZvdcUTestDArrayPushBackTest, IsExceptionSafeDuringReallocation)
 TEST_F(ZvdcUTestDArrayPushBackTest, IsExceptionSafeDuringReallocation2)
 {
     // The most important test: verify strong exception safety.
-    ZvdcDArray<zvd::utest::DummyThrowingCopy> arr;
+    ZvdcDArray<zvd::utest::da::DummyThrowingCopy> arr;
     arr.reserve(4);
 
     // Let's make the 3rd copy (when copying element with value=3) throw.
     // Total nCopies: 4 old, copy new (throws!)
-    zvd::utest::DummyThrowingCopy::s_nThrowOnCopyAttempt = 5;
+    zvd::utest::da::DummyThrowingCopy::s_nThrowOnCopyAttempt = 5;
 
-    arr.push_back(zvd::utest::DummyThrowingCopy(1));
-    arr.push_back(zvd::utest::DummyThrowingCopy(2));
-    arr.push_back(zvd::utest::DummyThrowingCopy(3));
-    arr.push_back(zvd::utest::DummyThrowingCopy(4));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(1));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(2));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(3));
+    arr.push_back(zvd::utest::da::DummyThrowingCopy(4));
 
 
     // The next push_back will reallocate.
-    zvd::utest::DummyThrowingCopy obj5(5);
+    zvd::utest::da::DummyThrowingCopy obj5(5);
     ZvdRegularResult result;
     // We expect our push_back to catch the exception and return an error code.
     result = arr.push_back(obj5);
@@ -305,7 +358,7 @@ TEST_F(ZvdcUTestDArrayPushBackTest, IsExceptionSafeDuringReallocation2)
     // 0 elements were successfully constructed in the new buffer before the exception.
     // Our exception-safe algorithm MUST destroy these 0 elements during rollback.
     // So, we expect 4 destructor calls.
-    EXPECT_EQ(zvd::utest::CDCMCounter::nDestructions, 4);
+    EXPECT_EQ(zvd::utest::da::CDCMCounter::nDestructions, 4);
 
     // Check the result
     EXPECT_FALSE(result.IsOk());
