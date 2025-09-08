@@ -471,10 +471,17 @@ private:
 		return M_ResizeMemoryAndInsert(end(), std::forward<TWithDecor>(val));
 	}
 
-	// not finished
 	template<typename TWithDecor>
 	IteratorResult M_InsertInPlace(iterator pos, TWithDecor&& val)
 	{
+		// === FACE CONTROL ===
+		// This method is only allowed for types that can be moved without throwing exceptions.
+		// If you try to use insert() with a type that has a throwing move constructor/assignment,
+		// this will cause a COMPILE-TIME error.
+		static_assert(std::is_nothrow_move_constructible_v<TElement> &&
+			std::is_nothrow_move_assignable_v<TElement>,
+			"ZvdcDArray::insert requires a nothrow-movable type for safety and performance.");
+
 		ZVD_ASSERT_HIGH(m_nCount + 1 <= m_nCapacity, "M_InsertInPlace called with no capacity");
 
 		const size_type nIndexToInsert = pos - begin();
@@ -488,59 +495,11 @@ private:
 		}
 		else
 		{
-			pointer pEnd = m_pData + m_nCount;
-			pointer pInsertTo = m_pData + nIndexToInsert;
-			if constexpr (std::is_nothrow_move_constructible_v<TElement>)
-			{
-				std::construct_at(pEnd, std::move(pEnd - 1));
-				std::move_backward(pInsertTo, pEnd - 1, pEnd);
-				m_pData[nIndexToInsert] = std::move(val);
-			}
-			else
-			{
-				pointer pDstLast{ pEnd };
-				pointer pSrcLast{ pEnd - 1 };
-				size_type nMoved{}; // for error message
-				try
-				{
-					while (pInsertTo != pSrcLast)
-					{
-						std::construct_at(pDstLast, std::addressof(*pSrcLast));
-						std::destroy_at(pSrcLast);
-						++nMoved;
-						--pSrcLast;
-						--pDstLast;
-					} 
-					std::construct_at(pDstLast, std::addressof(*pSrcLast));
-					++nMoved;
-				}
-				catch (...)
-				{
-					if (pDstLast != pEnd)
-					{
-						std::destroy(pSrcLast + 1, pEnd + 1);
-					}
-					
-					return IteratorResult(nullptr, ZvdPackedError(kZVD_ES_ERROR,
-						static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
-						kZVD_EC_CONSTRUCTEXCEPTION));
-				}
-			}
-			
-			try
-			{
-				std::construct_at(pInsertTo, val);
-			}
-			catch (...)
-			{
-				std::destroy(pInsertTo + 1, pEnd + 1);
-
-				return IteratorResult(nullptr, ZvdPackedError(kZVD_ES_ERROR,
-					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
-					kZVD_EC_CONSTRUCTEXCEPTION));
-			}
+			std::construct_at(std::addressof(m_pData[m_nCount]), std::move(back()));
+			std::move_backward(pos, end() - 1, end());
+			*pos = std::forward<TWithDecor>(val);
 			m_nCount++;
-			return IteratorResult(pInsertTo, ZvdPackedError::Ok());
+			return IteratorResult(m_pData + nIndexToInsert, ZvdPackedError::Ok());
 		}
 
 		ZVD_ASSERT_HIGH_NOMSG(false);
