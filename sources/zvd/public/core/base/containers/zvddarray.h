@@ -56,6 +56,7 @@ template <typename TElement,
 	typename TPolicies = ZvdRegularContainerPolicy<TElement>>
 class ZvdcDArray
 {
+	using IteratorResult = ZvdPointerResult<TElement>;
 public:
 	typedef size_t size_type;
 	typedef TElement value_type;
@@ -180,7 +181,7 @@ public:
 	/// Inserts an element at a specific position.
 	/// This is the dispatcher method.
 	/// </summary>
-	iterator insert(const_iterator position, const TElement& val)
+	IteratorResult insert(const_iterator position, const TElement& val)
 	{
 		// Calculate the index from the iterator before any potential reallocation
 		const size_type nInsertIndex = position - cbegin();
@@ -188,18 +189,26 @@ public:
 
 		if (m_nCount < m_nCapacity)
 		{
-			M_InsertInPlace(itInsertTo, val);
+			IteratorResult retVal = M_InsertInPlace(itInsertTo, val);
+			if (!retVal.IsOk())
+			{
+				return retVal;
+			}
 		}
 		else
 		{
-			M_ResizeMemoryAndInsert(itInsertTo, val);
+			ZvdPointerResult<TElement> retVal = M_ResizeMemoryAndInsert(itInsertTo, val);
+			if (!retVal.IsOk())
+			{
+				return IteratorResult(nullptr, retVal.Error());
+			}
 		}
 
-		return itInsertTo;
+		return IteratorResult(itInsertTo, ZvdPackedError::Ok());
 	}
 
 	// Move overload for insert
-	iterator insert(const_iterator position, TElement&& value)
+	IteratorResult insert(const_iterator position, TElement&& value)
 	{
 		const size_type nInsertIndex = position - cbegin();
 		iterator itInsertTo = begin() + nInsertIndex;
@@ -464,33 +473,80 @@ private:
 
 	// not finished
 	template<typename TWithDecor>
-	void M_InsertInPlace(iterator pos, TWithDecor&& val)
+	IteratorResult M_InsertInPlace(iterator pos, TWithDecor&& val)
 	{
-		ZVD_ASSERT_HIGH(m_nCount < m_nCapacity, "M_InsertInPlace called with no capacity");
+		ZVD_ASSERT_HIGH(m_nCount + 1 <= m_nCapacity, "M_InsertInPlace called with no capacity");
 
-		// If we are inserting at the end, it's just a push_back
+		const size_type nIndexToInsert = pos - begin();
+
 		if (pos == end())
 		{
-			std::construct_at(std::addressof(m_pData[m_nCount]), std::forward<TWithDecor>(val));
+			ZvdRegularResult pbipResult = M_PushBackInPlace(std::forward<TWithDecor>(val));
+			iterator it = pbipResult.IsOk ? m_pData + nIndexToInsert : nullptr;
+			IteratorResult retVal(it, pbipResult.Error());
+			return retVal;
 		}
 		else
 		{
-			// We need to make a hole.
-			// 1. Construct a temporary object at the very end.
-			std::construct_at(std::addressof(m_pData[m_nCount]), std::move(m_pData[m_nCount - 1]));
-
-			// 2. Move-assign elements from right to left to shift them.
-			// from [insert_index, end-1)
-			for (size_type i = m_nCount - 1; i > nInsertIndex; --i)
+			pointer pEnd = m_pData + m_nCount;
+			pointer pInsertTo = m_pData + nIndexToInsert;
+			if constexpr (std::is_nothrow_move_constructible_v<TElement>)
 			{
-				m_pData[i] = std::move(m_pData[i - 1]);
+				std::construct_at(pEnd, std::move(pEnd - 1));
+				std::move_backward(pInsertTo, pEnd - 1, pEnd);
+				m_pData[nIndexToInsert] = std::move(val);
 			}
+			else
+			{
+				pointer pDstLast{ pEnd };
+				pointer pSrcLast{ pEnd - 1 };
+				size_type nMoved{}; // for error message
+				try
+				{
+					while (pInsertTo != pSrcLast)
+					{
+						std::construct_at(pDstLast, std::addressof(*pSrcLast));
+						std::destroy_at(pSrcLast);
+						++nMoved;
+						--pSrcLast;
+						--pDstLast;
+					} 
+					std::construct_at(pDstLast, std::addressof(*pSrcLast));
+					++nMoved;
+				}
+				catch (...)
+				{
+					if (pDstLast != pEnd)
+					{
+						std::destroy(pSrcLast + 1, pEnd + 1);
+					}
+					
+					return IteratorResult(nullptr, ZvdPackedError(kZVD_ES_ERROR,
+						static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+						kZVD_EC_CONSTRUCTEXCEPTION));
+				}
+			}
+			
+			try
+			{
+				std::construct_at(pInsertTo, val);
+			}
+			catch (...)
+			{
+				std::destroy(pInsertTo + 1, pEnd + 1);
 
-			// 3. Place the new value in the created hole.
-			m_pData[nInsertIndex] = std::forward<TWithDecor>(val);
+				return IteratorResult(nullptr, ZvdPackedError(kZVD_ES_ERROR,
+					static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY),
+					kZVD_EC_CONSTRUCTEXCEPTION));
+			}
+			m_nCount++;
+			return IteratorResult(pInsertTo, ZvdPackedError::Ok());
 		}
 
-		m_nCount++;
+		ZVD_ASSERT_HIGH_NOMSG(false);
+		IteratorResult(nullptr, ZvdPackedError(kZVD_ES_FATAL | kZVD_EF_BAD_LOGIC,
+			static_cast<std::underlying_type_t<ZvdeErrorSource>>(ZvdeErrorSource::kCORE_DARRAY), 
+			kZVD_EC_UNACCEPTABLE));
 	}
 
 	ZvdRegularResult M_GrowMemory(size_type nGrowBy)
